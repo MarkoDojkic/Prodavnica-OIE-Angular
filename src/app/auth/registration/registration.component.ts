@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-registration',
@@ -10,6 +11,14 @@ export class RegistrationComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  onRegister(form: NgForm): void {
+    console.log(form.value);
+  }
+
+  onFormReset(form: NgForm): void {
+    form.reset();
   }
 
 }
