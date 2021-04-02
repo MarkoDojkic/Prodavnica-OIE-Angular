@@ -1,12 +1,53 @@
-<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%"
+<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.5%"
 #form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)">
-    <mat-form-field>
-        <input type="email" ngModel matInput placeholder="Email" name="Email"/>
-    </mat-form-field>
+
+    <div fxLayout="row" fxLayoutGap="5%">
+        <mat-form-field>
+            <input type="text" ngModel matInput placeholder="Name" name="name"/>
+        </mat-form-field>
+
+        <mat-form-field>
+            <input type="text" ngModel matInput placeholder="Surname" name="surname"/>
+        </mat-form-field>
+    </div>
+
+    <div fxLayout="row" fxLayoutGap="5%">
+        <mat-form-field>
+            <input type="email" ngModel matInput placeholder="Email" name="email"/>
+        </mat-form-field>
+
+        <mat-form-field>
+            <input type="password" ngModel matInput placeholder="Password" name="password"/>
+        </mat-form-field>
+    </div>
 
     <mat-form-field>
-        <input type="password" ngModel matInput placeholder="Password" name="Password"/>
+        <input type="text" ngModel matInput placeholder="Phone" name="phone"/>
     </mat-form-field>
+
+    <div fxLayout="row" fxLayoutGap="5%">
+        <mat-form-field>
+            <input type="text" ngModel matInput placeholder="Address" name="address"/>
+        </mat-form-field>
+        
+        <mat-form-field>
+            <input type="number" ngModel matInput placeholder="PAK" name="pak"/>
+        </mat-form-field>
+    </div>
+
+    <mat-form-field style="width: 50%">
+        <input type="text" ngModel matInput placeholder="Број кредитне картице/адреса новчаника крипто валуте:" name="paymentAddress"/>
+    </mat-form-field>
+
+    <div fxLayout="row" fxLayoutGap="3%">
+        <mat-radio-group fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" ngModel name="paymentType" *ngFor="let paymentType of paymentTypes">
+            <mat-radio-button ngModel value="{{paymentType}}">
+                {{paymentType}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
+
+    <mat-checkbox ngModel matInput name="wantsToBeSubscribed">Желим да се претплатим на новости</mat-checkbox>
 
     <div fxLayout="row" fxLayoutGap="5%">
         <button type="submit" mat-stroked-button color="primary">Submit</button>
