@@ -1,15 +1,21 @@
-<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%"
-#form="ngForm" (ngSubmit)="onLogin(form)" (ngReset)="onFormReset(form)">
-    <mat-form-field>
-        <input type="email" ngModel matInput placeholder="Email" name="Email"/>
+<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="3%"
+#form="ngForm" (ngSubmit)="onLogin(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
+    <mat-form-field appearance="outline">
+        <mat-label>Адреса електронске поште</mat-label>
+        <input type="email" ngModel matInput name="email"/>
+        <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+        <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
     </mat-form-field>
 
-    <mat-form-field>
-        <input type="password" ngModel matInput placeholder="Password" name="Password"/>
+    <mat-form-field appearance="outline">
+        <mat-label>Лозинка</mat-label>
+        <input type="password" ngModel matInput name="password"/>
+        <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+        <mat-hint>пр. secretPassword123</mat-hint>
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <button type="submit" mat-stroked-button color="primary">Submit</button>
-        <button type="reset" mat-stroked-button color="warn">Reset</button>
+        <button type="submit" mat-stroked-button color="primary">Улогуј ме</button>
+        <button type="reset" mat-stroked-button color="warn">Обриши све</button>
     </div>
 </form>
