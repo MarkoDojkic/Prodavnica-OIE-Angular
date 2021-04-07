@@ -1,48 +1,83 @@
-<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.5%"
-#form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)">
+<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.2%"
+#form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <mat-form-field>
-            <input type="text" ngModel matInput placeholder="Name" name="name"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Име</mat-label>
+            <input type="text" ngModel matInput name="name"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. Марко</mat-hint>
         </mat-form-field>
 
-        <mat-form-field>
-            <input type="text" ngModel matInput placeholder="Surname" name="surname"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Презиме</mat-label>
+            <input type="text" ngModel matInput name="surname"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. Дојкић</mat-hint>
         </mat-form-field>
     </div>
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <mat-form-field>
-            <input type="email" ngModel matInput placeholder="Email" name="email"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Адреса електронске поште</mat-label>
+            <input type="email" ngModel matInput name="email"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
         </mat-form-field>
 
-        <mat-form-field>
-            <input type="password" ngModel matInput placeholder="Password" name="password"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Број телефона</mat-label>
+            <input type="text" ngModel matInput name="phone"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. 0651234567 или +381651234567</mat-hint>
         </mat-form-field>
     </div>
 
-    <mat-form-field>
-        <input type="text" ngModel matInput placeholder="Phone" name="phone"/>
-    </mat-form-field>
+    <div fxLayout="row" fxLayoutGap="5%">
+        <mat-form-field appearance="outline">
+            <mat-label>Лозинка</mat-label>
+            <input type="password" ngModel matInput name="password"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. secretPassword123</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Понови лозинку</mat-label>
+            <input type="password" ngModel matInput name="password"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>Треба да се слаже са лозинком у пољу лево</mat-hint>
+        </mat-form-field>
+    </div>
+
+    
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <mat-form-field>
-            <input type="text" ngModel matInput placeholder="Address" name="address"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Адреса за доставу</mat-label>
+            <input type="text" ngModel matInput name="deliveryAddress"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. Данијелова 32</mat-hint>
         </mat-form-field>
         
-        <mat-form-field>
-            <input type="number" ngModel matInput placeholder="PAK" name="pak"/>
+        <mat-form-field appearance="outline">
+            <mat-label>Поштански адресни код</mat-label>
+            <input type="number" ngModel matInput name="deliveryPAK"/>
+            <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+            <mat-hint>пр. 456789</mat-hint>
         </mat-form-field>
     </div>
 
-    <mat-form-field style="width: 50%">
-        <input type="text" ngModel matInput placeholder="Број кредитне картице/адреса новчаника крипто валуте:" name="paymentAddress"/>
+    <mat-form-field style="width: 36%">
+        <mat-label>Број кредитне картице/адреса новчаника крипто валуте</mat-label>
+        <input type="text" ngModel matInput name="paymentAddress"/>
+        <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+        <mat-hint>пр. 7891 4412 6634 7110 или 3NEdQPmA6rfqTTm3f1WHtkXbdxv3i9mZZY</mat-hint>
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="3%">
-        <mat-radio-group fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" ngModel name="paymentType" *ngFor="let paymentType of paymentTypes">
-            <mat-radio-button ngModel value="{{paymentType}}">
-                {{paymentType}}
+        <mat-radio-group fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId">
+            <mat-radio-button ngModel value="{{ paymentId }}">
+                {{ paymentType }}
             </mat-radio-button>
         </mat-radio-group>
     </div>
@@ -50,7 +85,7 @@
     <mat-checkbox ngModel matInput name="wantsToBeSubscribed">Желим да се претплатим на новости</mat-checkbox>
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <button type="submit" mat-stroked-button color="primary">Submit</button>
-        <button type="reset" mat-stroked-button color="warn">Reset</button>
+        <button type="submit" mat-stroked-button color="primary">Региструј ме</button>
+        <button type="reset" mat-stroked-button color="warn">Обриши све</button>
     </div>
 </form>

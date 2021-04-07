@@ -10,8 +10,6 @@ export class RegistrationComponent implements OnInit {
 
   constructor() { }
 
-  paymentTypes = [ "MasterCard", "Visa", "American Express", "Bitcoin", "Ethereum", "Monero" ];
-
   ngOnInit(): void {
   }
 

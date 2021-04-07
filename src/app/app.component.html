@@ -1,18 +1,12 @@
 <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%">
-    <span routerLink="/">Продавница ОИЕ</span>
+    <span>Продавница ОИЕ</span>
     <button mat-stroked-button routerLink="/login">
-        <mat-icon>login</mat-icon> Login   
+        <mat-icon>login</mat-icon> Логовање   
     </button>
     <button mat-stroked-button routerLink="/registration">
-        <mat-icon>person_add</mat-icon> Registration
+        <mat-icon>person_add</mat-icon> Регистрација
     </button>
-    <button mat-button [matMenuTriggerFor]="languageMenu" ng-model="language" ng-change="changeLanguage(eng)"> {{ selectedLanguage }} </button>
-    <mat-menu #languageMenu="matMenu" xPosition="after">
-        <button mat-menu-item click="changeLanguage(eng)">English</button>
-        <button mat-menu-item ng-click="changeLanguage(srcyl)">Српски - ћирилица</button>
-        <button mat-menu-item ng-click="changeLanguage(srlat)">Srpski - latinica</button>
-    </mat-menu>
-    <mat-slide-toggle checked="isDark">Light/Dark</mat-slide-toggle>
+    <mat-slide-toggle (change)="onDarkModeChange($event)" >Активирај тамни режим</mat-slide-toggle>
     <span>© 2021 Марко Дојкић</span>
 </mat-toolbar>
 <router-outlet></router-outlet>

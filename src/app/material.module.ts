@@ -20,7 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
         MatMenuModule,
         MatRadioModule,
         MatCheckboxModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
     ],
     exports: [
         MatButtonModule,
