@@ -14,7 +14,7 @@ export class RegistrationComponent implements OnInit {
   }
 
   onRegister(form: NgForm): void {
-    console.log(form.value);
+    console.log("Успешно регистрован нови корисник" + form.value);
   }
 
   onFormReset(form: NgForm): void {
