@@ -1,67 +1,84 @@
-<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.2%"
+<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="0.7%"
 #form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
-
     <div fxLayout="row" fxLayoutGap="5%">
         <mat-form-field appearance="outline">
             <mat-label>Име</mat-label>
-            <input type="text" ngModel matInput name="name"/>
+            <input type="text" ngModel matInput name="name" #nameInput="ngModel" required/>
             <mat-hint>пр. Марко</mat-hint>
+            <mat-error *ngIf="nameInput.hasError('required')">Поље имена не сме бити празно</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
             <mat-label>Презиме</mat-label>
-            <input type="text" ngModel matInput name="surname"/>
+            <input type="text" ngModel matInput name="surname" #surnameInput="ngModel" required/>
             <mat-hint>пр. Дојкић</mat-hint>
+            <mat-error *ngIf="surnameInput.hasError('required')">Поље презимена не сме бити празно</mat-error>
         </mat-form-field>
     </div>
 
+    <mat-form-field appearance="outline" style="width: 36%">
+        <mat-label>Адреса електронске поште</mat-label>
+        <input type="email" email ngModel matInput name="email" #emailInput="ngModel" required/>
+        <mat-icon matSuffix>alternate_email</mat-icon>
+        <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
+        <mat-error *ngIf="emailInput.hasError('required')">Поље адресе електронске поште не сме бити празно</mat-error>
+        <mat-error *ngIf="!emailInput.hasError('required')">Није исправан формат адресе електронске поште</mat-error>
+    </mat-form-field>
+
     <div fxLayout="row" fxLayoutGap="5%">
         <mat-form-field appearance="outline">
-            <mat-label>Адреса електронске поште</mat-label>
-            <input type="email" ngModel matInput name="email"/>
-            <mat-icon matSuffix>alternate_email</mat-icon>
-            <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
             <mat-label>Број телефона</mat-label>
-            <input type="text" ngModel matInput name="phone"/>
+            <input type="text" ngModel matInput name="phone" #phone="ngModel" [required]="mobilePhone.value?.length == 0"/>
+            <mat-icon matSuffix>phone</mat-icon>
+            <mat-hint>пр. 0111234567 или +381111234567</mat-hint>
+            <mat-error *ngIf="phone.hasError('required')">Поље фиксног броја телефона не сме бити празно</mat-error>
+        </mat-form-field>
+    
+        <mat-form-field appearance="outline">
+            <mat-label>Број мобилног телефона</mat-label>
+            <input type="text" ngModel matInput name="mobilePhone" #mobilePhone="ngModel" [required]="phone.value?.length == 0"/>
             <mat-icon matSuffix>phone</mat-icon>
             <mat-hint>пр. 0651234567 или +381651234567</mat-hint>
+            <mat-error *ngIf="mobilePhone.hasError('required')">Поље мобилног броја телефона не сме бити празно</mat-error>
         </mat-form-field>
     </div>
 
     <div fxLayout="row" fxLayoutGap="5%">
         <mat-form-field appearance="outline">
             <mat-label>Лозинка</mat-label>
-            <input type="password" ngModel matInput name="password"/>
+            <input type="password" ngModel matInput name="password" #passwordInput="ngModel" minlength="8" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>пр. secretPassword123</mat-hint>
+            <mat-error *ngIf="passwordInput.hasError('required')">Поље лозинке не сме бити празно</mat-error>
+            <mat-error *ngIf="passwordInput.value?.length > 0 && passwordInput.value?.length < 8">Лозинка мора садржати минимум 8 карактера</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
             <mat-label>Понови лозинку</mat-label>
-            <input type="password" ngModel matInput name="password"/>
+            <input type="password" ngModel matInput name="passwordRepeat" #passwordInputRepeat="ngModel" minlength="8" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>Треба да се слаже са лозинком у пољу лево</mat-hint>
+            <mat-error *ngIf="passwordInputRepeat.hasError('required')">Поље поновне лозинке не сме бити празно</mat-error>
+            <mat-error *ngIf="passwordInputRepeat.value != passwordInput.value">Поље се не подудара са лозинком у пољу поред</mat-error>
         </mat-form-field>
     </div>
-
-    
 
     <div fxLayout="row" fxLayoutGap="5%">
         <mat-form-field appearance="outline">
             <mat-label>Адреса за доставу</mat-label>
-            <input type="text" ngModel matInput name="deliveryAddress"/>
+            <input type="text" ngModel matInput name="deliveryAddress" #shippingAddress="ngModel" [required]="shippingPak.value?.length < 6 && shippingPak.value?.length > 6"/>
             <mat-icon matSuffix>location_on</mat-icon>
             <mat-hint>пр. Данијелова 32</mat-hint>
-        </mat-form-field>
+            <mat-error *ngIf="shippingAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
+            <mat-error *ngIf="!shippingAddress.hasError('required') && shippingAddress.value?.length < 10">Поље се не подудара са лозинком у пољу поред</mat-error>
+        </mat-form-field>                                   <!-- Temp, should update with regex -->
         
         <mat-form-field appearance="outline">
             <mat-label>Поштански адресни код</mat-label>
-            <input type="number" ngModel matInput name="deliveryPAK"/>
+            <input type="number" ngModel matInput name="deliveryPAK" #shippingPak="ngModel" minlength="6" [required]="shippingAddress.invalid"/>
             <mat-icon matSuffix>local_post_office</mat-icon>
             <mat-hint>пр. 456789</mat-hint>
+            <mat-error *ngIf="shippingPak.hasError('required')">Поље ПАК броја не сме бити празно уколико адреса за доставу није наведена</mat-error>
         </mat-form-field>
     </div>
 
@@ -83,7 +100,7 @@
     <mat-checkbox ngModel matInput name="wantsToBeSubscribed">Желим да се претплатим на новости</mat-checkbox>
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <button type="submit" mat-stroked-button color="primary">Региструј ме</button>
+        <button type="submit" mat-stroked-button color="primary" [disabled]="form.invalid">Региструј ме</button>
         <button type="reset" mat-stroked-button color="warn">Обриши све</button>
     </div>
 </form>
