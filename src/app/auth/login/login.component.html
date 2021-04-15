@@ -2,20 +2,24 @@
 #form="ngForm" (ngSubmit)="onLogin(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <mat-form-field appearance="outline">
         <mat-label>Адреса електронске поште</mat-label>
-        <input type="email" ngModel matInput name="email"/>
+        <input type="email" ngModel matInput email name="email" #emailInput="ngModel" required/>
         <mat-icon matSuffix>alternate_email</mat-icon>
         <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
+        <mat-error *ngIf="emailInput.hasError('required')">Поље не сме бити празно</mat-error>
+        <mat-error *ngIf="!emailInput.hasError('required')">Није исправан формат е-маијл адресе</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
         <mat-label>Лозинка</mat-label>
-        <input type="password" ngModel matInput name="password"/>
+        <input type="password" ngModel matInput name="password" #passwordInput="ngModel" minlength="8" required/>
         <mat-icon matSuffix>lock</mat-icon>
         <mat-hint>пр. secretPassword123</mat-hint>
+        <mat-error *ngIf="passwordInput.hasError('required')">Поље не сме бити празно</mat-error>
+        <mat-error *ngIf="passwordInput.value?.length > 0 && passwordInput.value?.length < 8">Лозинка мора садржати минимум 8 карактера</mat-error>
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="5%">
-        <button type="submit" mat-stroked-button color="primary">Улогуј ме</button>
+        <button type="submit" mat-stroked-button color="primary" [disabled]="form.invalid">Улогуј ме</button>
         <button type="reset" mat-stroked-button color="warn">Обриши све</button>
     </div>
 </form>

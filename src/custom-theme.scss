@@ -71,7 +71,7 @@ $fontConfig: (
 // Foreground Elements
 
 // Light Theme Text
-$dark-text: #22b87f;
+$dark-text: #1a8c61;
 $dark-primary-text: rgba($dark-text, 0.87);
 $dark-accent-text: rgba($dark-primary-text, 0.54);
 $dark-disabled-text: rgba($dark-primary-text, 0.38);
@@ -98,7 +98,7 @@ $mat-light-theme-foreground: (
 );
 
 // Dark Theme text
-$light-text: #f79c18;
+$light-text: #db8c17;
 $light-primary-text: $light-text;
 $light-accent-text: rgba($light-primary-text, 0.7);
 $light-disabled-text: rgba($light-primary-text, 0.5);
@@ -167,7 +167,7 @@ $light-bg-alpha-12:   rgba(#f8ffa1, 0.12);
 $mat-dark-theme-background: (
   background:               $dark-background,
   status-bar:               $dark-bg-lighter-20,
-  app-bar:                  $dark-bg-lighter-5,
+  app-bar:                  $dark-bg-lighter-10,
   hover:                    $light-bg-alpha-4,
   card:                     $dark-bg-lighter-5,
   dialog:                   $dark-bg-lighter-5,
@@ -197,7 +197,7 @@ body {
 }
 
 $mat-primary: (
-  main: #24f901,
+  main: #24d209,
   lighter: #c2f790,
   darker: #5ce903,
   200: #24f901, // For slide toggle,
@@ -251,10 +251,49 @@ $mat-warn: (
     darker: $light-primary-text,
   )
 );
-$theme-warn: mat-palette($mat-warn, main, lighter, darker);;
+$theme-warn: mat-palette($mat-warn, main, lighter, darker);
+
+$mat-primary-dark: (
+  main: #d28809,
+  lighter: #f7d590,
+  darker: #e9b703,
+  200: #f9c301, // For slide toggle,
+  contrast : (
+    main: $dark-primary-text,
+    lighter: $dark-primary-text,
+    darker: $dark-primary-text,
+  )
+);
+$theme-primary-dark: mat-palette($mat-primary-dark, main, lighter, darker);
+
+$mat-accent-dark: (
+  main: #eb5c1e,
+  lighter: #f78d60,
+  darker: #f38015,
+  200: #eb6d1e, // For slide toggle,
+  contrast : (
+    main: $dark-primary-text,
+    lighter: $dark-primary-text,
+    darker: $dark-primary-text,
+  )
+);
+$theme-accent-dark: mat-palette($mat-accent-dark, main, lighter, darker);
+
+$mat-warn-dark: (
+  main: #f7643b,
+  lighter: #f1aca1,
+  darker: #eb2902,
+  200: #f74e3b, // For slide toggle,
+  contrast : (
+    main: $dark-primary-text,
+    lighter: $dark-primary-text,
+    darker: $light-primary-text,
+  )
+);
+$theme-warn-dark: mat-palette($mat-warn-dark, main, lighter, darker);
 
 $theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
-$darkTheme: mat-dark-theme($theme-primary, $theme-accent, $theme-warn);
+$darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-dark);
 
 // Theme Init
 
@@ -279,7 +318,7 @@ form { height: 95%; background-color: darkslategray; }
   min-width: 3em;
   line-height: 36.4px
 }
-
+//#1b1917
 .mat-standard-chip {
   padding: .5em .85em;
   min-height: 2.5em;
