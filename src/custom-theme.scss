@@ -299,10 +299,24 @@ $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-
 
 .theme-light {
   @include angular-material-theme($theme);
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: mat-color(map-get(mat-get-color-config($theme), foreground), text);
+    transition: background-color 5000s ease-in-out 0s;
+  } /* To remove autocomplete background on some browsers */
 }
 
 .theme-dark {
   @include angular-material-theme($darkTheme);
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: mat-color(map-get(mat-get-color-config($darkTheme), foreground), text);
+    transition: background-color 5000s ease-in-out 0s;
+  } /* To remove autocomplete background on some browsers */
 }
 
 // Specific component overrides, pieces that are not in line with the general theming
