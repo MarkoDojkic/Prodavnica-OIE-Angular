@@ -14,7 +14,8 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(form: NgForm): void {
-    console.log("Корисник са следећим параметрима покушава да се улогује" + form.value);
+    console.log("Корисник са следећим параметрима покушава да се улогује:");
+    console.log(form.value);
   }
 
   onFormReset(form: NgForm): void {
