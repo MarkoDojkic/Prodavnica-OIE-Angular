@@ -1,11 +1,25 @@
-<mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayoutGap.lt-md="1%" fxLayout.lt-sm="0.2%">
-    <span fxFlex>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
-    <button mat-stroked-button routerLink="/login" fxFlex>
-        <mat-icon>login</mat-icon> Логовање   
-    </button>
-    <button mat-stroked-button routerLink="/registration" fxFlex>
-        <mat-icon>person_add</mat-icon> Регистрација
-    </button>
-    <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" fxFlex>Активирај тамни режим</mat-slide-toggle>
-</mat-toolbar>
+<div [hidden]="isLoggedIn">
+    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayoutGap.lt-md="1%" fxLayout.lt-sm="0.2%">
+        <span fxFlex>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+        <button mat-stroked-button routerLink="/login" fxFlex>
+            <mat-icon>login</mat-icon> Логовање   
+        </button>
+        <button mat-stroked-button routerLink="/registration" fxFlex>
+            <mat-icon>person_add</mat-icon> Регистрација
+        </button>
+        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" fxFlex>Активирај тамни режим</mat-slide-toggle>
+    </mat-toolbar>
+</div>
+<div [hidden]="!isLoggedIn">
+    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayoutGap.lt-md="1%" fxLayout.lt-sm="0.2%">
+        <span fxFlex>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+        <button mat-stroked-button routerLink="/profilePage" fxFlex>
+            <mat-icon>person_pin</mat-icon> Профилна страница   
+        </button>
+        <button mat-stroked-button (click)="onLogout()" color="warn" fxFlex>
+            <mat-icon>person_outline</mat-icon> Излогуј ме <!-- Here should be name and surname of logged in user -->
+        </button>
+        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" fxFlex>Активирај тамни режим</mat-slide-toggle>
+    </mat-toolbar>
+</div>
 <router-outlet></router-outlet>
