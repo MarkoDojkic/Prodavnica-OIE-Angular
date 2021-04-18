@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "prodavnica-oie-angular": {
+      "hosting": {
+        "prodavnica-oie-angular": [
+          "prodavnica-oie-angular"
+        ]
+      }
+    }
+  }
+}
