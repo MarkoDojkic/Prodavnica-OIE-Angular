@@ -11,7 +11,7 @@
 
     <mat-form-field appearance="outline">
         <mat-label>Лозинка</mat-label>
-        <input type="password" ngModel matInput name="password" #passwordInput="ngModel" minlength="8" required/>
+        <input type="password" ngModel matInput autocomplete="prodavnica-oie-password" name="password" #passwordInput="ngModel" minlength="8" required/>
         <mat-icon matSuffix>lock</mat-icon>
         <mat-hint>пр. secretPassword123</mat-hint>
         <mat-error *ngIf="passwordInput.hasError('required')">Поље лозинке не сме бити празно</mat-error>
