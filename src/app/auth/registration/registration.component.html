@@ -71,18 +71,18 @@
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Адреса за доставу</mat-label>
             <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" 
-                    ngModel matInput name="deliveryAddress" #shippingAddress="ngModel" [required]="shippingPak.invalid || shippingPak.pristine">
+                    ngModel matInput name="deliveryAddress" #deliveryAddressAddress="ngModel" [required]="deliveryAddressPak.invalid || deliveryAddressPak.pristine">
             <mat-icon matSuffix>location_on</mat-icon>
             <mat-hint>пр. Данијелова 32 или Цара Душана 75d или Вудроа Вилсона ББ</mat-hint>
-            <mat-error *ngIf="shippingAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
+            <mat-error *ngIf="deliveryAddressAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
         </mat-form-field>
         <!-- Checking this group of fields has bugs in some edge cases -->
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Поштански адресни код</mat-label>
-            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="shippingPAK" #shippingPak="ngModel" [required]="shippingAddress.invalid || shippingAddress.pristine"/>
+            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="deliveryAddressPAK" #deliveryAddressPak="ngModel" [required]="deliveryAddressAddress.invalid || deliveryAddressAddress.pristine"/>
             <mat-icon matSuffix>local_post_office</mat-icon>
             <mat-hint>пр. 456789</mat-hint>
-            <mat-error *ngIf="shippingPak.hasError('required')">Поље ПАК броја не сме бити празно уколико адреса за доставу није наведена</mat-error>
+            <mat-error *ngIf="deliveryAddressPak.hasError('required')">Поље ПАК броја не сме бити празно уколико адреса за доставу није наведена</mat-error>
         </mat-form-field>
     </div>
 

@@ -1,0 +1,17 @@
+html {
+    background-color: orange;
+    transform: none;
+    text-align: center;
+}
+
+h1 {
+    color: red;
+}
+
+div {
+    justify-content: center;
+}
+
+div > button {
+    background-color: orangered;
+}

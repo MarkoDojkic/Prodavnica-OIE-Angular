@@ -13,12 +13,15 @@ export class AppComponent implements OnInit {
   //Code from: https://www.c-sharpcorner.com/article/angular-dynamic-page-title-based-on-route/
 
   isDarkMode: Boolean;
+  isLoggedIn: Boolean;
 
   constructor(private router: Router,  
     private activatedRoute: ActivatedRoute,  
     private titleService: Title) { }
 
-  ngOnInit() {  
+  ngOnInit() {
+    this.isLoggedIn = sessionStorage.getItem('loggedInUserId') !== undefined;
+    console.log(this.isLoggedIn);
     this.router.events.pipe(  
       filter(event => event instanceof NavigationEnd),  
     ).subscribe(() => {  
@@ -26,7 +29,7 @@ export class AppComponent implements OnInit {
       rt.data.subscribe(data => { this.titleService.setTitle(data.title) });  
     });
     this.isDarkMode = true; /* Initially dark mode is on */
-    if (this.router.getCurrentNavigation.length === 0) this.router.navigate(["/login"]) //If / => redirect to login
+    if (this.router.url === "/") this.router.navigate(["/profilePage"]);
   }  
 
   getChild(activatedRoute: ActivatedRoute) {  
@@ -38,7 +41,16 @@ export class AppComponent implements OnInit {
   get currentThemeMode() {
     return this.isDarkMode ? "theme-dark" : "theme-light";
   }
+
   onDarkModeChange(e) {
     this.isDarkMode = e.checked;
   }
+
+  onLogout() {
+    this.isLoggedIn = false;
+    sessionStorage.clear();
+    this.router.navigate(["/login"]);
+  }
 }
+
+
