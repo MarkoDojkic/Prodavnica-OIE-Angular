@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
 
   //Code from: https://www.c-sharpcorner.com/article/angular-dynamic-page-title-based-on-route/
 
-  private isDarkMode;
+  isDarkMode: Boolean;
 
   constructor(private router: Router,  
     private activatedRoute: ActivatedRoute,  
@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
       const rt = this.getChild(this.activatedRoute);  
       rt.data.subscribe(data => { this.titleService.setTitle(data.title) });  
     });
-    this.isDarkMode = false;
+    this.isDarkMode = true; /* Initially dark mode is on */
     if (this.router.getCurrentNavigation.length === 0) this.router.navigate(["/login"]) //If / => redirect to login
   }  
 

@@ -1,4 +1,4 @@
-<form fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1.2%"
+<form fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1.2%" fxLayoutGap.lt-md="2.2%"
 #form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
@@ -23,60 +23,63 @@
             <mat-icon matSuffix>alternate_email</mat-icon>
             <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
             <mat-error *ngIf="emailInput.hasError('required')">Поље адресе електронске поште не сме бити празно</mat-error>
-            <mat-error *ngIf="!emailInput.hasError('required')">Није исправан формат адресе електронске поште</mat-error>
+            <mat-error *ngIf="emailInput.hasError('pattern')">Није исправан формат адресе електронске поште</mat-error>
         </mat-form-field>
     </div>
 
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Број телефона</mat-label>
-            <input type="text" pattern="^(0|\+381)(([1-3][0-9])|(230)|(280)|(290)|(390))[0-9]{7}$" ngModel matInput name="phone" #phone="ngModel" [required]="mobilePhone.value?.length == 0"/>
+            <input type="text" pattern="^(0|\+381)(([1-3][0-9])|(230)|(280)|(290)|(390))[0-9]{7}$" ngModel matInput name="phone" #phone="ngModel" [required]="mobilePhone.invalid || mobilePhone.pristine"/>
             <mat-icon matSuffix>phone</mat-icon>
             <mat-hint>пр. 0111234567 или +381111234567</mat-hint>
-            <mat-error *ngIf="phone.hasError('required')">Поље фиксног броја телефона не сме бити празно</mat-error>
+            <mat-error *ngIf="phone.hasError('required')">Поље фиксног броја телефона не сме бити празно ако није унет број мобилног телефона</mat-error>
+            <mat-error *ngIf="phone.hasError('pattern')">Није исправан формат фиксног броја телефона</mat-error>
         </mat-form-field>
     
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Број мобилног телефона</mat-label>
-            <input type="text" pattern="^(0|\+381)6[0-69][0-9]{7}$" ngModel matInput name="mobilePhone" #mobilePhone="ngModel" [required]="phone.value?.length == 0"/>
+            <input type="text" pattern="^(0|\+381)6[0-69][0-9]{7}$" ngModel matInput name="mobilePhone" #mobilePhone="ngModel" [required]="phone.invalid || phone.pristine"/>
             <mat-icon matSuffix>phone</mat-icon>
             <mat-hint>пр. 0651234567 или +381651234567</mat-hint>
-            <mat-error *ngIf="mobilePhone.hasError('required')">Поље мобилног броја телефона не сме бити празно</mat-error>
+            <mat-error *ngIf="mobilePhone.hasError('required')">Поље мобилног броја телефона не сме бити празно ако није унет број фиксног телефона</mat-error>
+            <mat-error *ngIf="mobilePhone.hasError('pattern')">Није исправан формат мобилног броја телефона</mat-error>
         </mat-form-field>
     </div>
 
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Лозинка</mat-label>
-            <input type="password" ngModel matInput name="password" #passwordInput="ngModel" minlength="8" required/>
+            <input type="password" ngModel matInput autocomplete="prodavnica-oie-new-password" name="password" #passwordInput="ngModel" minlength="8" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>пр. secretPassword123</mat-hint>
             <mat-error *ngIf="passwordInput.hasError('required')">Поље лозинке не сме бити празно</mat-error>
-            <mat-error *ngIf="passwordInput.value?.length > 0 && passwordInput.value?.length < 8">Лозинка мора садржати минимум 8 карактера</mat-error>
+            <mat-error *ngIf="passwordInput.hasError('minlength')">Лозинка мора садржати минимум 8 карактера</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Понови лозинку</mat-label>
-            <input type="password" ngModel matInput name="passwordRepeat" #passwordInputRepeat="ngModel" minlength="8" required/>
+            <input type="password" ngModel matInput autocomplete="prodavnica-oie-new-password" name="passwordRepeat" #passwordInputRepeat="ngModel" (ngModelChange)="checkPasswordRepeat(passwordInput, passwordInputRepeat)" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>Иста лозинка као у пољу поред</mat-hint>
             <mat-error *ngIf="passwordInputRepeat.hasError('required')">Поље поновне лозинке не сме бити празно</mat-error>
-            <mat-error *ngIf="passwordInputRepeat.value != passwordInput.value">Поље се не подудара са лозинком у пољу поред</mat-error>
+            <mat-error *ngIf="passwordInputRepeat.hasError('matched')">Поље се не подудара са лозинком у пољу поред</mat-error>
         </mat-form-field>
     </div>
 
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Адреса за доставу</mat-label>
-            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" ngModel matInput name="deliveryAddress" #shippingAddress="ngModel" [required]="shippingPak.invalid"/>
+            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" 
+                    ngModel matInput name="deliveryAddress" #shippingAddress="ngModel" [required]="shippingPak.invalid || shippingPak.pristine">
             <mat-icon matSuffix>location_on</mat-icon>
             <mat-hint>пр. Данијелова 32 или Цара Душана 75d или Вудроа Вилсона ББ</mat-hint>
             <mat-error *ngIf="shippingAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
         </mat-form-field>
-        
+        <!-- Checking this group of fields has bugs in some edge cases -->
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Поштански адресни код</mat-label>
-            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="deliveryPAK" #shippingPak="ngModel" [required]="shippingAddress.invalid"/>
+            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="shippingPAK" #shippingPak="ngModel" [required]="shippingAddress.invalid || shippingAddress.pristine"/>
             <mat-icon matSuffix>local_post_office</mat-icon>
             <mat-hint>пр. 456789</mat-hint>
             <mat-error *ngIf="shippingPak.hasError('required')">Поље ПАК броја не сме бити празно уколико адреса за доставу није наведена</mat-error>
@@ -86,22 +89,23 @@
     <div>
         <mat-form-field fxFlexFill>
             <mat-label>Број кредитне картице/адреса новчаника крипто валуте</mat-label>
-            <input type="text" ngModel matInput name="paymentAddress"/>
+            <input type="text" pattern="{{ paymentPattern }}" ngModel matInput name="paymentAddress" [disabled]="paymentPattern == null" required/>
             <mat-icon matSuffix>payment</mat-icon>
-            <mat-hint>пр. 7891 4412 6634 7110/3NEdQPmA6rfqTTm3f1WHtkXbdxv3i9mZZY</mat-hint>
-        </mat-form-field> <!-- Add pattern and make editable acording to selected paymentType (initiali disabled!!) -->
+            <mat-hint>{{ paymentHint }}</mat-hint>
+            <mat-error>{{ paymentErrorMessage }}</mat-error>
+        </mat-form-field>
     </div>
 
-    <section fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="center center" fxLayoutGap="3%">
-        <mat-radio-group ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId">
-            <mat-radio-button ngModel value="{{ paymentId }}">
+    <section fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="center start" fxLayoutGap="3%" fxLayoutGap.lt-md="1.5%">
+        <mat-radio-group ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId" required>
+            <mat-radio-button ngModel value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)">
                 {{ paymentType }}
             </mat-radio-button>
         </mat-radio-group>
     </section>
 
     <section fxLayout="row" fxLayoutGap="5%">
-        <button type="submit" mat-stroked-button color="primary" [disabled]="form.invalid">Региструј ме</button> <!-- Disabled if form is invalid -->
+        <button type="submit" mat-stroked-button color="primary" [disabled]="!checkRequiredFields(form)">Региструј ме</button> <!-- Disabled if form is invalid -->
         <button type="reset" mat-stroked-button color="warn" [disabled]="form.pristine">Обриши све</button> <!-- Disabled if form isn't modified -->
     </section>
 </form>
