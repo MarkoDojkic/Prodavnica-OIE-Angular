@@ -1,9 +1,11 @@
 import { CryptoService } from './../crypto/crypto.service';
 import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FormGroup, NgForm, NgModel } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { RegistrationSuccessDialogComponent } from 'src/app/popupDialogs/registration-success-dialog/registration-success-dialog.component';
+import { RegistrationFailedDialogComponent } from 'src/app/popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
 
 @Component({
   selector: 'app-registration',
@@ -17,34 +19,33 @@ export class RegistrationComponent implements OnInit {
   paymentHint: String;
   paymentErrorMessage: String;
 
-  constructor(private firestore: AngularFirestore, private cs: CryptoService, private dialog: MatDialog) { }
+  constructor(private auth: AngularFireAuth,private firestore: AngularFirestore, private cs: CryptoService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.paymentPattern = this.paymentHint = this.paymentErrorMessage = null;
   }
 
   onRegister(form: NgForm): void {
-    const newUserId = this.firestore.createId();
-
-    this.firestore.firestore.runTransaction(() => {
-      const promise = Promise.all([
-        this.firestore.collection("users").doc(newUserId).set({
-          "name": form.controls["name"].value,
-          "surname": form.controls["surname"].value,
-          "email": form.controls["email"].value,
-          "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
-          "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
-          "password": this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY", form.controls["password"].value),
-          "address": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
-          "addressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
-          "paymentId": form.controls["paymentType"].value,
-          "paymentAddress": form.controls["paymentAddress"].value
-        })
-      ]);
-      return promise;
-    });
-    
-    this.dialog.open(RegistrationSuccessDialogComponent);
+    this.auth.createUserWithEmailAndPassword(form.controls["email"].value, this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY",
+        form.controls["password"].value)).then((result) => {
+          /* result.user.sendEmailVerification(); */
+          this.firestore.firestore.runTransaction(() => {
+            return this.firestore.collection("users").doc(result.user.uid).set({
+              "name": form.controls["name"].value,
+              "surname": form.controls["surname"].value,
+              "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
+              "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
+              "address": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
+              "addressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
+              "paymentId": form.controls["paymentType"].value,
+              "paymentAddress": form.controls["paymentAddress"].value
+            })
+          }).then(() => { this.dialog.open(RegistrationSuccessDialogComponent); })
+    }).catch((error) => {
+      console.log(error);
+      this.dialog.open(RegistrationFailedDialogComponent);
+      return;
+    })
   }
 
   onFormReset(form: NgForm): void {

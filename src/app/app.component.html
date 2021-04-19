@@ -1,25 +1,75 @@
 <div [hidden]="isLoggedIn">
-    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayoutGap.lt-md="1%" fxLayout.lt-sm="0.2%">
-        <span fxFlex>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
-        <button mat-stroked-button routerLink="/login" fxFlex>
-            <mat-icon>login</mat-icon> Логовање   
-        </button>
-        <button mat-stroked-button routerLink="/registration" fxFlex>
-            <mat-icon>person_add</mat-icon> Регистрација
-        </button>
-        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" fxFlex>Активирај тамни режим</mat-slide-toggle>
+    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayout.lt-sm="15%">
+        <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+        
+        <div [fxHide.lt-sm]="true" fxFlex="75" fxLayoutGap="2%">
+            <button mat-stroked-button routerLink="/shop" fxFlex>
+                <mat-icon>store</mat-icon> Продавница   
+            </button>
+            <button mat-stroked-button routerLink="/login" fxFlex>
+                <mat-icon>login</mat-icon> Логовање   
+            </button>
+            <button mat-stroked-button routerLink="/registration" fxFlex>
+                <mat-icon>person_add</mat-icon> Регистрација
+            </button>
+        </div>
+
+        <div [fxHide.gt-xs]="true" fxFlex="45" fxLayoutGap="15%">
+            <button mat-icon-button routerLink="/shop" fxFlex>
+                <mat-icon>store</mat-icon>
+            </button>
+            <button mat-icon-button routerLink="/login" fxFlex>
+                <mat-icon>login</mat-icon>   
+            </button>
+            <button mat-icon-button routerLink="/registration" fxFlex>
+                <mat-icon>person_add</mat-icon>
+            </button>
+        </div>
+
+        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" [fxFlex.gt-sm]="8" [fxFlex.lt-sm]="20">Тамни<br>режим</mat-slide-toggle>
     </mat-toolbar>
 </div>
 <div [hidden]="!isLoggedIn">
-    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayoutGap.lt-md="1%" fxLayout.lt-sm="0.2%">
-        <span fxFlex>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
-        <button mat-stroked-button routerLink="/profilePage" fxFlex>
-            <mat-icon>person_pin</mat-icon> Профилна страница   
-        </button>
-        <button mat-stroked-button (click)="onLogout()" color="warn" fxFlex>
-            <mat-icon>person_outline</mat-icon> Излогуј ме <!-- Here should be name and surname of logged in user -->
-        </button>
-        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" fxFlex>Активирај тамни режим</mat-slide-toggle>
+    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%">
+        <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+        
+        <div [fxHide.lt-sm]="true" fxFlex="75" fxLayoutGap="2%">
+            <button mat-stroked-button routerLink="/shop" fxFlex>
+                <mat-icon>store</mat-icon> Продавница   
+            </button>
+            <button mat-stroked-button routerLink="/order" fxFlex>
+                <mat-icon>receipt</mat-icon> Поруџбине   
+            </button>
+            <button mat-icon-button routerLink="/cart" fxFlex="5">
+                <mat-icon matBadge="0" matBadgeColor="warn">shopping_cart</mat-icon>
+            </button>
+            <button mat-stroked-button routerLink="/profile" fxFlex>
+                <mat-icon>person</mat-icon> Профил
+            </button>
+            <button mat-stroked-button (click)="onLogout()" color="warn" fxFlex>
+                <mat-icon>person_outline</mat-icon> Излогуј ме
+            </button>
+        </div>
+
+        <div [fxHide.gt-xs]="true" fxFlex="55" fxLayoutGap="4%">
+            <button mat-icon-button routerLink="/shop" fxFlex>
+                <mat-icon>store</mat-icon>
+            </button>
+            <button mat-icon-button routerLink="/orders" fxFlex>
+                <mat-icon>receipt</mat-icon>
+            </button>
+            <button mat-icon-button routerLink="/cart">
+                <mat-icon matBadge="0" matBadgeColor="warn">shopping_cart</mat-icon>
+            </button>
+            <button mat-icon-button routerLink="/profile" fxFlex>
+                <mat-icon>person</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onLogout()" color="warn" fxFlex>
+                <mat-icon>person_outline</mat-icon>
+            </button>
+        </div>
+
+        <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" [fxFlex.gt-sm]="8" [fxFlex.lt-sm]="20">Тамни<br>режим</mat-slide-toggle>
     </mat-toolbar>
 </div>
 <router-outlet></router-outlet>
