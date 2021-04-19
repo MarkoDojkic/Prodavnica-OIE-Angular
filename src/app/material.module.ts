@@ -9,6 +9,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatBadgeModule } from '@angular/material/badge';
 
 
 
@@ -23,7 +24,8 @@ import { MatDialogModule } from '@angular/material/dialog';
         MatRadioModule,
         MatCheckboxModule,
         MatSlideToggleModule,
-        MatDialogModule
+        MatDialogModule,
+        MatBadgeModule
     ],
     exports: [
         MatButtonModule,
@@ -35,7 +37,8 @@ import { MatDialogModule } from '@angular/material/dialog';
         MatRadioModule,
         MatCheckboxModule,
         MatSlideToggleModule,
-        MatDialogModule
+        MatDialogModule,
+        MatBadgeModule
     ]
 })
 

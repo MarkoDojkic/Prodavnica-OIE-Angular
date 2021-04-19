@@ -17,6 +17,11 @@ import { RegistrationSuccessDialogComponent } from './popupDialogs/registration-
 import { LoginSuccessDialogComponent } from './popupDialogs/login-success-dialog/login-success-dialog.component';
 import { LoginFailedDialogComponent } from './popupDialogs/login-failed-dialog/login-failed-dialog.component';
 import { ProfilePageComponent } from './main/profile-page/profile-page.component';
+import { RegistrationFailedDialogComponent } from './popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
+import { NgxWebstorageModule } from 'ngx-webstorage';
+import { ShopComponent } from './main/shop/shop.component';
+import { CartComponent } from './main/cart/cart.component';
+import { OrderComponent } from './main/order/order.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +31,11 @@ import { ProfilePageComponent } from './main/profile-page/profile-page.component
     RegistrationSuccessDialogComponent,
     LoginSuccessDialogComponent,
     LoginFailedDialogComponent,
-    ProfilePageComponent
+    ProfilePageComponent,
+    RegistrationFailedDialogComponent,
+    ShopComponent,
+    CartComponent,
+    OrderComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +45,8 @@ import { ProfilePageComponent } from './main/profile-page/profile-page.component
     FlexLayoutModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    NgxWebstorageModule.forRoot(),
   ],
   providers: [Title, CryptoService],
   bootstrap: [AppComponent]
