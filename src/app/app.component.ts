@@ -23,8 +23,6 @@ export class AppComponent implements OnInit {
     this.isLoggedIn = (this.localStorageS.retrieve("loggedInUserId") === undefined
                           || this.localStorageS.retrieve("loggedInUserId") !== null)
 
-    console.log(this.localStorageS.retrieve("loggedInUserId"));
-
     this.localStorageS.observe("loggedInUserId").subscribe((value) => {
       this.isLoggedIn = (value !== undefined || value !== null);
     });
@@ -38,8 +36,6 @@ export class AppComponent implements OnInit {
     });
 
     this.isDarkMode = true; /* Initially dark mode is on */
-    
-    if (this.router.url === "/") this.router.navigate(["/shop"]);
   }  
 
   getChild(activatedRoute: ActivatedRoute) {  
