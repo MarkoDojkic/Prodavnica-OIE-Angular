@@ -1,9 +1,12 @@
+import { UpdateProfileFailedDialogComponent } from './../../popupDialogs/update-profile-failed-dialog/update-profile-failed-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 import { AbstractControl, NgForm, NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { UpdateProfileSuccessDialogComponent } from 'src/app/popupDialogs/update-profile-success-dialog/update-profile-success-dialog.component';
 
 @Component({
   selector: 'app-profile-page',
@@ -28,16 +31,27 @@ export class ProfilePageComponent implements OnInit {
   constructor(private router: Router,
     private auth: AngularFireAuth,
     private firestore: AngularFirestore,
-    private localStorageS: LocalStorageService) { }
+    private localStorageS: LocalStorageService,
+    private dialog: MatDialog) { }
 
   ngOnInit(): void {
     if (this.localStorageS.retrieve("loggedInUserId") === undefined
       || this.localStorageS.retrieve("loggedInUserId") === null)
       this.router.navigate(["/login"]);
-    this.auth.signInAndRetrieveDataWithCredential(this.localStorageS.retrieve("loggedInUserId")).then(() => {
-      this.firestore.collection("users").doc(this.localStorageS.retrieve("loggedInUserId")).get().forEach((row) => {
-        console.log(row.data);
-      })
+    
+    this.auth.user.subscribe(user => {
+      this.userName = user.displayName.split(' ')[0];
+      this.userSurname = user.displayName.split(' ')[1];
+      this.userEmail = user.email;
+    })
+    
+    this.firestore.collection("users").doc(this.localStorageS.retrieve("loggedInUserId")).get().forEach((data) => {
+      this.userPhone = data.get("phone");
+      this.userMobilePhone = data.get("mobilePhone");
+      this.userDeliveryAddress = data.get("deliveryAddress");
+      this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
+      this.userPaymentAddress = data.get("paymentAddress");
+      this.userPaymentType = data.get("paymentType");
     });
   }
 
@@ -47,14 +61,43 @@ export class ProfilePageComponent implements OnInit {
   }
 
   onUpdate(form: NgForm): void {
+    var newDisplayName: string = null;
+    var isUpdateSuccesfull: Boolean = true;
+
+    if (form.controls["name"].valid && form.controls["name"].pristine) {
+      if (form.controls["surname"].valid && form.controls["surname"].pristine)
+        newDisplayName = form.controls["name"].value + " " + form.controls["surname"].value;
+      else
+        newDisplayName = form.controls["name"].value + " " + this.userSurname;
+    } else if (form.controls["surname"].valid && form.controls["surname"].pristine)
+        newDisplayName = this.userName + " " + form.controls["surname"].value ;
+
+    if (newDisplayName !== null) {
+      this.auth.user.subscribe(user => {
+        user.updateProfile({
+          displayName: newDisplayName
+        }).catch((error) => {
+          console.log("AuthProfileUpdateError: " + error);
+          isUpdateSuccesfull = false;
+        })
+      });
+    }
+
     Object.keys(form.controls).forEach(control => {
       var field: AbstractControl = form.controls[control];
-      if (field.dirty && field.valid) {
+      if (field.dirty && field.valid && control !== "name" && control !== "surname"
+            && control !== "email" && control !== "password" && control != "passwordRepeat") {
         this.firestore.collection("users").doc(this.localStorageS.retrieve("loggedInUserId")).update({
-          control:field.value
+          [control]: field.value
+        }).catch((error) => {
+          console.log([control] + "UpdateError: " + error);
+          isUpdateSuccesfull = false;
         });
       }
-    }); 
+    });
+    
+    if (isUpdateSuccesfull) this.dialog.open(UpdateProfileSuccessDialogComponent);
+    else this.dialog.open(UpdateProfileFailedDialogComponent);
   }
 
   onFormReset(form: NgForm): void {

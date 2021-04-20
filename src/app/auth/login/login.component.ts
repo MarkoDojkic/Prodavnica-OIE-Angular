@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
   onLogin(form: NgForm): void {
     this.auth.signInWithEmailAndPassword(form.controls["email"].value, this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY",
       form.controls["password"].value)).then((result) => {
-        this.localStorageS.store("loggedInUserId", result);
+        this.localStorageS.store("loggedInUserId", result.user.uid);
         this.dialog.open(LoginSuccessDialogComponent);
       }).catch((error) => {
         console.log(error);

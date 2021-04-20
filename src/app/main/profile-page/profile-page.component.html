@@ -49,7 +49,7 @@
 
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Понови нову лозинку</mat-label>
-            <input type="password" ngModel matInput name="passwordRepeat" #passwordInputRepeat="ngModel" (ngModelChange)="checkPasswordRepeat(passwordInput, passwordInputRepeat)" [required]="passwordInput.valid"/>
+            <input type="password" ngModel matInput name="passwordRepeat" #passwordInputRepeat="ngModel" (ngModelChange)="checkPasswordRepeat(passwordInput, passwordInputRepeat)" [required]="passwordInput.length > 8"/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-error *ngIf="passwordInputRepeat.hasError('required')">Поље поновне лозинке не сме бити празно</mat-error>
             <mat-error *ngIf="passwordInputRepeat.hasError('matched')">Поље се не подудара са лозинком у пољу поред</mat-error>
@@ -81,7 +81,7 @@
 
     <section fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="center start" fxLayoutGap="3%" fxLayoutGap.lt-md="1.5%">
         <mat-radio-group ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId" required>
-            <mat-radio-button ngModel value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)" [checked]="i === userPaymentType">
+            <mat-radio-button ngModel value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)" [checked]="paymentId == userPaymentType">
                 {{ paymentType }}
             </mat-radio-button>
         </mat-radio-group>
