@@ -22,6 +22,7 @@ import { NgxWebstorageModule } from 'ngx-webstorage';
 import { ShopComponent } from './main/shop/shop.component';
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
+import { NotFoundComponent } from './main/not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { OrderComponent } from './main/order/order.component';
     RegistrationFailedDialogComponent,
     ShopComponent,
     CartComponent,
-    OrderComponent
+    OrderComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,

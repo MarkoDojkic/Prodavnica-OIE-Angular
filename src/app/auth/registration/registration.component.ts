@@ -26,21 +26,24 @@ export class RegistrationComponent implements OnInit {
   }
 
   onRegister(form: NgForm): void {
-    this.auth.createUserWithEmailAndPassword(form.controls["email"].value, this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY",
+    var email = form.controls["email"].value;
+    this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY",
         form.controls["password"].value)).then((result) => {
-          /* result.user.sendEmailVerification(); */
+          result.user.emailVerified = true; /* result.user.sendEmailVerification(); */
+          result.user.displayName = form.controls["name"].value + " " + form.controls["surname"].value;
           this.firestore.firestore.runTransaction(() => {
             return this.firestore.collection("users").doc(result.user.uid).set({
-              "name": form.controls["name"].value,
-              "surname": form.controls["surname"].value,
               "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
               "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
-              "address": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
-              "addressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
-              "paymentId": form.controls["paymentType"].value,
+              "deliveryAddress": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
+              "deliveryAddressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
+              "paymentType": form.controls["paymentType"].value,
               "paymentAddress": form.controls["paymentAddress"].value
             })
-          }).then(() => { this.dialog.open(RegistrationSuccessDialogComponent); })
+          }).then(() => {
+            this.dialog.open(RegistrationSuccessDialogComponent);
+            this.auth.signOut(); //By default user is automatically signed in
+           })
     }).catch((error) => {
       console.log(error);
       this.dialog.open(RegistrationFailedDialogComponent);
@@ -65,8 +68,8 @@ export class RegistrationComponent implements OnInit {
     else repeatPass.control.setErrors(null);
   }
 
-  updatePaymentAddressInput(paymentId: Number) {
-    switch (paymentId) {
+  updatePaymentAddressInput(paymentType: Number) {
+    switch (paymentType) {
       case 0:
         this.paymentPattern = "^(2|5)[1-5][0-9]{14}$"; //International pattern
         this.paymentHint = "Унесите број Ваше МasterCard картице, пр. 5347240348201433";
