@@ -1,3 +1,4 @@
+import { AngularFireAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { NgModule } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
@@ -23,9 +24,8 @@ import { ShopComponent } from './main/shop/shop.component';
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
 import { NotFoundComponent } from './main/not-found/not-found.component';
+import { FirebaseService } from './auth/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
-import { UpdateProfileSuccessDialogComponent } from './popupDialogs/update-profile-success-dialog/update-profile-success-dialog.component';
-import { UpdateProfileFailedDialogComponent } from './popupDialogs/update-profile-failed-dialog/update-profile-failed-dialog.component';
 
 @NgModule({
   declarations: [
@@ -40,9 +40,7 @@ import { UpdateProfileFailedDialogComponent } from './popupDialogs/update-profil
     ShopComponent,
     CartComponent,
     OrderComponent,
-    NotFoundComponent,
-    UpdateProfileSuccessDialogComponent,
-    UpdateProfileFailedDialogComponent
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +53,7 @@ import { UpdateProfileFailedDialogComponent } from './popupDialogs/update-profil
     AngularFirestoreModule,
     NgxWebstorageModule.forRoot(),
   ],
-  providers: [Title, CryptoService, AngularFireAuthGuard],
+  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

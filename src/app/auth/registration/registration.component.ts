@@ -1,3 +1,4 @@
+import { FirebaseService } from './../firebase/firebase.service';
 import { CryptoService } from './../crypto/crypto.service';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -19,40 +20,10 @@ export class RegistrationComponent implements OnInit {
   paymentHint: String;
   paymentErrorMessage: String;
 
-  constructor(private auth: AngularFireAuth,private firestore: AngularFirestore, private cs: CryptoService, private dialog: MatDialog) { }
+  constructor(public fs:FirebaseService) { }
 
   ngOnInit(): void {
     this.paymentPattern = this.paymentHint = this.paymentErrorMessage = null;
-  }
-
-  onRegister(form: NgForm): void {
-    var email = form.controls["email"].value;
-    this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt("y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY",
-      form.controls["password"].value)).then((result) => {
-          /* result.user.sendEmailVerification(); */
-          result.user.updateProfile({ displayName: form.controls["name"].value + " " + form.controls["surname"].value });
-          this.firestore.firestore.runTransaction(() => {
-            return this.firestore.collection("users").doc(result.user.uid).set({
-              "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
-              "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
-              "deliveryAddress": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
-              "deliveryAddressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
-              "paymentType": form.controls["paymentType"].value,
-              "paymentAddress": form.controls["paymentAddress"].value
-            }).catch((error) => {
-              console.log(error);
-              this.dialog.open(RegistrationFailedDialogComponent);
-              return;
-            })
-          }).then(() => {
-            this.dialog.open(RegistrationSuccessDialogComponent);
-            this.auth.signOut(); //By default user is automatically signed in
-           })
-    }).catch((error) => {
-      console.log(error);
-      this.dialog.open(RegistrationFailedDialogComponent);
-      return;
-    })
   }
 
   onFormReset(form: NgForm): void {

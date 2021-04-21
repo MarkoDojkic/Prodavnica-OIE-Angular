@@ -1,4 +1,4 @@
-<div [hidden]="isLoggedIn">
+<div [hidden]="fs.isUserLoggedIn">
     <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayout.lt-sm="15%">
         <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
         
@@ -29,7 +29,7 @@
         <mat-slide-toggle (change)="onDarkModeChange($event)" [checked]="isDarkMode" [fxFlex.gt-sm]="8" [fxFlex.lt-sm]="20">Тамни<br>режим</mat-slide-toggle>
     </mat-toolbar>
 </div>
-<div [hidden]="!isLoggedIn">
+<div [hidden]="!fs.isUserLoggedIn">
     <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%">
         <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
         
@@ -46,7 +46,7 @@
             <button mat-stroked-button routerLink="/profile" fxFlex>
                 <mat-icon>person</mat-icon> Профил
             </button>
-            <button mat-stroked-button (click)="onLogout()" color="warn" fxFlex>
+            <button mat-stroked-button (click)="fs.signOut()" color="warn" fxFlex>
                 <mat-icon>person_outline</mat-icon> Излогуј ме
             </button>
         </div>
@@ -64,7 +64,7 @@
             <button mat-icon-button routerLink="/profile" fxFlex>
                 <mat-icon>person</mat-icon>
             </button>
-            <button mat-icon-button (click)="onLogout()" color="warn" fxFlex>
+            <button mat-icon-button (click)="fs.signOut()" color="warn" fxFlex>
                 <mat-icon>person_outline</mat-icon>
             </button>
         </div>
