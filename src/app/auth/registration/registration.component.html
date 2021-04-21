@@ -1,5 +1,5 @@
-<form fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1.2%" fxLayoutGap.lt-md="2.2%"
-#form="ngForm" (ngSubmit)="onRegister(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
+<form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.2%" fxLayoutGap.lt-md="2.2%"
+#form="ngForm" (ngSubmit)="fs.signUpViaEmail(emailInput,passwordInput, form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Име</mat-label>
@@ -19,7 +19,7 @@
     <div>
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Адреса електронске поште</mat-label>
-            <input type="email" pattern="^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$" ngModel matInput name="email" #emailInput="ngModel" required/>
+            <input type="email" autocomplete="prodavnica-oie-new-email" pattern="^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$" ngModel matInput name="email" #emailInput="ngModel" required/>
             <mat-icon matSuffix>alternate_email</mat-icon>
             <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
             <mat-error *ngIf="emailInput.hasError('required')">Поље адресе електронске поште не сме бити празно</mat-error>
@@ -50,7 +50,7 @@
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Лозинка</mat-label>
-            <input type="password" ngModel matInput autocomplete="prodavnica-oie-new-password" name="password" #passwordInput="ngModel" minlength="8" required/>
+            <input type="password" ngModel matInput autocomplete="new-password" name="password" #passwordInput="ngModel" minlength="8" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>пр. secretPassword123</mat-hint>
             <mat-error *ngIf="passwordInput.hasError('required')">Поље лозинке не сме бити празно</mat-error>
@@ -59,7 +59,7 @@
 
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Понови лозинку</mat-label>
-            <input type="password" ngModel matInput autocomplete="prodavnica-oie-new-password" name="passwordRepeat" #passwordInputRepeat="ngModel" (ngModelChange)="checkPasswordRepeat(passwordInput, passwordInputRepeat)" required/>
+            <input type="password" ngModel matInput autocomplete="new-password" name="passwordRepeat" #passwordInputRepeat="ngModel" (ngModelChange)="checkPasswordRepeat(passwordInput, passwordInputRepeat)" required/>
             <mat-icon matSuffix>lock</mat-icon>
             <mat-hint>Иста лозинка као у пољу поред</mat-hint>
             <mat-error *ngIf="passwordInputRepeat.hasError('required')">Поље поновне лозинке не сме бити празно</mat-error>
@@ -87,7 +87,7 @@
     </div>
 
     <div>
-        <mat-form-field fxFlexFill>
+        <mat-form-field appearance="outline" fxFlexFill>
             <mat-label>Број кредитне картице/адреса новчаника крипто валуте</mat-label>
             <input type="text" pattern="{{ paymentPattern }}" ngModel matInput name="paymentAddress" [disabled]="paymentPattern == null" required/>
             <mat-icon matSuffix>payment</mat-icon>
@@ -104,7 +104,7 @@
         </mat-radio-group>
     </section>
 
-    <section fxLayout="row" fxLayoutGap="5%">
+    <section fxLayout="row" fxLayoutGap="10px">
         <button type="submit" mat-stroked-button color="primary" [disabled]="!checkRequiredFields(form)">Региструј ме</button> <!-- Disabled if form is invalid -->
         <button type="reset" mat-stroked-button color="warn" [disabled]="form.pristine">Обриши све</button> <!-- Disabled if form isn't modified -->
     </section>

@@ -1,3 +1,5 @@
+import { FirebaseService } from './auth/firebase/firebase.service';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -12,21 +14,13 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
 
   isDarkMode: Boolean;
-  isLoggedIn: Boolean;
- 
+  
   constructor(private router: Router,  
     private activatedRoute: ActivatedRoute,  
     private titleService: Title,
-    private localStorageS: LocalStorageService) { }
+    public fs:FirebaseService) { }
 
   ngOnInit() {
-    this.isLoggedIn = (this.localStorageS.retrieve("loggedInUserId") === undefined
-                          || this.localStorageS.retrieve("loggedInUserId") !== null)
-
-    this.localStorageS.observe("loggedInUserId").subscribe((value) => {
-      this.isLoggedIn = (value !== undefined || value !== null);
-    });
-
     //Code from: https://www.c-sharpcorner.com/article/angular-dynamic-page-title-based-on-route/
     this.router.events.pipe(  
       filter(event => event instanceof NavigationEnd),  
@@ -51,12 +45,4 @@ export class AppComponent implements OnInit {
   onDarkModeChange(e) {
     this.isDarkMode = e.checked;
   }
-
-  onLogout() {
-    this.localStorageS.clear("loggedInUserId");
-    this.router.navigate(["/login"]);
-    this.isLoggedIn = false;
-  }
 }
-
-

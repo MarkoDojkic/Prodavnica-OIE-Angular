@@ -1,4 +1,4 @@
-import { UpdateProfileFailedDialogComponent } from './../../popupDialogs/update-profile-failed-dialog/update-profile-failed-dialog.component';
+import { FirebaseService } from './../../auth/firebase/firebase.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AbstractControl, NgForm, NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,7 +6,6 @@ import { Component, OnInit } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { UpdateProfileSuccessDialogComponent } from 'src/app/popupDialogs/update-profile-success-dialog/update-profile-success-dialog.component';
 
 @Component({
   selector: 'app-profile-page',
@@ -28,31 +27,26 @@ export class ProfilePageComponent implements OnInit {
   paymentHint: String;
   paymentErrorMessage: String;
 
-  constructor(private router: Router,
-    private auth: AngularFireAuth,
-    private firestore: AngularFirestore,
-    private localStorageS: LocalStorageService,
-    private dialog: MatDialog) { }
+  constructor(private fs:FirebaseService,
+    private localStorageS: LocalStorageService) { }
 
   ngOnInit(): void {
-    if (this.localStorageS.retrieve("loggedInUserId") === undefined
-      || this.localStorageS.retrieve("loggedInUserId") === null)
-      this.router.navigate(["/login"]);
-    
-    this.auth.user.subscribe(user => {
-      this.userName = user.displayName.split(' ')[0];
-      this.userSurname = user.displayName.split(' ')[1];
-      this.userEmail = user.email;
-    })
-    
-    this.firestore.collection("users").doc(this.localStorageS.retrieve("loggedInUserId")).get().forEach((data) => {
+
+    const userDataJSON = JSON.parse(this.localStorageS.retrieve("loggedInUser"));
+    const userDataFirestoreObservable = this.fs.getFirestoreData(userDataJSON["uid"]);
+
+    this.userName = userDataJSON["displayName"].split(' ')[0];
+    this.userSurname = userDataJSON["displayName"].split(' ')[1];
+    this.userEmail = userDataJSON["email"];
+
+    userDataFirestoreObservable.forEach((data) => {
       this.userPhone = data.get("phone");
       this.userMobilePhone = data.get("mobilePhone");
       this.userDeliveryAddress = data.get("deliveryAddress");
       this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
       this.userPaymentAddress = data.get("paymentAddress");
       this.userPaymentType = data.get("paymentType");
-    });
+    })
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
@@ -61,17 +55,47 @@ export class ProfilePageComponent implements OnInit {
   }
 
   onUpdate(form: NgForm): void {
-    var newDisplayName: string = null;
-    var isUpdateSuccesfull: Boolean = true;
 
-    if (form.controls["name"].valid && form.controls["name"].pristine) {
-      if (form.controls["surname"].valid && form.controls["surname"].pristine)
+    var newDisplayName: string = null;
+    var updatedFirestoreData: Map<string, any> = new Map<string, any>();
+
+    if (form.controls["name"].valid) { //Needs fixing
+      if (form.controls["surname"].valid)
         newDisplayName = form.controls["name"].value + " " + form.controls["surname"].value;
       else
         newDisplayName = form.controls["name"].value + " " + this.userSurname;
-    } else if (form.controls["surname"].valid && form.controls["surname"].pristine)
-        newDisplayName = this.userName + " " + form.controls["surname"].value ;
+    } else if (form.controls["surname"].valid)
+        newDisplayName = this.userName + " " + form.controls["surname"].value;
+    
+    console.log(newDisplayName);
+    
+    /* if (newDisplayName !== null)
+      this.fs.updateAuthUserProfile(newDisplayName, null); */
+    
+    Object.keys(form.controls).forEach(control => {
+      var field: AbstractControl = form.controls[control];
+      if (field.dirty && field.valid && control !== "name" && control !== "surname"
+        && control !== "email" && control !== "password" && control != "passwordRepeat") {
+        updatedFirestoreData.set(control, field.value);
+      }
+    });
 
+    this.fs.updateFirestoreData
+      (JSON.parse(this.localStorageS.retrieve("loggedInUser"))["uid"],
+        Object.assign({}, updatedFirestoreData)); //To be fixed (does nothing)
+    
+    
+    /* var newDisplayName: string = null;
+    var isUpdateSuccesfull: Boolean = true;
+
+    if (form.controls["name"].valid) {
+      if (form.controls["surname"].valid)
+        newDisplayName = form.controls["name"].value + " " + form.controls["surname"].value;
+      else
+        newDisplayName = form.controls["name"].value + " " + this.userSurname;
+    } else if (form.controls["surname"].valid)
+        newDisplayName = this.userName + " " + form.controls["surname"].value ;
+    
     if (newDisplayName !== null) {
       this.auth.user.subscribe(user => {
         user.updateProfile({
@@ -97,7 +121,7 @@ export class ProfilePageComponent implements OnInit {
     });
     
     if (isUpdateSuccesfull) this.dialog.open(UpdateProfileSuccessDialogComponent);
-    else this.dialog.open(UpdateProfileFailedDialogComponent);
+    else this.dialog.open(UpdateProfileFailedDialogComponent); */
   }
 
   onFormReset(form: NgForm): void {
