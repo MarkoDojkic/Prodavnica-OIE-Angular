@@ -1,11 +1,9 @@
 import { RegistrationSuccessDialogComponent } from 'src/app/popupDialogs/registration-success-dialog/registration-success-dialog.component';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from './user';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, DocumentSnapshot } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Injectable, NgZone } from '@angular/core';
-import { LocalStorageService } from 'ngx-webstorage';
 import { MatDialog } from '@angular/material/dialog';
 import { CryptoService } from '../crypto/crypto.service';
 import { RegistrationFailedDialogComponent } from 'src/app/popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
@@ -21,27 +19,28 @@ export class FirebaseService {
 
   //https://www.positronx.io/full-angular-7-firebase-authentication-system/
 
-  public loggedInUserData: User;
   private key: string = "y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY";
+  private firebaseLocalDB: IDBDatabase;
+  private isLoggedIn: boolean;
 
   constructor(public firestore: AngularFirestore, public auth: AngularFireAuth,
-    public ngZone: NgZone, private localStorageS: LocalStorageService, private router: Router,
+    public ngZone: NgZone, private router: Router,
     private cs: CryptoService, private dialog: MatDialog) {
-    this.auth.authState.subscribe(user => {
-      if (user) {
-        this.loggedInUserData = user;
-        this.localStorageS.store("loggedInUser", JSON.stringify(this.loggedInUserData));
-      } else this.localStorageS.clear("loggedInUser");
-    });
-  }
+      var openIDB = window.indexedDB.open("firebaseLocalStorageDb", 1);
+      openIDB.onsuccess = () => {
+        this.firebaseLocalDB = openIDB.result;
+      };
+      openIDB.onerror = error => {
+        console.log("Error while opening firebaseLocalDB: " + error);
+      };
+    }
 
   signInViaEmail(email: string, password: string): Promise<any> {
     return this.auth.signInWithEmailAndPassword(email, this.cs.encrypt(this.key, password)).then((result) => {
       this.ngZone.run(() => { this.router.navigate(["/profile"]); });
-      this.loggedInUserData = result.user;
-      this.localStorageS.store("loggedInUser", JSON.stringify(this.loggedInUserData));
     }).then(() => {
       this.dialog.open(LoginSuccessDialogComponent);
+      this.isLoggedIn = true;
     }).catch((error) => {
       console.log(error);
       this.dialog.open(LoginFailedDialogComponent);
@@ -70,7 +69,7 @@ export class FirebaseService {
   updateAuthUserProfile(displayName: string, photoURL: string): void {
     this.auth.user.subscribe((result) => {
       if (result) result.updateProfile({ displayName: displayName, photoURL: photoURL })
-                  .catch((error) => { console.log("UpdateAuthUserProfile error: " + error)});
+        .catch((error) => { console.log("UpdateAuthUserProfile error: " + error) });
     });
   }
 
@@ -85,14 +84,28 @@ export class FirebaseService {
     return this.firestore.collection("users").doc(userId).get();
   }
 
+  getIDBData(): Promise<any> {
+    this.isLoggedIn = true;
+    return new Promise<any>((resolve, reject) => {
+      const gettingData = this.firebaseLocalDB.transaction('firebaseLocalStorage', 'readonly').objectStore("firebaseLocalStorage").get(IDBKeyRange.lowerBound(0));
+      gettingData.onsuccess = () => {
+        resolve(gettingData.result["value"]);
+      }
+  
+      gettingData.onerror = (error) => {
+        reject(Error("Error while getting idb data: " + error));
+      }
+    });
+  }
+
   get isUserLoggedIn(): boolean {
-    return this.localStorageS.retrieve("loggedInUser") ? true : false;
+    return this.isLoggedIn;
   }
 
   signOut(): void {
     this.auth.signOut().then(() => {
-      this.localStorageS.clear("loggedInUser");
-      this.router.navigate(["login"]);
-    })
+      this.isLoggedIn = false;
+      this.router.navigate(["login"])
+    });
   }
 }

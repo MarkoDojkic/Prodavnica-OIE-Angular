@@ -1,11 +1,6 @@
 import { FirebaseService } from './../../auth/firebase/firebase.service';
-import { MatDialog } from '@angular/material/dialog';
 import { AbstractControl, NgForm, NgModel } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { LocalStorageService } from 'ngx-webstorage';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-profile-page',
@@ -14,40 +9,23 @@ import { AngularFireAuth } from '@angular/fire/auth';
 })
 export class ProfilePageComponent implements OnInit {
 
-  userName: String;
-  userSurname: String;
-  userEmail: String;
-  userPhone: String;
-  userMobilePhone: String;
-  userDeliveryAddress: String;
-  userDeliveryAddressPAK: String;
-  userPaymentAddress: String;
+  uid: string;
+  userName: string;
+  userSurname: string;
+  userEmail: string;
+  userPhone: string;
+  userMobilePhone: string;
+  userDeliveryAddress: string;
+  userDeliveryAddressPAK: string;
+  userPaymentAddress: string;
   userPaymentType: Number;
-  paymentPattern: String;
-  paymentHint: String;
-  paymentErrorMessage: String;
+  paymentPattern: string;
+  paymentHint: string;
+  paymentErrorMessage: string;
 
-  constructor(private fs:FirebaseService,
-    private localStorageS: LocalStorageService) { }
+  constructor(private fs:FirebaseService) { }
 
-  ngOnInit(): void {
-
-    const userDataJSON = JSON.parse(this.localStorageS.retrieve("loggedInUser"));
-    const userDataFirestoreObservable = this.fs.getFirestoreData(userDataJSON["uid"]);
-
-    this.userName = userDataJSON["displayName"].split(' ')[0];
-    this.userSurname = userDataJSON["displayName"].split(' ')[1];
-    this.userEmail = userDataJSON["email"];
-
-    userDataFirestoreObservable.forEach((data) => {
-      this.userPhone = data.get("phone");
-      this.userMobilePhone = data.get("mobilePhone");
-      this.userDeliveryAddress = data.get("deliveryAddress");
-      this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
-      this.userPaymentAddress = data.get("paymentAddress");
-      this.userPaymentType = data.get("paymentType");
-    })
-  }
+  ngOnInit(): void { this.updateFieldData(); }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
     if (pass.value != repeatPass.value) repeatPass.control.setErrors({ "matched": true });
@@ -56,76 +34,57 @@ export class ProfilePageComponent implements OnInit {
 
   onUpdate(form: NgForm): void {
 
-    var newDisplayName: string = null;
-    var updatedFirestoreData: Map<string, any> = new Map<string, any>();
+    var newName: string = form.controls["name"].value;
+    var newSurname: string = form.controls["surname"].value;
+    var updatedFirestoreData: any = {};
 
-    if (form.controls["name"].valid) { //Needs fixing
-      if (form.controls["surname"].valid)
-        newDisplayName = form.controls["name"].value + " " + form.controls["surname"].value;
-      else
-        newDisplayName = form.controls["name"].value + " " + this.userSurname;
-    } else if (form.controls["surname"].valid)
-        newDisplayName = this.userName + " " + form.controls["surname"].value;
+    console.log();
     
-    console.log(newDisplayName);
-    
-    /* if (newDisplayName !== null)
-      this.fs.updateAuthUserProfile(newDisplayName, null); */
-    
+    this.fs.updateAuthUserProfile(((!!newName ? newName : this.userName) + " "
+    + (!!newSurname ? newSurname : this.userSurname)), null);
+        
     Object.keys(form.controls).forEach(control => {
       var field: AbstractControl = form.controls[control];
       if (field.dirty && field.valid && control !== "name" && control !== "surname"
         && control !== "email" && control !== "password" && control != "passwordRepeat") {
-        updatedFirestoreData.set(control, field.value);
+        updatedFirestoreData[control] = field.value;
+        setTimeout(() => { field.reset(); }, 1500);
       }
     });
 
-    this.fs.updateFirestoreData
-      (JSON.parse(this.localStorageS.retrieve("loggedInUser"))["uid"],
-        Object.assign({}, updatedFirestoreData)); //To be fixed (does nothing)
+    this.fs.updateFirestoreData(this.uid, updatedFirestoreData);
     
-    
-    /* var newDisplayName: string = null;
-    var isUpdateSuccesfull: Boolean = true;
-
-    if (form.controls["name"].valid) {
-      if (form.controls["surname"].valid)
-        newDisplayName = form.controls["name"].value + " " + form.controls["surname"].value;
-      else
-        newDisplayName = form.controls["name"].value + " " + this.userSurname;
-    } else if (form.controls["surname"].valid)
-        newDisplayName = this.userName + " " + form.controls["surname"].value ;
-    
-    if (newDisplayName !== null) {
-      this.auth.user.subscribe(user => {
-        user.updateProfile({
-          displayName: newDisplayName
-        }).catch((error) => {
-          console.log("AuthProfileUpdateError: " + error);
-          isUpdateSuccesfull = false;
-        })
-      });
-    }
-
-    Object.keys(form.controls).forEach(control => {
-      var field: AbstractControl = form.controls[control];
-      if (field.dirty && field.valid && control !== "name" && control !== "surname"
-            && control !== "email" && control !== "password" && control != "passwordRepeat") {
-        this.firestore.collection("users").doc(this.localStorageS.retrieve("loggedInUserId")).update({
-          [control]: field.value
-        }).catch((error) => {
-          console.log([control] + "UpdateError: " + error);
-          isUpdateSuccesfull = false;
-        });
-      }
-    });
-    
-    if (isUpdateSuccesfull) this.dialog.open(UpdateProfileSuccessDialogComponent);
-    else this.dialog.open(UpdateProfileFailedDialogComponent); */
+    setTimeout(() => {
+      form.controls["name"].reset();
+      form.controls["surname"].reset();
+      form.controls["email"].reset();
+      form.controls["password"].reset();
+      form.controls["passwordRepeat"].reset();
+      this.updateFieldData();
+    }, 1000);
   }
-
+  
   onFormReset(form: NgForm): void {
     form.reset();
+  }
+
+  async updateFieldData() {
+    const ibData: Promise<any> = this.fs.getIDBData();
+    ibData.then(() => {
+      this.uid = ibData["__zone_symbol__value"]["uid"];
+      this.userName = ibData["__zone_symbol__value"]["displayName"].split(' ')[0];
+      this.userSurname = ibData["__zone_symbol__value"]["displayName"].split(' ')[1];
+      this.userEmail = ibData["__zone_symbol__value"]["email"];
+
+      this.fs.getFirestoreData(this.uid).forEach((data) => {
+        this.userPhone = data.get("phone");
+        this.userMobilePhone = data.get("mobilePhone");
+        this.userDeliveryAddress = data.get("deliveryAddress");
+        this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
+        this.userPaymentAddress = data.get("paymentAddress");
+        this.userPaymentType = data.get("paymentType");
+      });
+    })
   }
 
   updatePaymentAddressInput(paymentType: Number) {

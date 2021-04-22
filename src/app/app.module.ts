@@ -1,4 +1,3 @@
-import { AngularFireAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 import { NgModule } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
@@ -19,7 +18,6 @@ import { LoginSuccessDialogComponent } from './popupDialogs/login-success-dialog
 import { LoginFailedDialogComponent } from './popupDialogs/login-failed-dialog/login-failed-dialog.component';
 import { ProfilePageComponent } from './main/profile-page/profile-page.component';
 import { RegistrationFailedDialogComponent } from './popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
-import { NgxWebstorageModule } from 'ngx-webstorage';
 import { ShopComponent } from './main/shop/shop.component';
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
@@ -50,10 +48,9 @@ import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
     FlexLayoutModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
-    NgxWebstorageModule.forRoot(),
+    AngularFirestoreModule
   ],
-  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard],
+  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, IDBDatabase, IDBFactory],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

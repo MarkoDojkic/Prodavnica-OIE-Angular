@@ -7,20 +7,21 @@ import { RegistrationComponent } from "./auth/registration/registration.componen
 import { ProfilePageComponent } from "./main/profile-page/profile-page.component";
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
-import { canActivate, redirectLoggedInTo, redirectUnauthorizedTo, AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { redirectLoggedInTo, redirectUnauthorizedTo, AngularFireAuthGuard } from '@angular/fire/auth-guard';
 
 const redirectLoggedInToProfile = () => redirectLoggedInTo(["profile"]); //To resolve: https://github.com/angular/angularfire/issues/2099
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(["login"]);
 
 const routes: Routes = [
-    { path: '', redirectTo: "/shop", pathMatch: 'full'},
-    { path: 'login', component: LoginComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Логовање', authGuardPipe: redirectLoggedInToProfile } }, //Now working (glitch -> ...canActivate shortcut not working)
+    { path: '', redirectTo: "/shop", pathMatch: 'full'}, //Note: ...canActivate shortcut not working
+    { path: 'login', component: LoginComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Логовање', authGuardPipe: redirectLoggedInToProfile } },
     { path: 'registration', component: RegistrationComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Регистрација', authGuardPipe: redirectLoggedInToProfile } },
-    { path: 'profile', component: ProfilePageComponent, ...canActivate(() => redirectUnauthorizedTo(['login'])), data: { title: 'Профил' } }, //Now working (auth needed refactoring)
+    { path: 'profile', component: ProfilePageComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Профил', authGuardPipe: redirectUnauthorizedToLogin } },
     { path: 'shop', component: ShopComponent, data: { title: 'Продавница' } },
-    { path: 'cart', component: CartComponent, ...canActivate(() => redirectUnauthorizedTo(['login'])), data: { title: 'Корпа' } },
-    { path: 'order', component: OrderComponent, ...canActivate(() => redirectUnauthorizedTo(['login'])), data: { title: 'Поруџбине' } },
-    { path: '**', component: NotFoundComponent, data: { title: '404' } }
-]
+    { path: 'cart', component: CartComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Корпа', authGuardPipe: redirectUnauthorizedToLogin } },
+    { path: 'order', component: OrderComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Поруџбине', authGuardPipe: redirectUnauthorizedToLogin } },
+    { path: '**', component: NotFoundComponent, data: { title: 'Грешка 404' } }
+];
 
 @NgModule({
     imports: [

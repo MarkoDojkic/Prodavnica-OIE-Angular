@@ -1,9 +1,7 @@
 import { FirebaseService } from './auth/firebase/firebase.service';
-import { AngularFireAuth } from '@angular/fire/auth';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { LocalStorageService } from 'ngx-webstorage';
 import { filter } from 'rxjs/operators';
 
 @Component({
