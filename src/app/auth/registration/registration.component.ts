@@ -1,12 +1,6 @@
 import { FirebaseService } from './../firebase/firebase.service';
-import { CryptoService } from './../crypto/crypto.service';
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { FormGroup, NgForm, NgModel } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { RegistrationSuccessDialogComponent } from 'src/app/popupDialogs/registration-success-dialog/registration-success-dialog.component';
-import { RegistrationFailedDialogComponent } from 'src/app/popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
 
 @Component({
   selector: 'app-registration',
