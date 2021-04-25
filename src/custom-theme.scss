@@ -345,3 +345,8 @@ form { height: 95%; background-color: darkslategray; }
     font-family: 'Tenor Sans';
   }
 }
+
+.mat-drawer-backdrop.mat-drawer-shown {
+  background-color: rgba(76, 78, 79, 0.23) !important;
+  margin-right: 0px !important;
+}
