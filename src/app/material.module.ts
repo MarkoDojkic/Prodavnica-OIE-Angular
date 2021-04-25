@@ -10,7 +10,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatBadgeModule } from '@angular/material/badge';
-
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 
 @NgModule({
@@ -25,7 +26,9 @@ import { MatBadgeModule } from '@angular/material/badge';
         MatCheckboxModule,
         MatSlideToggleModule,
         MatDialogModule,
-        MatBadgeModule
+        MatBadgeModule,
+        MatSidenavModule,
+        MatGridListModule
     ],
     exports: [
         MatButtonModule,
@@ -38,7 +41,9 @@ import { MatBadgeModule } from '@angular/material/badge';
         MatCheckboxModule,
         MatSlideToggleModule,
         MatDialogModule,
-        MatBadgeModule
+        MatBadgeModule,
+        MatSidenavModule,
+        MatGridListModule
     ]
 })
 
