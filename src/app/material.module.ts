@@ -12,6 +12,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTreeModule } from "@angular/material/tree";
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         MatDialogModule,
         MatBadgeModule,
         MatSidenavModule,
-        MatGridListModule
+        MatGridListModule,
+        MatTreeModule
     ],
     exports: [
         MatButtonModule,
@@ -43,7 +45,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
         MatDialogModule,
         MatBadgeModule,
         MatSidenavModule,
-        MatGridListModule
+        MatGridListModule,
+        MatTreeModule
     ]
 })
 
