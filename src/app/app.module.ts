@@ -24,6 +24,7 @@ import { OrderComponent } from './main/order/order.component';
 import { NotFoundComponent } from './main/not-found/not-found.component';
 import { FirebaseService } from './auth/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { AngularFireStorageModule } from '@angular/fire/storage';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
     FlexLayoutModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    AngularFireStorageModule
   ],
   providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, IDBDatabase, IDBFactory],
   bootstrap: [AppComponent]

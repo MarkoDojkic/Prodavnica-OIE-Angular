@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import { FirebaseService } from 'src/app/auth/firebase/firebase.service';
+import { Observable } from 'rxjs/internal/Observable';
 
-export interface Tile {
-  color: string;
-  cols: number;
-  rows: number;
-  text: string;
+export interface Item {
+  title: string,
+  imageUrl: Observable<string | null>,
+  description: string,
+  leftInStock: number,
+  price: number
 }
 
 interface CategoryNode {
@@ -30,14 +33,7 @@ export class ShopComponent implements OnInit {
 
   num_of_cols: number;
   selectedCategory: string;
-
-  tiles: Tile[] = [
-    { text: 'One', cols: 1, rows: 1, color: 'blue' },
-    { text: 'Two', cols: 1, rows: 1, color: 'red' },
-    { text: 'Three', cols: 1, rows: 1, color: 'orange' },
-    { text: 'Four', cols: 1, rows: 1, color: 'white' },
-    { text: 'Five', cols: 1, rows: 1, color: 'green' }
-  ];
+  items: Array<Item>;
 
   _transformer = (node: CategoryNode, level: number) => {
     return {
@@ -55,33 +51,16 @@ export class ShopComponent implements OnInit {
 
   categoriesSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  constructor() {
-    this.categoriesSource.data = [ //Replace with category names from firebase firestore
+  constructor(private fs:FirebaseService) {
+    this.categoriesSource.data = [
       {
-        name: 'Fruit',
+        name: 'Соларни панели',
         children: [
-          {name: 'Apple'},
-          {name: 'Banana'},
-          {name: 'Fruit loops'},
-        ]
-      }, {
-        name: 'Vegetables',
-        children: [
-          {
-            name: 'Green',
-            children: [
-              {name: 'Broccoli'},
-              {name: 'Brussels sprouts'},
-            ]
-          }, {
-            name: 'Orange',
-            children: [
-              {name: 'Pumpkins'},
-              {name: 'Carrots'},
-            ]
-          },
-        ]
-      }
+          {name: 'Монокристални'},
+          {name: 'Поликристални'},
+          {name: 'Аморфни'},
+        ] //Add more categoryItems here
+      },
     ];
   }
 
@@ -114,8 +93,7 @@ export class ShopComponent implements OnInit {
   }
 
   displayItems(category: string): void {
-    console.log("Display items from category: " + category);
-    this.selectedCategory = category;
+    this.items = this.fs.getItemsByCategory(category);
   }
 
 }
