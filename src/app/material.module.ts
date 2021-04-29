@@ -1,3 +1,4 @@
+import { MatCardModule } from '@angular/material/card';
 import { NgModule } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -30,7 +31,8 @@ import { MatTreeModule } from "@angular/material/tree";
         MatBadgeModule,
         MatSidenavModule,
         MatGridListModule,
-        MatTreeModule
+        MatTreeModule,
+        MatCardModule
     ],
     exports: [
         MatButtonModule,
@@ -46,7 +48,8 @@ import { MatTreeModule } from "@angular/material/tree";
         MatBadgeModule,
         MatSidenavModule,
         MatGridListModule,
-        MatTreeModule
+        MatTreeModule,
+        MatCardModule
     ]
 })
 

@@ -10,6 +10,8 @@ import { RegistrationFailedDialogComponent } from 'src/app/popupDialogs/registra
 import { LoginFailedDialogComponent } from 'src/app/popupDialogs/login-failed-dialog/login-failed-dialog.component';
 import { LoginSuccessDialogComponent } from 'src/app/popupDialogs/login-success-dialog/login-success-dialog.component';
 import { Observable } from 'rxjs';
+import { Item } from 'src/app/main/shop/shop.component';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +25,8 @@ export class FirebaseService {
   private firebaseLocalDB: IDBDatabase;
   private isLoggedIn: boolean;
 
-  constructor(public firestore: AngularFirestore, public auth: AngularFireAuth,
-    public ngZone: NgZone, private router: Router,
+  constructor(private firestore: AngularFirestore, private auth: AngularFireAuth,
+    private ngZone: NgZone, private router: Router, private storage: AngularFireStorage,
     private cs: CryptoService, private dialog: MatDialog) {
       var openIDB = window.indexedDB.open("firebaseLocalStorageDb", 1);
       openIDB.onsuccess = () => {
@@ -107,5 +109,27 @@ export class FirebaseService {
       this.isLoggedIn = false;
       this.router.navigate(["login"])
     });
+  }
+
+  getItemsByCategory(categoryName: string): Array<Item> {
+    var categoryItems: Array<Item> = [];
+
+    this.firestore.collection("items").ref
+      .where("categoryName", "==", categoryName).get().then((querySnapshot) => {
+        querySnapshot.forEach((item) => {
+          categoryItems.push({
+            "title": item.data()["name"],
+            "imageUrl": this.retriveImageURL(item.id),
+            "description": item.data()["description"],
+            "leftInStock": item.data()["leftInStock"],
+            "price":item.data()["price"]
+          });
+        });
+      }).then(() => { return categoryItems; });
+    return categoryItems;
+  }
+
+  private retriveImageURL(imageName: string): Observable<string | null> {
+    return this.storage.ref("items/" + imageName + ".png").getDownloadURL();
   }
 }
