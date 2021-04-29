@@ -67,33 +67,25 @@ export class ShopComponent implements OnInit {
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
   ngOnInit(): void {
-    if (window.innerWidth <= 1920 && window.innerWidth > 1280)
-      this.num_of_cols = 4
-    else if (window.innerWidth <= 1280 && window.innerWidth > 960)
-      this.num_of_cols = 3
-    else if (window.innerWidth <= 960 && window.innerWidth > 600)
-      this.num_of_cols = 2
-    else if (window.innerWidth <= 600)
-      this.num_of_cols = 1
-    else
-      this.num_of_cols = 5
+    this.onResize(null);
   }
 
-  onResize(event): void {
-    if (window.innerWidth <= 1920 && window.innerWidth > 1280)
-      this.num_of_cols = 4
-    else if (window.innerWidth <= 1280 && window.innerWidth > 960)
-      this.num_of_cols = 3
-    else if (window.innerWidth <= 960 && window.innerWidth > 600)
-      this.num_of_cols = 2
-    else if (window.innerWidth <= 600)
-      this.num_of_cols = 1
-    else
+  onResize(event: any | null): void {
+    if(window.innerWidth > 1920)
       this.num_of_cols = 5
+    else if (window.innerWidth <= 1920 && window.innerWidth > 1300)
+      this.num_of_cols = 4
+    else if (window.innerWidth <= 1300 && window.innerWidth > 1000)
+      this.num_of_cols = 3
+    else if (window.innerWidth <= 1000 && window.innerWidth > 670)
+      this.num_of_cols = 2
+    else if (window.innerWidth <= 670)
+      this.num_of_cols = 1
   }
 
   displayItems(category: string): void {
     this.items = this.fs.getItemsByCategory(category);
+    this.selectedCategory = category;
   }
 
 }

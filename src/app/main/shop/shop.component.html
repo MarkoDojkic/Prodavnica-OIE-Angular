@@ -4,12 +4,11 @@
         <button type="button" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>keyboard_arrow_left</mat-icon>
         </button>
+        <!-- Add filters here (i.e. by price) -->
         <mat-tree [dataSource]="categoriesSource" [treeControl]="treeControl">
-            <!-- This is the tree node template for leaf nodes -->
             <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
               <button type="button" mat-flat-button (click)="displayItems(this.category.name)" [color]="this.category.name === selectedCategory ? 'primary' : none">{{category.name}}</button>
             </mat-tree-node>
-            <!-- This is the tree node template for expandable nodes -->
             <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
               <button mat-icon-button matTreeNodeToggle
                       [attr.aria-label]="'Toggle ' + node.name">
@@ -22,36 +21,26 @@
           </mat-tree>
     </mat-drawer>
 
-    <mat-drawer-content>
+    <mat-drawer-content> <!-- Attach overflow y to main scroll, while keeping toolbar over -->
         <button type="button" mat-icon-button class="floating" (click)="drawer.toggle()" *ngIf="!drawer.opened">
             <mat-icon>menu</mat-icon>
         </button>
-        <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" fxFlex fxLayoutGap="1.2%">
-            <mat-grid-tile *ngFor="let item of items, let i = index" [attr.data-index]="i" fxLayout="column" fxLayoutAlign="center center">
-              <header>
-                <span fxFlex>{{item.title}}</span>
-                <img fxFlex mat-card-image [src]="item.imageUrl | async" alt="Photo of {{item.title}}"/>
-              </header>
-              <p fxFlex>{{item.description}}</p>
-              <footer fxFlex>
-                <input type="number" min="0" [max]="item.leftInStock" ngModel matInput name="quantity_item{{i}}" required/>
-                  <span>{{item.price}} РСД</span>
-                  <button type="button" mat-stroked-button color="warn" *ngIf="item.leftInStock === 0">Нема на стању</button>
-                  <button type="submit" mat-stroked-button color="accent" *ngIf="item.leftInStock > 0">Додај у корпу</button>
-              </footer>
-              <!-- <mat-card >
-                <mat-card-header>
+        <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" rowHeight="2:4" style="min-width: 350px;">
+            <mat-grid-tile *ngFor="let item of items, let i = index" [attr.data-index]="i" fxFlex>
+              <mat-card fxLayout="column" fxLayoutAlign="center center" fxFlex>
+                <mat-card-header fxLayoutAlign="center center" fxFlex>
                   <mat-card-title>{{item.title}}</mat-card-title>
                 </mat-card-header>
                 <img mat-card-image [src]="item.imageUrl | async" alt="Photo of {{item.title}}"/>
-                <mat-card-content><p>{{item.description}}</p></mat-card-content>
-                <mat-card-actions>
-                  <input type="number" min="0" [max]="item.leftInStock" ngModel matInput name="quantity_item{{i}}" required/>
-                  <span>{{item.price}} РСД</span>
-                  <button type="button" mat-stroked-button color="warn" *ngIf="item.leftInStock === 0">Нема на стању</button>
-                  <button type="submit" mat-stroked-button color="accent" *ngIf="item.leftInStock > 0">Додај у корпу</button>
+                <mat-card-content fxLayoutAlign="center center" fxFlex>{{item.description}}</mat-card-content>
+                <mat-card-actions fxLayout="row" fxLayoutAlign="center center" fxFlexFill fxLayoutGap="2%">
+                  <span fxFlex="30" *ngIf="item.leftInStock > 0">Количина: <input type="number" min="0" [max]="item.leftInStock" ngModel matInput name="quantity_item{{i}}" required/></span>
+                  <span fxFlex="50">Цена: {{item.price}} РСД</span>
+                  <span fxFlex="40" *ngIf="item.leftInStock === 0">Нема на стању</span>
+                  <button fxFlex="10" type="submit" mat-icon-button color="accent" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>
+                  <button fxFlex="10" type="submit" mat-icon-button color="secondary"><mat-icon>comment</mat-icon></button>
                 </mat-card-actions>
-              </mat-card> -->
+              </mat-card>
             </mat-grid-tile>
         </mat-grid-list>
     </mat-drawer-content>
