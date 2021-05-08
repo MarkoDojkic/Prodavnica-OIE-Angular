@@ -1,3 +1,8 @@
+mat-toolbar {
+    position: fixed;
+    z-index: 2;
+}
+
 span, button, mat-slide-toggle {
     font-size: 1.2vw;
     text-align: center;

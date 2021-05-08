@@ -21,11 +21,11 @@
           </mat-tree>
     </mat-drawer>
 
-    <mat-drawer-content> <!-- Attach overflow y to main scroll, while keeping toolbar over -->
+    <mat-drawer-content>
         <button type="button" mat-icon-button class="floating" (click)="drawer.toggle()" *ngIf="!drawer.opened">
             <mat-icon>menu</mat-icon>
         </button>
-        <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" rowHeight="2:4" style="min-width: 350px;">
+        <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
             <mat-grid-tile *ngFor="let item of items, let i = index" [attr.data-index]="i" fxFlex>
               <mat-card fxLayout="column" fxLayoutAlign="center center" fxFlex>
                 <mat-card-header fxLayoutAlign="center center" fxFlex>
@@ -33,10 +33,10 @@
                 </mat-card-header>
                 <img mat-card-image [src]="item.imageUrl | async" alt="Photo of {{item.title}}"/>
                 <mat-card-content fxLayoutAlign="center center" fxFlex>{{item.description}}</mat-card-content>
-                <mat-card-actions fxLayout="row" fxLayoutAlign="center center" fxFlexFill fxLayoutGap="2%">
+                <mat-card-actions fxLayout="row" fxLayoutAlign="center center" fxFlexFill fxLayoutGap="1%">
                   <span fxFlex="30" *ngIf="item.leftInStock > 0">Количина: <input type="number" min="0" [max]="item.leftInStock" ngModel matInput name="quantity_item{{i}}" required/></span>
-                  <span fxFlex="50">Цена: {{item.price}} РСД</span>
-                  <span fxFlex="40" *ngIf="item.leftInStock === 0">Нема на стању</span>
+                  <span fxFlex="50">Цена по комаду: {{item.price}} Динара</span>
+                  <span fxFlex="50" *ngIf="item.leftInStock === 0">Нема на стању</span>
                   <button fxFlex="10" type="submit" mat-icon-button color="accent" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>
                   <button fxFlex="10" type="submit" mat-icon-button color="secondary"><mat-icon>comment</mat-icon></button>
                 </mat-card-actions>

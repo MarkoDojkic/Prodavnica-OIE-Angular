@@ -1,3 +1,9 @@
+form {
+    min-width: 380px;
+    height: 100%;
+    z-index: 1;
+}
+
 mat-form-field {
     width: 70%;
 }

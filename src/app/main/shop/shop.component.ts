@@ -34,6 +34,7 @@ export class ShopComponent implements OnInit {
   num_of_cols: number;
   selectedCategory: string;
   items: Array<Item>;
+  rowHeight: string;
 
   _transformer = (node: CategoryNode, level: number) => {
     return {
@@ -59,8 +60,30 @@ export class ShopComponent implements OnInit {
           {name: 'Монокристални'},
           {name: 'Поликристални'},
           {name: 'Аморфни'},
-        ] //Add more categoryItems here
+        ]
       },
+      {
+        name: 'Контролери пуњења акумулатора',
+        children: [
+          {name: 'PWM'},
+          {name: 'MPPT'}
+        ]
+      },
+      {
+        name: 'Инвертори',
+        children: [
+          {name: 'OFF-Grid'},
+          {name: 'ON-Grid' },
+          {name: 'Хибридни'}
+        ]
+      },
+      {
+        name: 'Ветрогенератори',
+        children: [
+          {name: 'Хоризонтални'},
+          {name: 'Вертикални' }
+        ]
+      },//Add more categoryItems here
     ];
   }
 
@@ -86,6 +109,19 @@ export class ShopComponent implements OnInit {
   displayItems(category: string): void {
     this.items = this.fs.getItemsByCategory(category);
     this.selectedCategory = category;
+    switch (this.selectedCategory) {
+      case "Монокристални": this.rowHeight = "1:2.2"; break;
+      case "Поликристални": this.rowHeight = "1:2.1"; break;
+      case "Аморфни": this.rowHeight = "1:2.2"; break;
+      case "PWM": this.rowHeight = "1:2.5"; break;
+      case "MPPT": this.rowHeight = "1:2.2"; break;
+      case "OFF-Grid": this.rowHeight = "1:2"; break;
+      case "ON-Grid": this.rowHeight = "1:2.2"; break;
+      case "Хибридни": this.rowHeight = "1:2.3"; break;
+      case "Хоризонтални": this.rowHeight = "1:2.8"; break;
+      case "Вертикални": this.rowHeight = "1:2.7"; break;
+      default: this.rowHeight = "1:1";
+    }
   }
 
 }
