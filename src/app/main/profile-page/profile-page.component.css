@@ -1,7 +1,17 @@
 form {
-    height: fit-content;
+    height: 100%;
+    overflow-y: scroll;
+    padding-top: 150px;
 }
 
 form > div {
     width: 85%;
+}
+
+@media screen and (max-width: 960px) {
+    form {
+        height: 100%;
+        overflow-y: scroll;
+        padding-top: 600px;
+    }
 }
