@@ -1,10 +1,27 @@
 <mat-drawer-container fxFill class="mat-card" autosize>
     <mat-drawer #drawer mode="over">
-        <span style="margin-left: 2px;">Категорије производа</span>
+        <span style="margin-left: 2px;">Сакри бочни мени за навигацију</span>
         <button type="button" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>keyboard_arrow_left</mat-icon>
         </button>
-        <!-- Add filters here (i.e. by price) -->
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по цени</mat-panel-description>
+            </mat-expansion-panel-header>
+            <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [options]="priceSliderOptions"></ngx-slider>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-description>Desc 2</mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>Tset 2 sadrzaj</p>
+          </mat-expansion-panel>
+          <!-- Add filters here 
+            filters: cena, snaga (kontroler -> struja), napon, min. na stanju, произвођач аутомобили
+          -->
+        </mat-accordion>
+        <mat-divider></mat-divider>
         <mat-tree [dataSource]="categoriesSource" [treeControl]="treeControl">
             <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
               <button type="button" mat-flat-button (click)="displayItems(this.category.name)" [color]="this.category.name === selectedCategory ? 'primary' : none">{{category.name}}</button>

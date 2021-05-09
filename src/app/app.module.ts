@@ -25,6 +25,7 @@ import { NotFoundComponent } from './main/not-found/not-found.component';
 import { FirebaseService } from './auth/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    NgxSliderModule
   ],
   providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, IDBDatabase, IDBFactory],
   bootstrap: [AppComponent]
