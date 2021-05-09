@@ -3,6 +3,7 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { FirebaseService } from 'src/app/auth/firebase/firebase.service';
 import { Observable } from 'rxjs/internal/Observable';
+import { Options } from '@angular-slider/ngx-slider';
 
 export interface Item {
   title: string,
@@ -52,6 +53,18 @@ export class ShopComponent implements OnInit {
 
   categoriesSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
+  hasChild = (_: number, node: FlatNode) => node.expandable;
+
+  minPrice: number = 0;
+  maxPrice: number = 100;
+
+  priceSliderOptions: Options = {
+    floor: 0,
+    ceil: 100,
+    step: 10,
+    showTicks: true
+  };
+
   constructor(private fs:FirebaseService) {
     this.categoriesSource.data = [
       {
@@ -83,11 +96,21 @@ export class ShopComponent implements OnInit {
           {name: 'Хоризонтални'},
           {name: 'Вертикални' }
         ]
-      },//Add more categoryItems here
+      },
+      {
+        name: 'Акумулатори',
+        children: [
+          { name: 'Оловни' },
+          { name: 'Никл базирани' },
+          { name: 'Литијумски' },
+          { name: 'Специјални' }
+        ]
+      },
+      {
+       name: 'Електрична возила' 
+      }
     ];
   }
-
-  hasChild = (_: number, node: FlatNode) => node.expandable;
 
   ngOnInit(): void {
     this.onResize(null);
@@ -120,6 +143,11 @@ export class ShopComponent implements OnInit {
       case "Хибридни": this.rowHeight = "1:2.3"; break;
       case "Хоризонтални": this.rowHeight = "1:2.8"; break;
       case "Вертикални": this.rowHeight = "1:2.7"; break;
+      case "Оловни": this.rowHeight = "1:1.9"; break;
+      case "Никл базирани": this.rowHeight = "1:1.9"; break;
+      case "Литијумски": this.rowHeight = "1:1.9"; break;
+      case "Специјални": this.rowHeight = "1:1.9"; break;
+      case "Електрична возила": this.rowHeight = "1:1.8"; break;
       default: this.rowHeight = "1:1";
     }
   }

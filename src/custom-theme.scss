@@ -358,3 +358,26 @@ form { height: 95%; background-color: darkslategray; }
 .mat-card-content {
   text-align: justify;
 }
+
+/*
+
+ngx-slider class is applied to the ngx-slider element
+
+ngx-slider-pointer-min is applied to low pointer
+ngx-slider-pointer-max is applied to high pointer
+ngx-slider-bubble class is applied to all labels:
+ngx-slider-floor class is applied to floor label
+ngx-slider-ceil class is applied to floor label
+ngx-slider-model-value class is applied to low pointer label
+ngx-slider-model-high class is applied to high pointer label
+ngx-slider-combined class is appied to combined label
+ngx-slider-bar class is applied to all bar elements:
+no additional class is applied to full bar
+ngx-slider-selection is applied to selection bar
+ngx-slider-left-out-selection is applied to left outer selection bar
+ngx-slider-right-out-selection is applied to right outer selection bar
+ngx-slider-tick class is applied to each tick element:
+ngx-slider-tick-value is applied to tick value label
+ngx-slider-tick-legend is applied to tick legend label
+
+*/
