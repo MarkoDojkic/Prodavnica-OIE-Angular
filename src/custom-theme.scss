@@ -45,6 +45,7 @@ $prodavnica-oie-angular-theme: mat-light-theme((
 */
 
 @import '~@angular/material/theming';
+
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 
@@ -200,7 +201,7 @@ $mat-primary: (
   main: #24d209,
   lighter: #c2f790,
   darker: #5ce903,
-  200: #24f901, // For slide toggle,
+  200: #24f901, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -222,7 +223,7 @@ $mat-accent: (
   main: #1eeb2a,
   lighter: #91f760,
   darker: #68f315,
-  200: #1eeb2a, // For slide toggle,
+  200: #1eeb2a, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -244,7 +245,7 @@ $mat-warn: (
   main: #f7953b,
   lighter: #f1c8a1,
   darker: #eb5902,
-  200: #f7953b, // For slide toggle,
+  200: #f7953b, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -257,7 +258,7 @@ $mat-primary-dark: (
   main: #d28809,
   lighter: #f7d590,
   darker: #e9b703,
-  200: #f9c301, // For slide toggle,
+  200: #f9c301, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -270,7 +271,7 @@ $mat-accent-dark: (
   main: #eb5c1e,
   lighter: #f78d60,
   darker: #f38015,
-  200: #eb6d1e, // For slide toggle,
+  200: #eb6d1e, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -283,7 +284,7 @@ $mat-warn-dark: (
   main: #f7643b,
   lighter: #f1aca1,
   darker: #eb2902,
-  200: #f74e3b, // For slide toggle,
+  200: #f74e3b, // For slide toggle
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -295,10 +296,55 @@ $theme-warn-dark: mat-palette($mat-warn-dark, main, lighter, darker);
 $theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-dark);
 
+//Custom @mixin themes
+
+@mixin ngx-slider-theme($config-or-theme) {
+  $config: mat-get-color-config($config-or-theme);
+  $primary: map-get($config, primary);
+  $accent: map-get($config, accent);
+  $warn: map-get($config, warn);
+  $background: map-get($config, background);
+  $foreground: map-get($config, foreground);
+
+  .ngx-slider {
+    .ngx-slider-bar {
+      background: #ebebeb !important;
+    }
+
+    .ngx-slider-pointer {
+      width: 16px !important;
+      height: 16px !important;
+      top: -7px !important;
+      background: mat-color($accent, 200) !important;
+    }
+
+    .ngx-slider-pointer::after {
+      display: none !important;
+    }
+
+    .ngx-slider-pointer-min {
+      background: mat-color($primary, lighter) !important;
+    }
+
+    .ngx-slider-pointer-max .ngx-slider-tick {
+      background: mat-color($primary, 200) !important;
+    }
+
+    .ngx-slider-tick.ngx-slider-selected {
+      background: mat-color($accent, 200) !important;
+    }
+
+    .ngx-slider-bubble {
+      color: mat-color($accent, text) !important;
+    }
+  }
+}
+
 // Theme Init
 
 .theme-light {
   @include angular-material-theme($theme);
+  @include ngx-slider-theme($theme);
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -310,6 +356,7 @@ $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-
 
 .theme-dark {
   @include angular-material-theme($darkTheme);
+  @include ngx-slider-theme($darkTheme);
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -358,26 +405,3 @@ form { height: 95%; background-color: darkslategray; }
 .mat-card-content {
   text-align: justify;
 }
-
-/*
-
-ngx-slider class is applied to the ngx-slider element
-
-ngx-slider-pointer-min is applied to low pointer
-ngx-slider-pointer-max is applied to high pointer
-ngx-slider-bubble class is applied to all labels:
-ngx-slider-floor class is applied to floor label
-ngx-slider-ceil class is applied to floor label
-ngx-slider-model-value class is applied to low pointer label
-ngx-slider-model-high class is applied to high pointer label
-ngx-slider-combined class is appied to combined label
-ngx-slider-bar class is applied to all bar elements:
-no additional class is applied to full bar
-ngx-slider-selection is applied to selection bar
-ngx-slider-left-out-selection is applied to left outer selection bar
-ngx-slider-right-out-selection is applied to right outer selection bar
-ngx-slider-tick class is applied to each tick element:
-ngx-slider-tick-value is applied to tick value label
-ngx-slider-tick-legend is applied to tick legend label
-
-*/
