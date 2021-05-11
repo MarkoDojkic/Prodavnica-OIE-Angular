@@ -4,12 +4,12 @@
         <button type="button" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>keyboard_arrow_left</mat-icon>
         </button>
-        <mat-accordion>
+        <mat-accordion *ngIf="filteredItems != null">
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по цени</mat-panel-description>
             </mat-expansion-panel-header>
-            <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [options]="priceSliderOptions"></ngx-slider>
+            <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [(options)]="priceSliderOptions" (userChangeEnd)="filterByPrice($event)"></ngx-slider>
           </mat-expansion-panel>
           <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -18,7 +18,7 @@
             <p>Tset 2 sadrzaj</p>
           </mat-expansion-panel>
           <!-- Add filters here 
-            filters: cena, snaga (kontroler -> struja), napon, min. na stanju, произвођач аутомобили
+            filters: cena+, snaga (kontroler -> struja), napon, min. na stanju, произвођач аутомобили
           -->
         </mat-accordion>
         <mat-divider></mat-divider>
@@ -43,7 +43,7 @@
             <mat-icon>menu</mat-icon>
         </button>
         <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
-            <mat-grid-tile *ngFor="let item of items, let i = index" [attr.data-index]="i" fxFlex>
+            <mat-grid-tile *ngFor="let item of filteredItems, let i = index" [attr.data-index]="i" fxFlex>
               <mat-card fxLayout="column" fxLayoutAlign="center center" fxFlex>
                 <mat-card-header fxLayoutAlign="center center" fxFlex>
                   <mat-card-title>{{item.title}}</mat-card-title>

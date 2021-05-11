@@ -2,27 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { FirebaseService } from 'src/app/auth/firebase/firebase.service';
-import { Observable } from 'rxjs/internal/Observable';
-import { Options } from '@angular-slider/ngx-slider';
-
-export interface Item {
-  title: string,
-  imageUrl: Observable<string | null>,
-  description: string,
-  leftInStock: number,
-  price: number
-}
-
-interface CategoryNode {
-  name: string;
-  children?: CategoryNode[];
-}
-
-interface FlatNode {
-  expandable: boolean;
-  name: string;
-  level: number;
-}
+import { ChangeContext, LabelType, Options } from '@angular-slider/ngx-slider';
+import { Item, CategoryNode, FlatNode } from './shop.model';
 
 @Component({
   selector: 'app-shop',
@@ -35,7 +16,12 @@ export class ShopComponent implements OnInit {
   num_of_cols: number;
   selectedCategory: string;
   items: Array<Item>;
+  filteredItems: Array<Item>;
   rowHeight: string;
+  filterShow = false;
+  minPrice: number;
+  maxPrice: number;
+  priceSliderOptions: Options;
 
   _transformer = (node: CategoryNode, level: number) => {
     return {
@@ -54,16 +40,6 @@ export class ShopComponent implements OnInit {
   categoriesSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
-
-  minPrice: number = 0;
-  maxPrice: number = 100;
-
-  priceSliderOptions: Options = {
-    floor: 0,
-    ceil: 100,
-    step: 10,
-    showTicks: true
-  };
 
   constructor(private fs:FirebaseService) {
     this.categoriesSource.data = [
@@ -145,11 +121,43 @@ export class ShopComponent implements OnInit {
       case "Вертикални": this.rowHeight = "1:2.7"; break;
       case "Оловни": this.rowHeight = "1:1.9"; break;
       case "Никл базирани": this.rowHeight = "1:1.9"; break;
-      case "Литијумски": this.rowHeight = "1:1.9"; break;
-      case "Специјални": this.rowHeight = "1:1.9"; break;
+      case "Литијумски": this.rowHeight = "1:2"; break;
+      case "Специјални": this.rowHeight = "1:2"; break;
       case "Електрична возила": this.rowHeight = "1:1.8"; break;
       default: this.rowHeight = "1:1";
     }
+
+    setTimeout(() => {
+      var min = Math.min.apply(Math, this.items.map(item => { return item.price; }));
+      var max = Math.max.apply(Math, this.items.map(item => { return item.price; }));
+
+      this.minPrice = min;
+      this.maxPrice = max;
+
+      this.priceSliderOptions = {
+        floor: min,
+        ceil: max,
+        step: (max - min) / 10,
+        translate: (value: number, label: LabelType): string => {
+          switch (label) {
+            case LabelType.Low:
+              return "<b>" + value + " РСД</b>";
+            case LabelType.High:
+              return "<b>" + value + " РСД</b>";
+            default:
+              return value + " РСД";
+          }
+        }
+      };
+      this.filteredItems = this.items;
+    }, 1000);
   }
 
+  filterByPrice(filterValues: ChangeContext): void {
+    this.filteredItems = this.items.filter(item => {
+      return item.price >= filterValues.value && item.price <= filterValues.highValue;
+    });
+  }
 }
+
+export { Item, CategoryNode, FlatNode }; //To resolve additional export request by Angular
