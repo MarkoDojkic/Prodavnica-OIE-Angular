@@ -14,7 +14,7 @@ export class RegistrationComponent implements OnInit {
   paymentHint: String;
   paymentErrorMessage: String;
 
-  constructor(public fs:FirebaseService) { }
+  constructor(private fs:FirebaseService) { }
 
   ngOnInit(): void {
     this.paymentPattern = this.paymentHint = this.paymentErrorMessage = null;

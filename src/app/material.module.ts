@@ -19,6 +19,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTreeModule } from "@angular/material/tree";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
     imports: [
@@ -41,7 +42,8 @@ import { MatDividerModule } from '@angular/material/divider';
         MatDividerModule,
         MatTabsModule,
         MatTableModule,
-        MatSortModule
+        MatSortModule,
+        MatSnackBarModule
     ],
     exports: [
         MatButtonModule,
@@ -63,7 +65,8 @@ import { MatDividerModule } from '@angular/material/divider';
         MatDividerModule,
         MatTabsModule,
         MatTableModule,
-        MatSortModule
+        MatSortModule,
+        MatSnackBarModule
     ]
 })
 

@@ -6,6 +6,7 @@ export interface Item {
   description: string;
   leftInStock: number;
   price: number;
+  orderedQuantity?: string;
 }
 
 export interface CategoryNode {

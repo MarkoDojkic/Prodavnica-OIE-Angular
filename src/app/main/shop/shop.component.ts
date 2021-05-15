@@ -6,6 +6,9 @@ import { LabelType, Options } from '@angular-slider/ngx-slider';
 import { Item, CategoryNode, FlatNode } from './shop.model';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { KeyValue } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shop',
@@ -59,7 +62,7 @@ export class ShopComponent implements OnInit {
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  constructor(private fs:FirebaseService) {
+  constructor(private fs:FirebaseService, private snackbar: MatSnackBar, private router: Router) {
     this.categoriesSource.data = [
       {
         name: 'Соларни панели',
@@ -505,11 +508,39 @@ export class ShopComponent implements OnInit {
   }
 
   buyProduct(product: Item) {
-    
+    product.orderedQuantity = product.orderedQuantity === undefined ? "1" : product.orderedQuantity;
+    product.orderedQuantity = parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock.toString() : product.orderedQuantity;
+
+    if (!this.fs.isUserLoggedIn) {
+      Swal.fire({
+        title: "Нисте улоговани!",
+        text: "Морате бити улоговани да бисте додали производ у корпу!",
+        icon: "error",
+        showCancelButton: true,
+        confirmButtonText: "Преусмери ме на страницу за логовање",
+        cancelButtonText: "Одустани",
+      }).then(result => {
+        if(result.isConfirmed) this.router.navigate(["/login"]); //If clicked on confirm button
+      });
+
+      return;
+    }
+
+    //Add to shopping basket logic to be implemented here
+
+    var message = "Успешно додато у корпу: " + product.title + " x" + product.orderedQuantity;
+    this.snackbar.open(message, "", {
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      direction: "ltr",
+      duration: 5000,
+      politeness: "assertive",
+      panelClass: "snackbar",
+    });
   }
 
   showComments(product: Item) {
-    
+    //Comments logic to be implemented here
   }
 }
 
