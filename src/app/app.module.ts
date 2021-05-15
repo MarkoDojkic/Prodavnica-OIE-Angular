@@ -13,11 +13,7 @@ import { RoutingModule } from './routing.module';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { CryptoService } from './auth/crypto/crypto.service';
-import { RegistrationSuccessDialogComponent } from './popupDialogs/registration-success-dialog/registration-success-dialog.component';
-import { LoginSuccessDialogComponent } from './popupDialogs/login-success-dialog/login-success-dialog.component';
-import { LoginFailedDialogComponent } from './popupDialogs/login-failed-dialog/login-failed-dialog.component';
 import { ProfilePageComponent } from './main/profile-page/profile-page.component';
-import { RegistrationFailedDialogComponent } from './popupDialogs/registration-failed-dialog/registration-failed-dialog.component';
 import { ShopComponent } from './main/shop/shop.component';
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
@@ -34,11 +30,7 @@ import { HttpClientModule } from '@angular/common/http';
     AppComponent,
     LoginComponent,
     RegistrationComponent,
-    RegistrationSuccessDialogComponent,
-    LoginSuccessDialogComponent,
-    LoginFailedDialogComponent,
     ProfilePageComponent,
-    RegistrationFailedDialogComponent,
     ShopComponent,
     CartComponent,
     OrderComponent,
