@@ -9,7 +9,7 @@ import { NgForm } from '@angular/forms';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(public fs:FirebaseService) { }
+  constructor(private fs:FirebaseService) { }
 
   ngOnInit(): void {
   }
