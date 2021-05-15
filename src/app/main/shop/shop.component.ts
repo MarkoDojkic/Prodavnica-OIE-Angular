@@ -194,7 +194,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Хоризонтални":
-          this.rowHeight = "1:2.8";
+          this.rowHeight = "1:2.9";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Излазна снага: "),
@@ -204,7 +204,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Вертикални":
-          this.rowHeight = "1:2.7";
+          this.rowHeight = "1:2.9";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Излазна снага: "),
@@ -502,6 +502,14 @@ export class ShopComponent implements OnInit {
       console.log(temp);
       return parseInt(temp) < voltageMin || parseInt(temp) > voltageMax;
     })
+  }
+
+  buyProduct(product: Item) {
+    
+  }
+
+  showComments(product: Item) {
+    
   }
 }
 

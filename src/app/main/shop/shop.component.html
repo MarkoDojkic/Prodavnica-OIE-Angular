@@ -4,6 +4,7 @@
         <button type="button" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>keyboard_arrow_left</mat-icon>
         </button>
+
         <mat-accordion *ngIf="filteredItems != null">
           <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -11,12 +12,14 @@
             </mat-expansion-panel-header>
             <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [(options)]="priceSliderOptions" (userChangeEnd)="applyFilters()"></ngx-slider>
           </mat-expansion-panel>
+
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по количини</mat-panel-description>
             </mat-expansion-panel-header>
             <span>Најмања количина на стању: <input type="number" [(ngModel)]="minInStock" name="minInStock" (keyup)="applyFilters()"/></span>
           </mat-expansion-panel>
+
           <mat-expansion-panel *ngIf="voltages != null">
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по напону</mat-panel-description>
@@ -25,6 +28,7 @@
               <mat-checkbox [(ngModel)]="voltage.value" (change)="updateVoltages(voltage.key, $event)">{{voltage.key}}</mat-checkbox>
             </span>
           </mat-expansion-panel>
+
           <mat-expansion-panel *ngIf="amperages != null">
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по јачини струје пуњења</mat-panel-description>
@@ -33,6 +37,7 @@
               <mat-checkbox [(ngModel)]="amperage.value" (change)="updateAmperages(amperage.key, $event)">{{amperage.key}}</mat-checkbox>
             </span>
           </mat-expansion-panel>
+
           <mat-expansion-panel *ngIf="wattages != null">
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по излазној снази</mat-panel-description>
@@ -41,6 +46,7 @@
               <mat-checkbox [(ngModel)]="wattage.value" (change)="updateWattages(wattage.key, $event)">{{wattage.key}}</mat-checkbox>
             </span>
           </mat-expansion-panel>
+
           <mat-expansion-panel *ngIf="amperhours != null">
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по капацитету</mat-panel-description>
@@ -49,14 +55,17 @@
               <mat-checkbox [(ngModel)]="amperhour.value" (change)="updateAmperhours(amperhour.key, $event)">{{amperhour.key}}</mat-checkbox>
             </span>
           </mat-expansion-panel>
+
           <mat-expansion-panel *ngIf="selectedCategory === 'Електрична возила'">
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по домету</mat-panel-description>
             </mat-expansion-panel-header>
             <ngx-slider [(value)]="minDrivingRange" [(highValue)]="maxDrivingRange" [(options)]="priceSliderOptionsDrivingRange" (userChangeEnd)="applyFilters()"></ngx-slider>
           </mat-expansion-panel>
+          
         </mat-accordion>
         <mat-divider></mat-divider>
+
         <mat-tree [dataSource]="categoriesSource" [treeControl]="treeControl">
             <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
               <button type="button" mat-flat-button (click)="displayItems(this.category.name)" [color]="this.category.name === selectedCategory ? 'primary' : none">{{category.name}}</button>
@@ -89,8 +98,8 @@
                   <span fxFlex="30" *ngIf="item.leftInStock > 0">Количина: <input type="number" min="0" [max]="item.leftInStock" ngModel matInput name="quantity_item{{i}}" required/></span>
                   <span fxFlex="50">Цена по комаду: {{item.price}} Динара</span>
                   <span fxFlex="50" *ngIf="item.leftInStock === 0">Нема на стању</span>
-                  <button fxFlex="10" type="submit" mat-icon-button color="accent" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>
-                  <button fxFlex="10" type="submit" mat-icon-button color="secondary"><mat-icon>comment</mat-icon></button>
+                  <button fxFlex="10" type="button" mat-icon-button color="accent" (click)="buyProduct(item)" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>
+                  <button fxFlex="10" type="button" mat-icon-button color="secondary" (click)="showComments(item)"><mat-icon>comment</mat-icon></button>
                 </mat-card-actions>
               </mat-card>
             </mat-grid-tile>
