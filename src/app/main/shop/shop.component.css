@@ -13,3 +13,7 @@ mat-drawer-container {
 mat-card {
     text-align: center;
 }
+
+span > mat-checkbox {
+    margin: 0 10px;
+}

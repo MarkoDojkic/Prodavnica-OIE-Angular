@@ -311,6 +311,10 @@ $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-
       background: #ebebeb !important;
     }
 
+    .ngx-slider-selection {
+      background: mat-color($primary, darker) !important;
+    }
+
     .ngx-slider-pointer {
       width: 16px !important;
       height: 16px !important;
@@ -404,4 +408,8 @@ form { height: 95%; background-color: darkslategray; }
 
 .mat-card-content {
   text-align: justify;
+}
+
+* > .mat-tab-header, .mat-tab-body-wrapper {
+  top: 64px !important;
 }
