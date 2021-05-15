@@ -1,3 +1,6 @@
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { NgModule } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
@@ -35,7 +38,10 @@ import { MatDividerModule } from '@angular/material/divider';
         MatTreeModule,
         MatCardModule,
         MatExpansionModule,
-        MatDividerModule
+        MatDividerModule,
+        MatTabsModule,
+        MatTableModule,
+        MatSortModule
     ],
     exports: [
         MatButtonModule,
@@ -54,7 +60,10 @@ import { MatDividerModule } from '@angular/material/divider';
         MatTreeModule,
         MatCardModule,
         MatExpansionModule,
-        MatDividerModule
+        MatDividerModule,
+        MatTabsModule,
+        MatTableModule,
+        MatSortModule
     ]
 })
 

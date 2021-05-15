@@ -9,17 +9,52 @@
             <mat-expansion-panel-header>
               <mat-panel-description>Филтрирај по цени</mat-panel-description>
             </mat-expansion-panel-header>
-            <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [(options)]="priceSliderOptions" (userChangeEnd)="filterByPrice($event)"></ngx-slider>
+            <ngx-slider [(value)]="minPrice" [(highValue)]="maxPrice" [(options)]="priceSliderOptions" (userChangeEnd)="applyFilters()"></ngx-slider>
           </mat-expansion-panel>
           <mat-expansion-panel>
             <mat-expansion-panel-header>
-              <mat-panel-description>Desc 2</mat-panel-description>
+              <mat-panel-description>Филтрирај по количини</mat-panel-description>
             </mat-expansion-panel-header>
-            <p>Tset 2 sadrzaj</p>
+            <span>Најмања количина на стању: <input type="number" [(ngModel)]="minInStock" name="minInStock" (keyup)="applyFilters()"/></span>
           </mat-expansion-panel>
-          <!-- Add filters here 
-            filters: cena+, snaga (kontroler -> struja), napon, min. na stanju, произвођач аутомобили
-          -->
+          <mat-expansion-panel *ngIf="voltages != null">
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по напону</mat-panel-description>
+            </mat-expansion-panel-header>
+            <span *ngFor="let voltage of voltages | keyvalue">
+              <mat-checkbox [(ngModel)]="voltage.value" (change)="updateVoltages(voltage.key, $event)">{{voltage.key}}</mat-checkbox>
+            </span>
+          </mat-expansion-panel>
+          <mat-expansion-panel *ngIf="amperages != null">
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по јачини струје пуњења</mat-panel-description>
+            </mat-expansion-panel-header>
+            <span *ngFor="let amperage of amperages | keyvalue : orderByNumber">
+              <mat-checkbox [(ngModel)]="amperage.value" (change)="updateAmperages(amperage.key, $event)">{{amperage.key}}</mat-checkbox>
+            </span>
+          </mat-expansion-panel>
+          <mat-expansion-panel *ngIf="wattages != null">
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по излазној снази</mat-panel-description>
+            </mat-expansion-panel-header>
+            <span *ngFor="let wattage of wattages | keyvalue : orderByNumber">
+              <mat-checkbox [(ngModel)]="wattage.value" (change)="updateWattages(wattage.key, $event)">{{wattage.key}}</mat-checkbox>
+            </span>
+          </mat-expansion-panel>
+          <mat-expansion-panel *ngIf="amperhours != null">
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по капацитету</mat-panel-description>
+            </mat-expansion-panel-header>
+            <span *ngFor="let amperhour of amperhours | keyvalue : orderByNumber">
+              <mat-checkbox [(ngModel)]="amperhour.value" (change)="updateAmperhours(amperhour.key, $event)">{{amperhour.key}}</mat-checkbox>
+            </span>
+          </mat-expansion-panel>
+          <mat-expansion-panel *ngIf="selectedCategory === 'Електрична возила'">
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по домету</mat-panel-description>
+            </mat-expansion-panel-header>
+            <ngx-slider [(value)]="minDrivingRange" [(highValue)]="maxDrivingRange" [(options)]="priceSliderOptionsDrivingRange" (userChangeEnd)="applyFilters()"></ngx-slider>
+          </mat-expansion-panel>
         </mat-accordion>
         <mat-divider></mat-divider>
         <mat-tree [dataSource]="categoriesSource" [treeControl]="treeControl">
@@ -42,7 +77,7 @@
         <button type="button" mat-icon-button class="floating" (click)="drawer.toggle()" *ngIf="!drawer.opened">
             <mat-icon>menu</mat-icon>
         </button>
-        <mat-grid-list [cols]="num_of_cols" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
+        <mat-grid-list [cols]="numberOfColums" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
             <mat-grid-tile *ngFor="let item of filteredItems, let i = index" [attr.data-index]="i" fxFlex>
               <mat-card fxLayout="column" fxLayoutAlign="center center" fxFlex>
                 <mat-card-header fxLayoutAlign="center center" fxFlex>

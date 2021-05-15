@@ -26,6 +26,8 @@ import { FirebaseService } from './auth/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { FishDemoComponent } from './fish-demo/fish-demo.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     ShopComponent,
     CartComponent,
     OrderComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    FishDemoComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +55,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireStorageModule,
-    NgxSliderModule
+    NgxSliderModule,
+    HttpClientModule
   ],
   providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, IDBDatabase, IDBFactory],
   bootstrap: [AppComponent]
