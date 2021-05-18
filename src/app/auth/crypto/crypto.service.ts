@@ -10,9 +10,9 @@ export class CryptoService {
   constructor() { }
 
   encrypt(encryptionKey: string, value: string): string {
-    var key = CryptoJS.enc.Utf8.parse(encryptionKey);
-    var iv = CryptoJS.enc.Utf8.parse(encryptionKey);
-    var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value.toString()), key,
+    const key = CryptoJS.enc.Utf8.parse(encryptionKey);
+    const iv = CryptoJS.enc.Utf8.parse(encryptionKey);
+    const encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value.toString()), key,
     {
         keySize: 128 / 8,
         iv: iv,
@@ -24,9 +24,9 @@ export class CryptoService {
   }
 
   decrypt(encryptionKey: string, encryptedValue: string): string {
-    var key = CryptoJS.enc.Utf8.parse(encryptionKey);
-    var iv = CryptoJS.enc.Utf8.parse(encryptionKey);
-    var decrypted = CryptoJS.AES.decrypt(encryptedValue, key, {
+    const key = CryptoJS.enc.Utf8.parse(encryptionKey);
+    const iv = CryptoJS.enc.Utf8.parse(encryptionKey);
+    const decrypted = CryptoJS.AES.decrypt(encryptedValue, key, {
         keySize: 128 / 8,
         iv: iv,
         mode: CryptoJS.mode.CBC,

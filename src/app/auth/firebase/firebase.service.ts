@@ -1,9 +1,9 @@
+import { IndexedDatabaseService } from './../../main/indexed-database/indexed-database.service';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Injectable, NgZone } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { CryptoService } from '../crypto/crypto.service';
 import { Observable } from 'rxjs';
 import { Item } from 'src/app/main/shop/shop.component';
@@ -18,20 +18,19 @@ export class FirebaseService {
 
   //https://www.positronx.io/full-angular-7-firebase-authentication-system/
 
-  private key: string = "y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY";
-  private firebaseLocalDB: IDBDatabase;
-  private isLoggedIn: boolean;
+  key: string = "y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY";
+  firebaseLocalStorageDb: string = "firebaseLocalStorageDb";
+  isLoggedIn: boolean;
 
   constructor(private firestore: AngularFirestore, private auth: AngularFireAuth,
     private ngZone: NgZone, private router: Router, private storage: AngularFireStorage,
-    private cs: CryptoService, private dialog: MatDialog) {
-      var openIDB = window.indexedDB.open("firebaseLocalStorageDb", 1);
-      openIDB.onsuccess = () => {
-        this.firebaseLocalDB = openIDB.result;
-      };
-      openIDB.onerror = error => {
-        console.log("Error while opening firebaseLocalDB: " + error);
-      };
+    private idb: IndexedDatabaseService, private cs: CryptoService) {
+      this.idb.openIDB(this.firebaseLocalStorageDb, 1);
+      
+      setTimeout(() => { /* Timeout to wait for database to be created/opened */ 
+        this.idb.getObjectStoresItemCount(this.idb.getIDB(this.firebaseLocalStorageDb), ["firebaseLocalStorage"])
+                .subscribe(result => this.isLoggedIn = result[0] > 0);
+      }, 1000);
     }
 
   signInViaEmail(email: string, password: string): Promise<any> {
@@ -113,18 +112,21 @@ export class FirebaseService {
     return this.firestore.collection("users").doc(userId).get();
   }
 
-  getIDBData(): Promise<any> {
-    this.isLoggedIn = true;
-    return new Promise<any>((resolve, reject) => {
-      const gettingData = this.firebaseLocalDB.transaction('firebaseLocalStorage', 'readonly').objectStore("firebaseLocalStorage").get(IDBKeyRange.lowerBound(0));
-      gettingData.onsuccess = () => {
-        resolve(gettingData.result["value"]);
-      }
-  
-      gettingData.onerror = (error) => {
-        reject(Error("Error while getting idb data: " + error));
+  getIDBData(): Observable<any> {
+    const output: Observable<number[]> = new Observable((observer) => {
+      this.idb.getObjectStoreItem(this.idb.getIDB(this.firebaseLocalStorageDb),
+      "firebaseLocalStorage", IDBKeyRange.lowerBound(0))
+        .then(value => { observer.next(value); })
+        .catch(error => { observer.next(error); });
+
+      return {
+        unsubscribe() {
+          observer.remove(observer);
+        }
       }
     });
+
+    return output;
   }
 
   get isUserLoggedIn(): boolean {
@@ -156,7 +158,7 @@ export class FirebaseService {
     return categoryItems;
   }
 
-  private retriveImageURL(imageName: string): Observable<string | null> {
+  retriveImageURL(imageName: string): Observable<string | null> {
     return this.storage.ref("items/" + imageName + ".png").getDownloadURL();
   }
 }
