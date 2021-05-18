@@ -25,7 +25,11 @@ export class ProfilePageComponent implements OnInit {
 
   constructor(private fs:FirebaseService) { }
 
-  ngOnInit(): void { this.updateFieldData(); }
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.updateFieldData();
+    }, 1000);
+  }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
     if (pass.value != repeatPass.value) repeatPass.control.setErrors({ "matched": true });
@@ -34,9 +38,9 @@ export class ProfilePageComponent implements OnInit {
 
   onUpdate(form: NgForm): void {
 
-    var newName: string = form.controls["name"].value;
-    var newSurname: string = form.controls["surname"].value;
-    var updatedFirestoreData: any = {};
+    const newName: string = form.controls["name"].value;
+    const newSurname: string = form.controls["surname"].value;
+    const updatedFirestoreData: any = {};
 
     console.log();
     
@@ -44,7 +48,7 @@ export class ProfilePageComponent implements OnInit {
     + (!!newSurname ? newSurname : this.userSurname)), null);
         
     Object.keys(form.controls).forEach(control => {
-      var field: AbstractControl = form.controls[control];
+      const field: AbstractControl = form.controls[control];
       if (field.dirty && field.valid && control !== "name" && control !== "surname"
         && control !== "email" && control !== "password" && control != "passwordRepeat") {
         updatedFirestoreData[control] = field.value;
@@ -68,13 +72,12 @@ export class ProfilePageComponent implements OnInit {
     form.reset();
   }
 
-  async updateFieldData() {
-    const ibData: Promise<any> = this.fs.getIDBData();
-    ibData.then(() => {
-      this.uid = ibData["__zone_symbol__value"]["uid"];
-      this.userName = ibData["__zone_symbol__value"]["displayName"].split(' ')[0];
-      this.userSurname = ibData["__zone_symbol__value"]["displayName"].split(' ')[1];
-      this.userEmail = ibData["__zone_symbol__value"]["email"];
+  updateFieldData() {
+    this.fs.getIDBData().subscribe(ibData => {
+      this.uid = ibData["value"]["uid"];
+      this.userName = ibData["value"]["displayName"].split(' ')[0];
+      this.userSurname = ibData["value"]["displayName"].split(' ')[1];
+      this.userEmail = ibData["value"]["email"];
 
       this.fs.getFirestoreData(this.uid).forEach((data) => {
         this.userPhone = data.get("phone");
@@ -84,7 +87,7 @@ export class ProfilePageComponent implements OnInit {
         this.userPaymentAddress = data.get("paymentAddress");
         this.userPaymentType = data.get("paymentType");
       });
-    })
+    });
   }
 
   updatePaymentAddressInput(paymentType: Number) {

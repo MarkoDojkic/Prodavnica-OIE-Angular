@@ -12,7 +12,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -32,7 +31,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatRadioModule,
         MatCheckboxModule,
         MatSlideToggleModule,
-        MatDialogModule,
         MatBadgeModule,
         MatSidenavModule,
         MatGridListModule,
@@ -55,7 +53,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatRadioModule,
         MatCheckboxModule,
         MatSlideToggleModule,
-        MatDialogModule,
         MatBadgeModule,
         MatSidenavModule,
         MatGridListModule,

@@ -9,6 +9,8 @@ import { KeyValue } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { IndexedDatabaseService } from '../indexed-database/indexed-database.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-shop',
@@ -24,8 +26,7 @@ export class ShopComponent implements OnInit {
   items: Array<Item>;
   filteredItems: Array<Item>;
   filterShow = false;
-  priceSliderOptions: Options;
-  priceSliderOptionsDrivingRange: Options;
+  localStorageDb: string = "localStorageDb";
 
   //Filtering values
   minPrice: number;
@@ -37,6 +38,8 @@ export class ShopComponent implements OnInit {
   amperhours: Map<string, boolean>;
   minDrivingRange: number;
   maxDrivingRange: number;
+  priceSliderOptions: Options;
+  priceSliderOptionsDrivingRange: Options;
 
   //To order when using keyvalue pipe in amperages * otherwise it'll sort like strings *
   orderByNumber = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
@@ -62,7 +65,7 @@ export class ShopComponent implements OnInit {
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  constructor(private fs:FirebaseService, private snackbar: MatSnackBar, private router: Router) {
+  constructor(private fs:FirebaseService, private snackbar: MatSnackBar, private router: Router, private idb: IndexedDatabaseService) {
     this.categoriesSource.data = [
       {
         name: 'Соларни панели',
@@ -258,14 +261,14 @@ export class ShopComponent implements OnInit {
           break;
         case "Електрична возила":
           this.rowHeight = "1:1.8";
-          var minDR = Math.min.apply(Math, this.items.map(item => {
+          const minDR = Math.min.apply(Math, this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Домет при пуној батерији: "),
                                 temp.lastIndexOf(" km Број путника:"))
             temp = temp.slice(26, temp.length);
             return parseInt(temp);
           }));
-          var maxDR = Math.max.apply(Math, this.items.map(item => {
+          const maxDR = Math.max.apply(Math, this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Домет при пуној батерији: "),
                                 temp.lastIndexOf(" km Број путника:"))
@@ -297,8 +300,8 @@ export class ShopComponent implements OnInit {
       }
 
       this.filteredItems = this.items;
-      var min = Math.min.apply(Math, this.items.map(item => { return item.price; }));
-      var max = Math.max.apply(Math, this.items.map(item => { return item.price; }));
+      const min = Math.min.apply(Math, this.items.map(item => { return item.price; }));
+      const max = Math.max.apply(Math, this.items.map(item => { return item.price; }));
 
       this.minPrice = min;
       this.maxPrice = max;
@@ -331,7 +334,7 @@ export class ShopComponent implements OnInit {
       this.filteredItems = this.filteredItems.filter(item => item.leftInStock >= this.minInStock);
     
     if (this.selectedCategory === "Монокристални" || this.selectedCategory === "Поликристални" || this.selectedCategory === "Аморфни") {
-      for (var key of Array.from(this.voltages.keys())) {
+      for (const key of Array.from(this.voltages.keys())) {
         if (key === "12V" && !this.voltages.get(key)) this.filterOutVoltage(12, 24);
         if (key === "24V" && !this.voltages.get(key)) this.filterOutVoltage(24, 36);
         if (key === "24V/36V" && !this.voltages.get(key)) this.filterOutVoltage(24, 48);
@@ -342,7 +345,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "PWM") {
-      for (var key of Array.from(this.voltages.keys())) {
+      for (const key of Array.from(this.voltages.keys())) {
         if (!this.voltages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -354,7 +357,7 @@ export class ShopComponent implements OnInit {
         }
       }
 
-      for (var key of Array.from(this.amperages.keys())) {
+      for (const key of Array.from(this.amperages.keys())) {
         if (!this.amperages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -368,7 +371,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "MPPT") {
-      for (var key of Array.from(this.amperages.keys())) {
+      for (const key of Array.from(this.amperages.keys())) {
         if (!this.amperages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -382,7 +385,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "OFF-Grid") {
-      for (var key of Array.from(this.wattages.keys())) {
+      for (const key of Array.from(this.wattages.keys())) {
         if (!this.wattages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -396,7 +399,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "ON-Grid") {
-      for (var key of Array.from(this.wattages.keys())) {
+      for (const key of Array.from(this.wattages.keys())) {
         if (!this.wattages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -410,7 +413,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "Хибридни") {
-      for (var key of Array.from(this.wattages.keys())) {
+      for (const key of Array.from(this.wattages.keys())) {
         if (!this.wattages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -424,7 +427,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "Хоризонтални" || this.selectedCategory === "Вертикални") {
-      for (var key of Array.from(this.wattages.keys())) {
+      for (const key of Array.from(this.wattages.keys())) {
         if (!this.wattages.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -438,7 +441,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "Оловни" || this.selectedCategory === "Никл базирани") {
-      for (var key of Array.from(this.amperhours.keys())) {
+      for (const key of Array.from(this.amperhours.keys())) {
         if (!this.amperhours.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -452,7 +455,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "Литијумски" || this.selectedCategory === "Специјални") {
-      for (var key of Array.from(this.amperhours.keys())) {
+      for (const key of Array.from(this.amperhours.keys())) {
         if (!this.amperhours.get(key)) {
           this.filteredItems = this.filteredItems.filter(item => {
             var temp = item.description;
@@ -508,14 +511,14 @@ export class ShopComponent implements OnInit {
   }
 
   buyProduct(product: Item) {
-    product.orderedQuantity = product.orderedQuantity === undefined ? "1" : product.orderedQuantity;
+    product.orderedQuantity = typeof (product.orderedQuantity) !== "number" || parseInt(product.orderedQuantity) < 1 ? "1" : product.orderedQuantity;
     product.orderedQuantity = parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock.toString() : product.orderedQuantity;
 
     if (!this.fs.isUserLoggedIn) {
       Swal.fire({
         title: "Нисте улоговани!",
         text: "Морате бити улоговани да бисте додали производ у корпу!",
-        icon: "error",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Преусмери ме на страницу за логовање",
         cancelButtonText: "Одустани",
@@ -526,16 +529,32 @@ export class ShopComponent implements OnInit {
       return;
     }
 
-    //Add to shopping basket logic to be implemented here
+    new Observable((observer) => {
+      this.idb.getObjectStoreItem(this.idb.getIDB(this.localStorageDb),
+        "orderedProducts", product.title)
+        .then(value => { observer.next(value); })
+        .catch(error => { observer.next(error); });
 
-    var message = "Успешно додато у корпу: " + product.title + " x" + product.orderedQuantity;
-    this.snackbar.open(message, "", {
-      horizontalPosition: "right",
-      verticalPosition: "top",
-      direction: "ltr",
-      duration: 5000,
-      politeness: "assertive",
-      panelClass: "snackbar",
+      return {
+        unsubscribe() {
+          observer.remove(observer);
+        }
+      }
+    }).subscribe(data => {
+      var newQuantaty = typeof (data) === "undefined" ? 0 : data["orderedQuantity"];
+      newQuantaty = newQuantaty + parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock : newQuantaty + parseInt(product.orderedQuantity);
+      this.idb.putObjectStoreItem(this.idb.getIDB(this.localStorageDb),
+        "orderedProducts", { productTitle: product.title, orderedQuantity: newQuantaty, price: product.price, description: product.description });
+
+      var message = "Стање у корпи за " + product.title + " " + newQuantaty + " комада";
+      this.snackbar.open(message, "", {
+        horizontalPosition: "right",
+        verticalPosition: "top",
+        direction: "ltr",
+        duration: 5000,
+        politeness: "assertive",
+        panelClass: "snackbar-coloring"
+      });
     });
   }
 

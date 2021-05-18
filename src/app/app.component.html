@@ -41,7 +41,7 @@
                 <mat-icon>receipt</mat-icon> Поруџбине   
             </button>
             <button mat-icon-button routerLink="/cart" fxFlex="5">
-                <mat-icon matBadge="0" matBadgeColor="warn">shopping_cart</mat-icon>
+                <mat-icon matBadge="{{numberOfProductsInShoppingCart}}" matBadgeColor="warn">shopping_cart</mat-icon>
             </button>
             <button mat-stroked-button routerLink="/profile" fxFlex>
                 <mat-icon>person</mat-icon> Профил
@@ -59,7 +59,7 @@
                 <mat-icon>receipt</mat-icon>
             </button>
             <button mat-icon-button routerLink="/cart">
-                <mat-icon matBadge="0" matBadgeColor="warn">shopping_cart</mat-icon>
+                <mat-icon matBadge="{{ numberOfProductsInShoppingCart }}" matBadgeColor="warn">shopping_cart</mat-icon>
             </button>
             <button mat-icon-button routerLink="/profile" fxFlex>
                 <mat-icon>person</mat-icon>
