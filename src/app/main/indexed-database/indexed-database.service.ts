@@ -69,7 +69,7 @@ export class IndexedDatabaseService {
   }
 
   getObjectStoreItem(database: IDBDatabase, objectStoreName: string, objectStoreKey: IDBValidKey | IDBKeyRange): Promise<any> {
-    const transaction = database.transaction(objectStoreName, 'readonly').objectStore(objectStoreName).get(objectStoreKey);
+    const transaction = database.transaction(objectStoreName, 'readonly').objectStore(objectStoreName).getAll(objectStoreKey);
     return new Promise<any>((resolve, reject) => {
       transaction.onsuccess = () => { resolve(transaction.result) };
       transaction.onerror = error => { reject(Error("Error while getting idb data: " + error)); };
@@ -78,5 +78,13 @@ export class IndexedDatabaseService {
 
   putObjectStoreItem(database: IDBDatabase, objectStoreName: string, objectStoreItemValue: any, objectStoreItemKey?: IDBValidKey): void {
     database.transaction(objectStoreName, "readwrite").objectStore(objectStoreName).put(objectStoreItemValue, objectStoreItemKey);
+  }
+
+  removeObjectStoreItem(database: IDBDatabase, objectStoreName: string, objectStoreItemKey?: IDBValidKey): void {
+    database.transaction(objectStoreName, "readwrite").objectStore(objectStoreName).delete(objectStoreItemKey);
+  }
+
+  clearObjectStoredatabase(database: IDBDatabase, objectStoreName: string): void {
+    database.transaction(objectStoreName, "readwrite").objectStore(objectStoreName).clear();
   }
 }

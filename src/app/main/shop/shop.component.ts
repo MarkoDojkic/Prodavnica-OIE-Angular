@@ -541,10 +541,10 @@ export class ShopComponent implements OnInit {
         }
       }
     }).subscribe(data => {
-      var newQuantaty = typeof (data) === "undefined" ? 0 : data["orderedQuantity"];
+      var newQuantaty = ((data as Array<Item>).length !== 1) ? 0 : data[0]["orderedQuantity"];
       newQuantaty = newQuantaty + parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock : newQuantaty + parseInt(product.orderedQuantity);
       this.idb.putObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-        "orderedProducts", { productTitle: product.title, orderedQuantity: newQuantaty, price: product.price, description: product.description });
+        "orderedProducts", { productTitle: product.title, orderedQuantity: newQuantaty, price: product.price, description: product.description, inStock: product.leftInStock });
 
       var message = "Стање у корпи за " + product.title + " " + newQuantaty + " комада";
       this.snackbar.open(message, "", {

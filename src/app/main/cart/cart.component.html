@@ -1,0 +1,68 @@
+<div class="spaceing">
+    <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%" class="mat-card">
+        <mat-table [dataSource]="itemsInCart" matSort class="spaceing-top">
+            <ng-container matColumnDef="productTitle">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Име производа</mat-header-cell>
+                <mat-cell *matCellDef="let element">{{ element.productTitle }}</mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef>Опис</mat-header-cell>
+                <mat-cell *matCellDef="let element"><button mat-icon-button (click)="showDescription(element.productTitle, element.description)"><mat-icon>search</mat-icon></button></mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="price">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Јединична цена</mat-header-cell>
+                <mat-cell *matCellDef="let element">{{ element.price | number }} РСД</mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="orderedQuantity">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Поручена количина</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span *ngIf="!element.isEditing">{{ element.orderedQuantity | number }} комада</span>
+                <span *ngIf="element.isEditing"><input type="number" min="1" max="{{element.inStock}}" matInput [(ngModel)]="element.orderedQuantity"/> комада</span>
+                </mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="totalCost">
+                <mat-header-cell *matHeaderCellDef>Укупна цена</mat-header-cell>
+                <mat-cell *matCellDef="let element">{{ (element.price * element.orderedQuantity) | number }} РСД</mat-cell>
+                <mat-footer-cell *matFooterCellDef>Укупна цена производа (+20% ПДВ):</mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <button mat-icon-button *ngIf="!element.isEditing" (click)="element.isEditing = true"><mat-icon>edit</mat-icon></button>
+                    <button mat-icon-button *ngIf="element.isEditing" (click)="element.isEditing = false; updateItemQuntaty(element)"><mat-icon>check_circle</mat-icon></button>
+                    <button mat-icon-button (click)="removeFromCart(element)"><mat-icon>remove_shopping_cart</mat-icon></button>
+                </mat-cell>
+                <mat-footer-cell *matFooterCellDef>{{ (subtotal + subtotal/5) | number }} РСД</mat-footer-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+            <mat-row *matRowDef="let rows; columns: displayedColumns;"></mat-row>
+            <mat-footer-row *matFooterRowDef="displayedColumns;"></mat-footer-row>
+        </mat-table>
+        <section fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="6%" fxLayoutGap.lt-sm="3%" fxFlex>
+            <section fxLayout="row" fxLayoutAlign="space-evenly center" fxLayoutGap="5%" fxLayoutGap.lt-sm="2%">
+                <span>Начин доставе:</span>
+                <mat-radio-group ngModel name="shippingVia" *ngFor="let shippingVia of ['Лично преузимање','Курирска служба','Пошта']">
+                    <mat-radio-button value="{{ shippingVia }}" (click)="updateShipping(shippingVia)">
+                        {{ shippingVia }}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </section>
+            <section>
+                <span>
+                    Адреса за доставу: <i>Подешена на профилу</i> <br><br>
+                    Начин плаћања: <i>Подешена на профилу</i> <br><br>
+                    Цена доставе: {{ shippingCost | number }} РСД <br><br>
+                    Укупно за плаћање: {{ shippingCost + subtotal + subtotal/5 | number }} РСД
+                </span>
+            </section>
+            <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5%">
+                <button type="button" mat-stroked-button color="primary" [disabled]="shippingCost === undefined || itemsInCart.data === []">Потврди поруџбину</button>
+                <button type="button" mat-stroked-button color="warn" (click)="emptyCart()" [disabled]="itemsInCart.data === []">Испразни корпу</button>
+            </section>
+        </section>
+    </div>
+</div>
