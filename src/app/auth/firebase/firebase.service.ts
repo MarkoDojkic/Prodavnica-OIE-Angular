@@ -116,7 +116,7 @@ export class FirebaseService {
     const output: Observable<number[]> = new Observable((observer) => {
       this.idb.getObjectStoreItem(this.idb.getIDB(this.firebaseLocalStorageDb),
       "firebaseLocalStorage", IDBKeyRange.lowerBound(0))
-        .then(value => { observer.next(value); })
+        .then(value => { observer.next(value[0]); })
         .catch(error => { observer.next(error); });
 
       return {
