@@ -48,6 +48,7 @@ export class AppComponent implements OnInit {
   }
   
   onDarkModeChange(e) {
+    this.isDarkMode = e.checked;
     document.querySelector("body").classList.remove(!e.checked ? "theme-dark" : "theme-light");
     document.querySelector("body").classList.add(e.checked ? "theme-dark" : "theme-light");
   }

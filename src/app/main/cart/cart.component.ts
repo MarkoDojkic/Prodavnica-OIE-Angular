@@ -54,7 +54,7 @@ export class CartComponent implements OnInit {
 
   showDescription(productName: string, description: string): void {
     Swal.fire({
-      title: "Опис за производ \"" + productName + "\":",
+      title: "Опис за производ „" + productName + "“:",
       text: description,
       icon: "info",
       confirmButtonText: "У реду",
@@ -75,7 +75,7 @@ export class CartComponent implements OnInit {
   removeFromCart(droppedItem: ItemInCart): void {
     Swal.fire({
       title: "Уклањање производа из корпе",
-      text: "Да ли сте сигурни да желите да избаците производ \"" + droppedItem.productTitle + "\" из корпе?",
+      text: "Да ли сте сигурни да желите да избаците производ „" + droppedItem.productTitle + "“ из корпе?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Да",
