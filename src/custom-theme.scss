@@ -45,6 +45,7 @@ $prodavnica-oie-angular-theme: mat-light-theme((
 */
 
 @import '~@angular/material/theming';
+@import "~angular-notifier/styles";
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
@@ -344,26 +345,12 @@ $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-
   }
 }
 
-@mixin mat-snackbar-theme($config-or-theme) {
-  $config: mat-get-color-config($config-or-theme);
-  $primary: map-get($config, primary);
-  $accent: map-get($config, accent);
-  $warn: map-get($config, warn);
-  $background: map-get($config, background);
-  $foreground: map-get($config, foreground);
-
-  .snackbar-coloring {
-    background: mat-color($background, status-bar) !important;
-    color: mat-color($warn, darker) !important;
-  }
-}
-
 // Theme Init
 
 .theme-light {
-  @include mat-snackbar-theme($theme);
   @include angular-material-theme($theme);
   @include ngx-slider-theme($theme);
+  @import '~@sweetalert2/theme-default/default.scss';
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -376,7 +363,7 @@ $darkTheme: mat-dark-theme($theme-primary-dark, $theme-accent-dark, $theme-warn-
 .theme-dark {
   @include angular-material-theme($darkTheme);
   @include ngx-slider-theme($darkTheme);
-  @include mat-snackbar-theme($darkTheme);
+  @import '~@sweetalert2/theme-dark/dark.scss';
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,

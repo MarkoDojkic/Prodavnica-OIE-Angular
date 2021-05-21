@@ -6,11 +6,11 @@ import { LabelType, Options } from '@angular-slider/ngx-slider';
 import { Item, CategoryNode, FlatNode } from './shop.model';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { KeyValue } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { IndexedDatabaseService } from '../indexed-database/indexed-database.service';
 import { Observable } from 'rxjs';
+import { NotifierService, NotifierOptions } from 'angular-notifier';
 
 @Component({
   selector: 'app-shop',
@@ -65,7 +65,8 @@ export class ShopComponent implements OnInit {
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  constructor(private fs:FirebaseService, private snackbar: MatSnackBar, private router: Router, private idb: IndexedDatabaseService) {
+  constructor(private fs: FirebaseService, private ns: NotifierService,
+    private router: Router, private idb: IndexedDatabaseService) {
     this.categoriesSource.data = [
       {
         name: 'Соларни панели',
@@ -313,11 +314,11 @@ export class ShopComponent implements OnInit {
         translate: (value: number, label: LabelType): string => {
           switch (label) {
             case LabelType.Low:
-              return "<b>" + value + " РСД</b>";
+              return "<b>" + value + " динара</b>";
             case LabelType.High:
-              return "<b>" + value + " РСД</b>";
+              return "<b>" + value + " динара</b>";
             default:
-              return value + " РСД";
+              return value + " динара";
           }
         },
         hideLimitLabels: true
@@ -542,19 +543,15 @@ export class ShopComponent implements OnInit {
       }
     }).subscribe(data => {
       var newQuantaty = ((data as Array<Item>).length !== 1) ? 0 : data[0]["orderedQuantity"];
+      
+      if (newQuantaty === product.leftInStock) this.ns.notify("error", "Није могуће додати производ! Већ се у корпи налази максимална количина!");
+      else this.ns.notify("success", "Производ успешно додат у корпу!");
+      
       newQuantaty = newQuantaty + parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock : newQuantaty + parseInt(product.orderedQuantity);
       this.idb.putObjectStoreItem(this.idb.getIDB(this.localStorageDb),
         "orderedProducts", { productTitle: product.title, orderedQuantity: newQuantaty, price: product.price, description: product.description, inStock: product.leftInStock });
-
-      var message = "Стање у корпи за " + product.title + " " + newQuantaty + " комада";
-      this.snackbar.open(message, "", {
-        horizontalPosition: "right",
-        verticalPosition: "top",
-        direction: "ltr",
-        duration: 5000,
-        politeness: "assertive",
-        panelClass: "snackbar-coloring"
-      });
+      
+      this.ns.notify("info", "Стање у корпи за производ „" + product.title + "“ је: " + newQuantaty + " комад(а)");
     });
   }
 

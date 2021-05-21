@@ -13,20 +13,20 @@
             </ng-container>
             <ng-container matColumnDef="price">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Јединична цена</mat-header-cell>
-                <mat-cell *matCellDef="let element">{{ element.price | number }} РСД</mat-cell>
+                <mat-cell *matCellDef="let element">{{ element.price | number }} динара</mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="orderedQuantity">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Поручена количина</mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    <span *ngIf="!element.isEditing">{{ element.orderedQuantity | number }} комада</span>
-                <span *ngIf="element.isEditing"><input type="number" min="1" max="{{element.inStock}}" matInput [(ngModel)]="element.orderedQuantity"/> комада</span>
+                    <span *ngIf="!element.isEditing">{{ element.orderedQuantity | number }} комад(а)</span>
+                <span *ngIf="element.isEditing"><input type="number" min="1" max="{{element.inStock}}" matInput [(ngModel)]="element.orderedQuantity"/> комад(а)</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="totalCost">
                 <mat-header-cell *matHeaderCellDef>Укупна цена</mat-header-cell>
-                <mat-cell *matCellDef="let element">{{ (element.price * element.orderedQuantity) | number }} РСД</mat-cell>
+                <mat-cell *matCellDef="let element">{{ (element.price * element.orderedQuantity) | number }} динара</mat-cell>
                 <mat-footer-cell *matFooterCellDef>Укупна цена производа (+20% ПДВ):</mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="actions">
@@ -36,7 +36,7 @@
                     <button mat-icon-button *ngIf="element.isEditing" (click)="element.isEditing = false; updateItemQuntaty(element)"><mat-icon>check_circle</mat-icon></button>
                     <button mat-icon-button (click)="removeFromCart(element)"><mat-icon>remove_shopping_cart</mat-icon></button>
                 </mat-cell>
-                <mat-footer-cell *matFooterCellDef>{{ (subtotal + subtotal/5) | number }} РСД</mat-footer-cell>
+                <mat-footer-cell *matFooterCellDef>{{ (subtotal + subtotal/5) | number }} динара</mat-footer-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
             <mat-row *matRowDef="let rows; columns: displayedColumns;"></mat-row>
@@ -55,11 +55,11 @@
                 <span>
                     Адреса за доставу: <i>Подешена на профилу</i> <br><br>
                     Начин плаћања: <i>Подешена на профилу</i> <br><br>
-                    Цена доставе: {{ shippingCost | number }} РСД <br><br>
-                    Укупно за плаћање: {{ shippingCost + subtotal + subtotal/5 | number }} РСД
+                    Цена доставе: {{ shippingCost | number }} динара <br><br>
+                    Укупно за плаћање: {{ shippingCost + subtotal + subtotal/5 | number }} динара
                 </span>
             </section>
-            <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5%">
+            <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
                 <button type="button" mat-stroked-button color="primary" [disabled]="shippingCost === undefined || itemsInCart.data === []">Потврди поруџбину</button>
                 <button type="button" mat-stroked-button color="warn" (click)="emptyCart()" [disabled]="itemsInCart.data === []">Испразни корпу</button>
             </section>
