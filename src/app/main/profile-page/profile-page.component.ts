@@ -28,7 +28,7 @@ export class ProfilePageComponent implements OnInit {
   ngOnInit(): void {
     setTimeout(() => {
       this.updateFieldData();
-    }, 1000);
+    }, 1000); /* To give time for firebaseLocalStorageDb to be opened by service */
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
@@ -41,8 +41,6 @@ export class ProfilePageComponent implements OnInit {
     const newName: string = form.controls["name"].value;
     const newSurname: string = form.controls["surname"].value;
     const updatedFirestoreData: any = {};
-
-    console.log();
     
     this.fs.updateAuthUserProfile(((!!newName ? newName : this.userName) + " "
     + (!!newSurname ? newSurname : this.userSurname)), null);
@@ -52,9 +50,23 @@ export class ProfilePageComponent implements OnInit {
       if (field.dirty && field.valid && control !== "name" && control !== "surname"
         && control !== "email" && control !== "password" && control != "passwordRepeat") {
         updatedFirestoreData[control] = field.value;
-        setTimeout(() => { field.reset(); }, 1500);
+        setTimeout(() => { field.reset(); }, 1500); /* To give time to firestore to update */
       }
     });
+
+    if (form.controls["email"].dirty && form.controls["email"].valid) {
+      this.fs.updateUserEmail(form.controls["email"].value);
+      form.controls["email"].reset();
+      return;
+    }
+
+    if (form.controls["password"].dirty && form.controls["password"].valid
+          && form.controls["password"].value === form.controls["passwordRepeat"].value) {
+      this.fs.updateUserPassword(form.controls["password"].value);
+      form.controls["password"].reset();
+      form.controls["passwordRepeat"].reset();
+      return;
+    }
 
     this.fs.updateFirestoreData(this.uid, updatedFirestoreData);
     
@@ -65,7 +77,7 @@ export class ProfilePageComponent implements OnInit {
       form.controls["password"].reset();
       form.controls["passwordRepeat"].reset();
       this.updateFieldData();
-    }, 1000);
+    }, 1000); /* To give time to retrive updated data */
   }
   
   onFormReset(form: NgForm): void {
@@ -79,14 +91,14 @@ export class ProfilePageComponent implements OnInit {
       this.userSurname = ibData["value"]["displayName"].split(' ')[1];
       this.userEmail = ibData["value"]["email"];
 
-      this.fs.getFirestoreData(this.uid).forEach((data) => {
+      this.fs.getFirestoreData(this.uid).forEach((data) => { //Assumes valid return from firestore database
         this.userPhone = data.get("phone");
         this.userMobilePhone = data.get("mobilePhone");
         this.userDeliveryAddress = data.get("deliveryAddress");
         this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
         this.userPaymentAddress = data.get("paymentAddress");
         this.userPaymentType = data.get("paymentType");
-      });
+      });      
     });
   }
 

@@ -32,14 +32,14 @@ export class AppComponent implements OnInit {
 
     this.isDarkMode = true; /* Initially dark mode is on */
     
-    this.idb.createNewDatabase(this.localStorageDb, ["orderedProducts"],
-                                  [{ keyPath: "productTitle", autoIncrement: false }],
-                                  [["orderedQuantity"]], [["productTitle"]], [[{ unique: false }]]);
+    this.idb.createNewDatabase(this.localStorageDb, 1, ["orderedProducts"],
+          [{ keyPath: "productTitle", autoIncrement: false }], null, null, null);
 
     setInterval(() => { /* Interval to update count of items in cart automaitcally */
-      this.idb.getObjectStoresItemCount(this.idb.getIDB(this.localStorageDb), ["orderedProducts"])
-        .subscribe(result => this.numberOfProductsInShoppingCart = result[0]);
-    }, 1000);
+      const observable = this.idb.getObjectStoresItemCount(this.idb.getIDB(this.localStorageDb), ["orderedProducts"]);
+      if (observable === null) this.numberOfProductsInShoppingCart = 0;
+      else observable.subscribe(result => this.numberOfProductsInShoppingCart = result[0]);
+    }, 2000);
   }  
 
   getChild(activatedRoute: ActivatedRoute) {  

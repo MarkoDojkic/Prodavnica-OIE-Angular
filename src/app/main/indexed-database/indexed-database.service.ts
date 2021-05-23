@@ -20,37 +20,31 @@ export class IndexedDatabaseService {
     return this.openedIDBDatabases.find(value => value.name === dbName);
   }
 
-  createNewDatabase(name: string, objectStoreNames: Array<string>,
+  createNewDatabase(name: string, version, objectStoreNames: Array<string>,
     objectStoreParametars: Array<IDBObjectStoreParameters>, indexNames: Array<Array<string>>,
     indexKeyPaths: Array<Array<string>>, indexParameters: Array<Array<IDBIndexParameters>>): void {   
-      const createIDB = window.indexedDB.open(name, 1);
-      createIDB.onsuccess = () => {
-        const openIDB = window.indexedDB.open(name, 2);
-        
-        openIDB.onupgradeneeded = () => {
-          const index = this.openedIDBDatabases.push(openIDB.result);
-          var i = 0, j = 0;
-
-          objectStoreNames.forEach(objectStoreName => {
-            const createOS = this.openedIDBDatabases[index].createObjectStore(objectStoreName, objectStoreParametars[i]);
-            indexNames[i].forEach(indexName => {
-              createOS.createIndex(indexName, indexKeyPaths[i][j], indexParameters[i][j]);
-              j++;
-            });
-            i++;
+    var createIDB = window.indexedDB.open(name, 1);
+    createIDB.onupgradeneeded = event => {
+      if (event.oldVersion < 1) {
+        this.openedIDBDatabases.push(createIDB.result);        
+        var i = 0, j = 0;
+        if (objectStoreNames === undefined || objectStoreNames === null) return;
+        objectStoreNames.forEach(objectStoreName => {
+          const createOS = this.getIDB(name).createObjectStore(objectStoreName, objectStoreParametars[i]);
+          indexNames[i].forEach(indexName => {
+            createOS.createIndex(indexName, indexKeyPaths[i][j], indexParameters[i][j]);
+            j++;
           });
-        };
-      };
-    
-    createIDB.onerror = () => {
-      const openIDB = window.indexedDB.open(name, 2);
-      
-      openIDB.onsuccess = () => { this.openedIDBDatabases.push(openIDB.result); }
-      openIDB.onerror = () => { console.log("Error while attempting to create or open indexed database: " + JSON.stringify(createIDB.result)); }
+          i++;
+        });
+      }
     }
+    createIDB.onsuccess = () => this.openedIDBDatabases.push(createIDB.result);
+    createIDB.onerror = error => console.log(error);
   }
   
   getObjectStoresItemCount(database: IDBDatabase, objectStoreNames: string[]): Observable<number[]> {
+    if (database === undefined || database.objectStoreNames.length === 0) return null;
     const output: Observable<number[]> = new Observable((observer) => {
       objectStoreNames.forEach(objectStoreName => {
         const transaction = database.transaction(objectStoreName, "readonly").objectStore(objectStoreName).count();

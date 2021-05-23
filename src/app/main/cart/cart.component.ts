@@ -34,22 +34,24 @@ export class CartComponent implements OnInit {
   constructor(private idb: IndexedDatabaseService) { }
 
   ngOnInit(): void {
-    new Observable((observer) => {
-      this.idb.getObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-        "orderedProducts", IDBKeyRange.lowerBound(0))
-        .then(value => { observer.next(value); })
-        .catch(error => { observer.next(error); });
-
-      return {
-        unsubscribe() {
-          observer.remove(observer);
+    setTimeout(() => {
+      new Observable((observer) => {
+        this.idb.getObjectStoreItem(this.idb.getIDB(this.localStorageDb),
+          "orderedProducts", IDBKeyRange.lowerBound(0))
+          .then(value => { observer.next(value); })
+          .catch(error => { observer.next(error); });
+  
+        return {
+          unsubscribe() {
+            observer.remove(observer);
+          }
         }
-      }
-    }).subscribe(data => {
-      this.itemsInCart.data = (data as Array<ItemInCart>);
-      this.itemsInCart.sort = this.sort;
-      this.updateSubtotal();
-    });
+      }).subscribe(data => {
+        this.itemsInCart.data = (data as Array<ItemInCart>);
+        this.itemsInCart.sort = this.sort;
+        this.updateSubtotal();
+      });
+    }, 1000); /* To give time for database to be opened by app component */
   }
 
   showDescription(productName: string, description: string): void {
