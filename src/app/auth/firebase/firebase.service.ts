@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { Item } from 'src/app/main/shop/shop.component';
 import { AngularFireStorage } from '@angular/fire/storage';
 import Swal from 'sweetalert2';
+import * as firebase from 'firebase';
 
 @Injectable({
   providedIn: 'root'
@@ -17,25 +18,30 @@ import Swal from 'sweetalert2';
 export class FirebaseService {
 
   //https://www.positronx.io/full-angular-7-firebase-authentication-system/
-
+  firebaseApplication = firebase.default;
   key: string = "y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY";
   firebaseLocalStorageDb: string = "firebaseLocalStorageDb";
   isLoggedIn: boolean;
+  
 
   constructor(private firestore: AngularFirestore, private auth: AngularFireAuth,
     private ngZone: NgZone, private router: Router, private storage: AngularFireStorage,
     private idb: IndexedDatabaseService, private cs: CryptoService) {
+    
+    setTimeout(() => {
       this.idb.openIDB(this.firebaseLocalStorageDb, 1);
+    }, 1000); /* This timeout is added to give firebase time to create firebaseLocalStorageDb, if not done already */
       
-      setTimeout(() => { /* Timeout to wait for database to be created/opened */ 
-        this.idb.getObjectStoresItemCount(this.idb.getIDB(this.firebaseLocalStorageDb), ["firebaseLocalStorage"])
-                .subscribe(result => this.isLoggedIn = result[0] > 0);
-      }, 1000);
+    setTimeout(() => { /* Timeout to wait for database to be opened */
+      const observable = this.idb.getObjectStoresItemCount(this.idb.getIDB(this.firebaseLocalStorageDb), ["firebaseLocalStorage"])
+      if (observable === null) this.isLoggedIn = false;
+        else observable.subscribe(result => this.isLoggedIn = result[0] > 0);
+      }, 2000);
     }
 
-  signInViaEmail(email: string, password: string): Promise<any> {
-    return this.auth.signInWithEmailAndPassword(email, this.cs.encrypt(this.key, password))
-    .then((result) => {}).then(() => {
+  signInViaEmail(email: string, password: string): void {
+    this.auth.signInWithEmailAndPassword(email, this.cs.encrypt(this.key, password))
+      .then(/* result => { console.log(result); } */).then(() => {
       Swal.fire({
         title: "Логовање успешно!",
         text: "Успешно сте се улоговали!",
@@ -47,7 +53,7 @@ export class FirebaseService {
         this.isLoggedIn = true;
       });
     }).catch((error) => {
-      console.log(error);
+      /* console.log(error); */
       Swal.fire({
         title: "Логовање неуспешно!",
         text: "Проверите поново да ли сте исправно унели\nВашу адресу електронске поште и лозинку!",
@@ -58,8 +64,8 @@ export class FirebaseService {
     });
   }
 
-  signUpViaEmail(email: string, password: string, form: NgForm): Promise<void> {
-    return this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt(this.key, password)).then((result) => {
+  signUpViaEmail(email: string, password: string, form: NgForm): void {
+    this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt(this.key, password)).then((result) => {
       /* result.user.sendEmailVerification(); */
       this.updateAuthUserProfile((form.controls["name"].value + " " + form.controls["surname"].value), null);
       this.updateFirestoreData(result.user.uid, {
@@ -71,7 +77,6 @@ export class FirebaseService {
         "paymentAddress": form.controls["paymentAddress"].value
       });
     }).then(() => {
-      this.signOut();
       Swal.fire({
         title: "Регистрација успешна!",
         text: "Успешно сте креирали нови налог.\nСада се можете улоговати\nса унетом адресом електронске поште и лозинком.\nНакон изласка бићете\nпреусмерени на страницу за логовање!",
@@ -79,7 +84,7 @@ export class FirebaseService {
         showCancelButton: false,
         confirmButtonText: "У реду",
       }).then(() => {
-        this.ngZone.run(() => { this.router.navigate(["/profile"]); });
+        this.ngZone.run(() => { this.signOut(); });
         this.isLoggedIn = true;
       });
     }).catch((error) => {
@@ -95,20 +100,48 @@ export class FirebaseService {
   }
 
   updateAuthUserProfile(displayName: string, photoURL: string): void {
-    this.auth.user.subscribe((result) => {
+    this.auth.user.subscribe(result => {
       if (result) result.updateProfile({ displayName: displayName, photoURL: photoURL })
-        .catch((error) => { console.log("UpdateAuthUserProfile error: " + error) });
+        .catch(/* (error) => { console.log("UpdateAuthUserProfile error: " + error) } */);
     });
   }
 
   updateFirestoreData(userId: string, data: any): void {
     this.firestore.firestore.runTransaction(() => {
       return this.firestore.collection("users").doc(userId)
-        .update(data).catch((error) => { console.log(error); });
+        .update(data)
+        .then(/* result => console.log(result) */)
+        .catch(/* (error) => { console.log(error); } */);
     });
   }
 
-  getFirestoreData(userId: string): Observable<any> {
+  updateUserEmail(newEmail: string) {
+    this.auth.user.subscribe(result => {
+      /* if (result) result.updateEmail(newEmail); */
+      Swal.fire({
+        title: "Промена адресе електронске поште!",
+        text: "Захтев за промену адресе електронске поште је послат на Вашу стару адресу!",
+        icon: "warning",
+        showCancelButton: false,
+        confirmButtonText: "У реду",
+      });
+    });
+  }
+
+  updateUserPassword(newPassword: string) {
+    this.auth.user.subscribe(result => {
+      result.updatePassword(this.cs.encrypt(this.key, newPassword));
+      Swal.fire({
+        title: "Лозинка успешно промењена!",
+        text: "Успешно сте променили лозинку! Ради сигурности сада ћете бити излоговани.",
+        icon: "success",
+        showCancelButton: false,
+        confirmButtonText: "У реду",
+      }).then(() => this.signOut());
+    });
+  }
+
+  getFirestoreData(userId: string): Observable<any> {    
     return this.firestore.collection("users").doc(userId).get();
   }
 

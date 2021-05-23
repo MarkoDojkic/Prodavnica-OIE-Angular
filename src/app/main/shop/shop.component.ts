@@ -132,7 +132,7 @@ export class ShopComponent implements OnInit {
 
   displayItems(category: string): void {
     this.items = this.fs.getItemsByCategory(category);
-    setTimeout(() => {
+    setTimeout(() => { /* To give time to firestore to get items */
       this.selectedCategory = category;
       this.voltages = this.amperages = this.wattages = this.amperhours = null;
 
@@ -506,7 +506,7 @@ export class ShopComponent implements OnInit {
       temp = temp.slice(temp.lastIndexOf("Максимални радни напон: "),
                           temp.lastIndexOf("V Струја кратког споја:"))
       temp = temp.slice(24, temp.length);
-      console.log(temp);
+      
       return parseInt(temp) < voltageMin || parseInt(temp) > voltageMax;
     })
   }
