@@ -1,9 +1,10 @@
 import { IndexedDatabaseService } from './main/indexed-database/indexed-database.service';
 import { FirebaseService } from './auth/firebase/firebase.service';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Item } from './main/shop/shop.model';
 
 @Component({
   selector: 'app-root',
@@ -33,12 +34,12 @@ export class AppComponent implements OnInit {
     this.isDarkMode = true; /* Initially dark mode is on */
     
     this.idb.createNewDatabase(this.localStorageDb, 1, ["orderedProducts"],
-          [{ keyPath: "productTitle", autoIncrement: false }], null, null, null);
+          [{ keyPath: "id", autoIncrement: false }], null, null, null);
 
     setInterval(() => { /* Interval to update count of items in cart automaitcally */
-      const observable = this.idb.getObjectStoresItemCount(this.idb.getIDB(this.localStorageDb), ["orderedProducts"]);
-      if (observable === null) this.numberOfProductsInShoppingCart = 0;
-      else observable.subscribe(result => this.numberOfProductsInShoppingCart = result[0]);
+      this.idb.getAllObjectStoreItems(this.idb.getIDB(this.localStorageDb), "orderedProducts").then(
+        result => this.numberOfProductsInShoppingCart = (result as Array<Item>).filter(item => item.id.includes(this.fs.loggedInUserId + "_")).length
+      );
     }, 2000);
   }  
 

@@ -68,7 +68,7 @@ export class ProfilePageComponent implements OnInit {
       return;
     }
 
-    this.fs.updateFirestoreData(this.uid, updatedFirestoreData);
+    this.fs.updateFirestoreUserData(this.uid, updatedFirestoreData);
     
     setTimeout(() => {
       form.controls["name"].reset();
