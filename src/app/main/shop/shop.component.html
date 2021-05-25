@@ -95,7 +95,7 @@
                 <img mat-card-image [src]="item.imageUrl | async" alt="Photo of {{item.title}}"/>
                 <mat-card-content fxLayoutAlign="center center" fxFlex>{{item.description}}</mat-card-content>
                 <mat-card-actions fxLayout="row" fxLayoutAlign="center center" fxFlexFill fxLayoutGap="1%">
-                  <span fxFlex="30" *ngIf="item.leftInStock > 0">Количина: <input type="number" min="0" [max]="item.leftInStock" matInput [(ngModel)]="item.orderedQuantity" required/></span>
+                  <span fxFlex="30" *ngIf="item.leftInStock > 0">Количина: <input type="number" min="0" [max]="item.leftInStock.toString()" matInput [(ngModel)]="item.orderedQuantity" required/></span>
                   <span fxFlex="50">Цена по комаду: {{item.price | number}} динара</span>
                   <span fxFlex="50" *ngIf="item.leftInStock === 0">Нема на стању</span>
                   <button fxFlex="10" type="button" mat-icon-button color="accent" (click)="buyProduct(item)" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>

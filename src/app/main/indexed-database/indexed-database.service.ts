@@ -42,28 +42,17 @@ export class IndexedDatabaseService {
     createIDB.onsuccess = () => this.openedIDBDatabases.push(createIDB.result);
     createIDB.onerror = error => console.log(error);
   }
-  
-  getObjectStoresItemCount(database: IDBDatabase, objectStoreNames: string[]): Observable<number[]> {
-    if (database === undefined || database.objectStoreNames.length === 0) return null;
-    const output: Observable<number[]> = new Observable((observer) => {
-      objectStoreNames.forEach(objectStoreName => {
-        const transaction = database.transaction(objectStoreName, "readonly").objectStore(objectStoreName).count();
-        transaction.onsuccess = () => observer.next([transaction.result]);
-        transaction.onerror = () => observer.next([-1]);
-      });
-      
-      return {
-        unsubscribe() {
-          observer.remove(observer);
-        }
-      }
-    });
-
-    return output;
-  }
 
   getObjectStoreItem(database: IDBDatabase, objectStoreName: string, objectStoreKey: IDBValidKey | IDBKeyRange): Promise<any> {
     const transaction = database.transaction(objectStoreName, 'readonly').objectStore(objectStoreName).getAll(objectStoreKey);
+    return new Promise<any>((resolve, reject) => {
+      transaction.onsuccess = () => { resolve(transaction.result) };
+      transaction.onerror = error => { reject(Error("Error while getting idb data: " + error)); };
+    });
+  }
+
+  getAllObjectStoreItems(database: IDBDatabase, objectStoreName: string): Promise<any> {
+    const transaction = database.transaction(objectStoreName, 'readonly').objectStore(objectStoreName).getAll(IDBKeyRange.lowerBound(0));
     return new Promise<any>((resolve, reject) => {
       transaction.onsuccess = () => { resolve(transaction.result) };
       transaction.onerror = error => { reject(Error("Error while getting idb data: " + error)); };

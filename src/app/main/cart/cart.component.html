@@ -1,14 +1,14 @@
 <div class="spaceing">
     <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%" class="mat-card">
         <mat-table [dataSource]="itemsInCart" matSort class="spaceing-top">
-            <ng-container matColumnDef="productTitle">
+            <ng-container matColumnDef="title">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Име производа</mat-header-cell>
-                <mat-cell *matCellDef="let element">{{ element.productTitle }}</mat-cell>
+                <mat-cell *matCellDef="let element">{{ element.title }}</mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="description">
                 <mat-header-cell *matHeaderCellDef>Опис</mat-header-cell>
-                <mat-cell *matCellDef="let element"><button mat-icon-button (click)="showDescription(element.productTitle, element.description)"><mat-icon>search</mat-icon></button></mat-cell>
+                <mat-cell *matCellDef="let element"><button mat-icon-button (click)="showDescription(element.title, element.description)"><mat-icon>search</mat-icon></button></mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="price">
@@ -60,7 +60,7 @@
                 </span>
             </section>
             <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
-                <button type="button" mat-stroked-button color="primary" [disabled]="shippingCost === undefined || itemsInCart.data === []">Потврди поруџбину</button>
+                <button type="button" mat-stroked-button color="primary" (click)="submitOrder()" [disabled]="shippingCost === undefined || itemsInCart.data.length == 0">Потврди поруџбину</button>
                 <button type="button" mat-stroked-button color="warn" (click)="emptyCart()" [disabled]="itemsInCart.data === []">Испразни корпу</button>
             </section>
         </section>

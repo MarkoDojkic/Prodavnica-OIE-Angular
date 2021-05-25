@@ -512,10 +512,11 @@ export class ShopComponent implements OnInit {
   }
 
   buyProduct(product: Item) {
-    product.orderedQuantity = typeof (product.orderedQuantity) !== "number" || parseInt(product.orderedQuantity) < 1 ? "1" : product.orderedQuantity;
-    product.orderedQuantity = parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock.toString() : product.orderedQuantity;
-
-    if (!this.fs.isUserLoggedIn) {
+    
+    product.orderedQuantity = product.orderedQuantity === undefined || product.orderedQuantity < 1 ? 1 : product.orderedQuantity;
+    product.orderedQuantity = product.orderedQuantity > product.leftInStock ? product.leftInStock : product.orderedQuantity;
+    
+    if (this.fs.loggedInUserId === null) {
       Swal.fire({
         title: "Нисте улоговани!",
         text: "Морате бити улоговани да бисте додали производ у корпу!",
@@ -532,7 +533,7 @@ export class ShopComponent implements OnInit {
 
     new Observable((observer) => {
       this.idb.getObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-        "orderedProducts", product.title)
+        "orderedProducts", this.fs.loggedInUserId + "_" + product.title)
         .then(value => { observer.next(value); })
         .catch(error => { observer.next(error); });
 
@@ -542,14 +543,18 @@ export class ShopComponent implements OnInit {
         }
       }
     }).subscribe(data => {
+      
       var newQuantaty = ((data as Array<Item>).length !== 1) ? 0 : data[0]["orderedQuantity"];
       
       if (newQuantaty === product.leftInStock) this.ns.notify("error", "Није могуће додати производ! Већ се у корпи налази максимална количина!");
       else this.ns.notify("success", "Производ успешно додат у корпу!");
       
-      newQuantaty = newQuantaty + parseInt(product.orderedQuantity) > product.leftInStock ? product.leftInStock : newQuantaty + parseInt(product.orderedQuantity);
+      newQuantaty = newQuantaty + product.orderedQuantity > product.leftInStock ? product.leftInStock : newQuantaty + product.orderedQuantity;
       this.idb.putObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-        "orderedProducts", { productTitle: product.title, orderedQuantity: newQuantaty, price: product.price, description: product.description, inStock: product.leftInStock });
+        "orderedProducts", {
+          id: this.fs.loggedInUserId + "_" + product.title, title: product.title, orderedQuantity: newQuantaty,
+          price: product.price, description: product.description, inStock: product.leftInStock, orderedBy: this.fs.loggedInUserId
+      });
       
       this.ns.notify("info", "Стање у корпи за производ „" + product.title + "“ је: " + newQuantaty + " комад(а)");
     });

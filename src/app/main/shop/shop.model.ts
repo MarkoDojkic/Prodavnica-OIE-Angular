@@ -1,12 +1,14 @@
 import { Observable } from "rxjs/internal/Observable";
 
 export interface Item {
+  id?: string; //Used in indexedDB only
   title: string;
   imageUrl: Observable<string | null>;
   description: string;
   leftInStock: number;
   price: number;
-  orderedQuantity?: string;
+  orderedQuantity?: number; //Used in indexedDB only
+  isEditing?: boolean; //Used in cart component only
 }
 
 export interface CategoryNode {

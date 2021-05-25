@@ -21,22 +21,16 @@ export class FirebaseService {
   firebaseApplication = firebase.default;
   key: string = "y/B?E(H+MbQeThWmYq3t6w9z$C&F)J@NcRfUjXn2r4u7x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkY";
   firebaseLocalStorageDb: string = "firebaseLocalStorageDb";
-  isLoggedIn: boolean;
+  userId: string = null;
   
 
   constructor(private firestore: AngularFirestore, private auth: AngularFireAuth,
     private ngZone: NgZone, private router: Router, private storage: AngularFireStorage,
     private idb: IndexedDatabaseService, private cs: CryptoService) {
-    
-    setTimeout(() => {
-      this.idb.openIDB(this.firebaseLocalStorageDb, 1);
-    }, 1000); /* This timeout is added to give firebase time to create firebaseLocalStorageDb, if not done already */
-      
-    setTimeout(() => { /* Timeout to wait for database to be opened */
-      const observable = this.idb.getObjectStoresItemCount(this.idb.getIDB(this.firebaseLocalStorageDb), ["firebaseLocalStorage"])
-      if (observable === null) this.isLoggedIn = false;
-        else observable.subscribe(result => this.isLoggedIn = result[0] > 0);
-      }, 2000);
+      setTimeout(() => {
+        this.idb.openIDB(this.firebaseLocalStorageDb, 1);
+      }, 1000); /* This timeout is added to give firebase time to create firebaseLocalStorageDb, if not done already */
+      this.updateLoggedInUserId();
     }
 
   signInViaEmail(email: string, password: string): void {
@@ -50,7 +44,7 @@ export class FirebaseService {
         confirmButtonText: "У реду",
       }).then(() => {
         this.ngZone.run(() => { this.router.navigate(["/profile"]); });
-        this.isLoggedIn = true;
+        this.updateLoggedInUserId();
       });
     }).catch((error) => {
       /* console.log(error); */
@@ -68,7 +62,7 @@ export class FirebaseService {
     this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt(this.key, password)).then((result) => {
       /* result.user.sendEmailVerification(); */
       this.updateAuthUserProfile((form.controls["name"].value + " " + form.controls["surname"].value), null);
-      this.updateFirestoreData(result.user.uid, {
+      this.updateFirestoreUserData(result.user.uid, {
         "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
         "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
         "deliveryAddress": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
@@ -85,7 +79,6 @@ export class FirebaseService {
         confirmButtonText: "У реду",
       }).then(() => {
         this.ngZone.run(() => { this.signOut(); });
-        this.isLoggedIn = true;
       });
     }).catch((error) => {
       /* console.log(error); */
@@ -106,12 +99,27 @@ export class FirebaseService {
     });
   }
 
-  updateFirestoreData(userId: string, data: any): void {
+  updateFirestoreUserData(userId: string, data: any): void {
     this.firestore.firestore.runTransaction(() => {
       return this.firestore.collection("users").doc(userId)
         .update(data)
         .then(/* result => console.log(result) */)
         .catch(/* (error) => { console.log(error); } */);
+    });
+  }
+  
+  updateFirestoreOrderData(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): void {
+    this.firestore.firestore.runTransaction(() => {
+      return this.firestore.collection("orders").add({
+        "orderedBy": this.loggedInUserId,
+        "items": orderedItems,
+        "shippingMethod": shippingMethod,
+        "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
+        "totalPrice": totalPrice,
+        "status": "Текућа",
+        "comments": []
+      }).then(result => console.log(result))
+        .catch((error) => { console.log(error); });
     });
   }
 
@@ -162,15 +170,23 @@ export class FirebaseService {
     return output;
   }
 
-  get isUserLoggedIn(): boolean {
-    return this.isLoggedIn;
+  get loggedInUserId(): string {
+    return this.userId;
   }
 
   signOut(): void {
     this.auth.signOut().then(() => {
-      this.isLoggedIn = false;
+      this.userId = null;
       this.router.navigate(["login"])
     });
+  }
+
+  updateLoggedInUserId(): void {
+    setTimeout(() => { /* Timeout to wait for database to be opened */
+        const observable = this.getIDBData();
+        if (observable === null) this.userId = null;
+        else observable.subscribe(result => this.userId = result["value"]["uid"]);
+    }, 2000);
   }
 
   getItemsByCategory(categoryName: string): Array<Item> {
