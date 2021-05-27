@@ -16,15 +16,17 @@ import { NotifierModule } from 'angular-notifier';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistrationComponent } from './auth/registration/registration.component';
-import { CryptoService } from './auth/crypto/crypto.service';
+import { CryptoService } from './services/crypto/crypto.service';
 import { ProfilePageComponent } from './main/profile-page/profile-page.component';
 import { ShopComponent } from './main/shop/shop.component';
 import { CartComponent } from './main/cart/cart.component';
 import { OrderComponent } from './main/order/order.component';
 import { NotFoundComponent } from './main/not-found/not-found.component';
-import { FirebaseService } from './auth/firebase/firebase.service';
+import { FirebaseService } from './services/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { FishDemoComponent } from './fish-demo/fish-demo.component';
+import { getSerbianPaginatorIntl } from './services/MatPaginatorLocalization';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -93,7 +95,8 @@ import { FishDemoComponent } from './fish-demo/fish-demo.component';
   ],
 
   
-  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, IDBDatabase, IDBFactory],
+  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard,
+    IDBDatabase, IDBFactory, { provide: MatPaginatorIntl, useValue: getSerbianPaginatorIntl() }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

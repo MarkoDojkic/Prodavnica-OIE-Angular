@@ -1,5 +1,5 @@
-import { IndexedDatabaseService } from './main/indexed-database/indexed-database.service';
-import { FirebaseService } from './auth/firebase/firebase.service';
+import { IndexedDatabaseService } from './services/indexed-database/indexed-database.service';
+import { FirebaseService } from './services/firebase/firebase.service';
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';

@@ -1,4 +1,3 @@
-import { IndexedDatabaseService } from './../../main/indexed-database/indexed-database.service';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -10,6 +9,7 @@ import { Item } from 'src/app/main/shop/shop.component';
 import { AngularFireStorage } from '@angular/fire/storage';
 import Swal from 'sweetalert2';
 import * as firebase from 'firebase';
+import { IndexedDatabaseService } from '../indexed-database/indexed-database.service';
 
 @Injectable({
   providedIn: 'root'

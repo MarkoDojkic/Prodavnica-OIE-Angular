@@ -42,7 +42,9 @@
             <mat-row *matRowDef="let rows; columns: displayedColumns;"></mat-row>
             <mat-footer-row *matFooterRowDef="displayedColumns;"></mat-footer-row>
         </mat-table>
+        
         <section fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="6%" fxLayoutGap.lt-sm="3%" fxFlex>
+            <mat-paginator [pageSize]="1" [pageSizeOptions]="pageSizeOptions" itemsPerPageLabel="Број ставки по страни"></mat-paginator>
             <section fxLayout="row" fxLayoutAlign="space-evenly center" fxLayoutGap="5%" fxLayoutGap.lt-sm="2%">
                 <span>Начин доставе:</span>
                 <mat-radio-group ngModel name="shippingVia" *ngFor="let shippingVia of ['Лично преузимање','Курирска служба','Пошта']">

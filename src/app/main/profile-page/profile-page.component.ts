@@ -1,4 +1,4 @@
-import { FirebaseService } from './../../auth/firebase/firebase.service';
+import { FirebaseService } from '../../services/firebase/firebase.service';
 import { AbstractControl, NgForm, NgModel } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
