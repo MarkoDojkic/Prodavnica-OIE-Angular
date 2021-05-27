@@ -1,4 +1,4 @@
-import { FirebaseService } from './../firebase/firebase.service';
+import { FirebaseService } from '../../services/firebase/firebase.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, NgForm, NgModel } from '@angular/forms';
 

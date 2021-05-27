@@ -1,11 +1,12 @@
 import { Item } from 'src/app/main/shop/shop.component';
-import { IndexedDatabaseService } from './../indexed-database/indexed-database.service';
+import { IndexedDatabaseService } from '../../services/indexed-database/indexed-database.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { MatSort } from '@angular/material/sort';
-import { FirebaseService } from 'src/app/auth/firebase/firebase.service';
+import { FirebaseService } from 'src/app/services/firebase/firebase.service';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-cart',
@@ -20,8 +21,11 @@ export class CartComponent implements OnInit {
   subtotal: number;
   shippingVia: string;
   localStorageDb: string = "localStorageDb";
+  pageSizeOptionsSet: Set<number> = new Set<number>();
+  pageSizeOptions: Array<number>;
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private idb: IndexedDatabaseService, private fs: FirebaseService) { }
 
@@ -41,7 +45,16 @@ export class CartComponent implements OnInit {
       }).subscribe(data => {
         this.itemsInCart.data = (data as Array<Item>).filter(item => item.id.includes(this.fs.loggedInUserId + "_"));
         this.itemsInCart.sort = this.sort;
+        this.itemsInCart.paginator = this.paginator;
         this.updateSubtotal();
+        
+        this.pageSizeOptionsSet.add(1);
+        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 2));
+        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 5));
+        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 8));
+        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 10));
+        this.pageSizeOptionsSet.add(this.itemsInCart.data.length);
+        this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
       });
     }, 2000); /* To give time for database to be opened by app component */
   }
@@ -140,8 +153,7 @@ export class CartComponent implements OnInit {
         });
         this.itemsInCart.data = [];
         this.updateShipping(null);
-        this.updateSubtotal();
-        
+        this.updateSubtotal();       
       });
     }
   }

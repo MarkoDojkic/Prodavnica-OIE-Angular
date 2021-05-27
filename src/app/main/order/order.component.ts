@@ -12,5 +12,13 @@ export class OrderComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
+  //"status": 'završena', 'tekuća', 'otkazana'
+  //"shippingAddressOrPAK": Stored in users collection, retrive from there
+  /*
+  "comments": [
+          [0, "ocena proizvoda ide od 0 - 10, a prikazati kao zvezdice, ovde ide komentar"],
+          [0, "ocena proizvoda ide od 0 - 10, a prikazati kao zvezdice, ovde ide komentar"],
+          [0, "ocena proizvoda ide od 0 - 10, a prikazati kao zvezdice, ovde ide komentar"]
+        ]
+        */
 }
