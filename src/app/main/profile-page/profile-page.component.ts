@@ -18,7 +18,7 @@ export class ProfilePageComponent implements OnInit {
   userDeliveryAddress: string;
   userDeliveryAddressPAK: string;
   userPaymentAddress: string;
-  userPaymentType: Number;
+  userPaymentType: number;
   paymentPattern: string;
   paymentHint: string;
   paymentErrorMessage: string;
@@ -102,7 +102,7 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
-  updatePaymentAddressInput(paymentType: Number) {
+  updatePaymentAddressInput(paymentType: number) {
     switch (paymentType) {
       case 0:
         this.paymentPattern = "^(2|5)[1-5][0-9]{14}$"; //International pattern

@@ -13,7 +13,7 @@ import { Item } from './main/shop/shop.model';
 })
 export class AppComponent implements OnInit {
 
-  isDarkMode: Boolean;
+  isDarkMode: boolean;
   numberOfProductsInShoppingCart: number;
   localStorageDb: string = "localStorageDb";
   

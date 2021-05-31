@@ -48,6 +48,7 @@ export class CartComponent implements OnInit {
         this.itemsInCart.paginator = this.paginator;
         this.updateSubtotal();
         
+        this.pageSizeOptionsSet.clear();
         this.pageSizeOptionsSet.add(1);
         this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 2));
         this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 5));
@@ -141,7 +142,7 @@ export class CartComponent implements OnInit {
         text: "Сви производи из корпе су успешно поручени. Статус и податке о поруџбини можете пратити на страни Поруџбине. У сваком тренутку можете да откажете поруџбину, докле год она нема статус „Завршена“",
         icon: "success",
         showCancelButton: false,
-        confirmButtonText: "Уреду",
+        confirmButtonText: "У реду",
         allowOutsideClick: false
       }).then(() => {
         this.fs.updateFirestoreOrderData(this.itemsInCart.data, this.shippingVia,

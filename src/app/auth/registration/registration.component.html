@@ -3,14 +3,14 @@
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Име</mat-label>
-            <input type="text" pattern="^[\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+$" ngModel matInput name="name" #nameInput="ngModel" required/>
+            <input type="text" pattern="^[\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+$" ngModel matInput name="name" #nameInput="ngModel" required/>
             <mat-hint>пр. Марко</mat-hint>
             <mat-error *ngIf="nameInput.hasError('required')">Поље имена не сме бити празно</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Презиме</mat-label>
-            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+(\s|\-)?)+$" ngModel matInput name="surname" #surnameInput="ngModel" required/>
+            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+(\s|\-)?)+$" ngModel matInput name="surname" #surnameInput="ngModel" required/>
             <mat-hint>пр. Дојкић или Петровић-Тошић или Fon Nojman</mat-hint> <!-- Patten includes one uppercase succeded with 1+ lowercase letter serbian cyrilic/latin or english -->
             <mat-error *ngIf="surnameInput.hasError('required')">Поље презимена не сме бити празно</mat-error>
         </mat-form-field>
@@ -70,7 +70,7 @@
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label>Адреса за доставу</mat-label>
-            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" 
+            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" 
                     ngModel matInput name="deliveryAddress" #deliveryAddressAddress="ngModel" [required]="deliveryAddressPak.invalid || deliveryAddressPak.pristine">
             <mat-icon matSuffix>location_on</mat-icon>
             <mat-hint>пр. Данијелова 32 или Цара Душана 75d или Вудроа Вилсона ББ</mat-hint>

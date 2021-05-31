@@ -10,9 +10,9 @@ import { FormGroup, NgForm, NgModel } from '@angular/forms';
   
 export class RegistrationComponent implements OnInit {
 
-  paymentPattern: String;
-  paymentHint: String;
-  paymentErrorMessage: String;
+  paymentPattern: string;
+  paymentHint: string;
+  paymentErrorMessage: string;
 
   constructor(public fs:FirebaseService) { }
 
@@ -24,12 +24,12 @@ export class RegistrationComponent implements OnInit {
     form.reset();
   }
 
-  checkRequiredFields(form: FormGroup): Boolean {
-    var isAllValid: Boolean = true;
+  checkRequiredFields(form: FormGroup): boolean {
+    var isAllValid: boolean = true;
     Object.keys(form.controls).forEach(id => {
       if(form.controls[id].hasError('required')) isAllValid = false;
     });
-    return isAllValid;
+    return isAllValid && !form.controls["passwordRepeat"].hasError("matched");
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
@@ -37,7 +37,7 @@ export class RegistrationComponent implements OnInit {
     else repeatPass.control.setErrors(null);
   }
 
-  updatePaymentAddressInput(paymentType: Number) {
+  updatePaymentAddressInput(paymentType: number) {
     switch (paymentType) {
       case 0:
         this.paymentPattern = "^(2|5)[1-5][0-9]{14}$"; //International pattern
