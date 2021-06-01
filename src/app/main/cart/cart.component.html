@@ -13,21 +13,21 @@
             </ng-container>
             <ng-container matColumnDef="price">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Јединична цена</mat-header-cell>
-                <mat-cell *matCellDef="let element">{{ element.price | number }} динара</mat-cell>
+                <mat-cell *matCellDef="let element">{{ element.price?.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="orderedQuantity">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Поручена количина</mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    <span *ngIf="!element.isEditing">{{ element.orderedQuantity | number }} комад(а)</span>
+                    <span *ngIf="!element.isEditing">{{ element.orderedQuantity?.toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }} комад(а)</span>
                 <span *ngIf="element.isEditing"><input type="number" min="1" max="{{element.inStock}}" matInput [(ngModel)]="element.orderedQuantity"/> комад(а)</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="totalCost">
                 <mat-header-cell *matHeaderCellDef>Укупна цена</mat-header-cell>
-                <mat-cell *matCellDef="let element">{{ (element.price * element.orderedQuantity) | number }} динара</mat-cell>
-                <mat-footer-cell *matFooterCellDef>Укупна цена производа (+20% ПДВ):</mat-footer-cell>
+                <mat-cell *matCellDef="let element">{{ (element.price * element.orderedQuantity).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</mat-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="actions">
                 <mat-header-cell *matHeaderCellDef></mat-header-cell>
@@ -36,11 +36,14 @@
                     <button mat-icon-button *ngIf="element.isEditing" (click)="element.isEditing = false; updateItemQuntaty(element)"><mat-icon>check_circle</mat-icon></button>
                     <button mat-icon-button (click)="removeFromCart(element)"><mat-icon>remove_shopping_cart</mat-icon></button>
                 </mat-cell>
-                <mat-footer-cell *matFooterCellDef>{{ (subtotal + subtotal/5) | number }} динара</mat-footer-cell>
+                <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="footer">
+                <mat-footer-cell *matFooterCellDef style="margin-left: 25%;">Укупна цена поручених производа је {{ (subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара (са 20% ПДВ)</mat-footer-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
             <mat-row *matRowDef="let rows; columns: displayedColumns;"></mat-row>
-            <mat-footer-row *matFooterRowDef="displayedColumns;"></mat-footer-row>
+            <mat-footer-row *matFooterRowDef="['footer'];"></mat-footer-row>
         </mat-table>
         
         <section fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="6%" fxLayoutGap.lt-sm="3%" fxFlex>
@@ -57,8 +60,8 @@
                 <span>
                     Адреса за доставу: <i>Подешена на профилу</i> <br><br>
                     Начин плаћања: <i>Подешена на профилу</i> <br><br>
-                    Цена доставе: {{ shippingCost | number }} динара <br><br>
-                    Укупно за плаћање: {{ shippingCost + subtotal + subtotal/5 | number }} динара
+                    Цена доставе: {{ shippingCost?.toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара <br><br>
+                    Укупно за плаћање: {{ (shippingCost + subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара
                 </span>
             </section>
             <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
@@ -66,5 +69,6 @@
                 <button type="button" mat-stroked-button color="warn" (click)="emptyCart()" [disabled]="itemsInCart.data === []">Испразни корпу</button>
             </section>
         </section>
+        <section></section> <!-- Blank space -->
     </div>
 </div>

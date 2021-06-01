@@ -17,8 +17,8 @@ export class CartComponent implements OnInit {
 
   itemsInCart = new MatTableDataSource<Item>();
   displayedColumns: Array<string> = ["title","description","price","orderedQuantity","totalCost","actions"];
-  shippingCost: number = undefined;
-  subtotal: number;
+  shippingCost: number = 0;
+  subtotal: number = 0;
   shippingVia: string;
   localStorageDb: string = "localStorageDb";
   pageSizeOptionsSet: Set<number> = new Set<number>();
