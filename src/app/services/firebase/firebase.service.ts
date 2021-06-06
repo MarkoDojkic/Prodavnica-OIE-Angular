@@ -10,6 +10,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import Swal from 'sweetalert2';
 import * as firebase from 'firebase';
 import { IndexedDatabaseService } from '../indexed-database/indexed-database.service';
+import { Order } from 'src/app/main/order/order.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +48,7 @@ export class FirebaseService {
         this.updateLoggedInUserId();
       });
     }).catch((error) => {
-      /* console.log(error); */
+      /* console.error(error); */
       Swal.fire({
         title: "Логовање неуспешно!",
         text: "Проверите поново да ли сте исправно унели\nВашу адресу електронске поште и лозинку!",
@@ -81,7 +82,7 @@ export class FirebaseService {
         this.ngZone.run(() => { this.signOut(); });
       });
     }).catch((error) => {
-      /* console.log(error); */
+      /* console.error(error); */
       Swal.fire({
         title: "Регистрација неуспешна!",
         text: "Највероватније већ постоји корисник са наведеном адресом електронске поште.\nУколико сте заборавили лознику затражите промену лозинке!",
@@ -95,31 +96,35 @@ export class FirebaseService {
   updateAuthUserProfile(displayName: string, photoURL: string): void {
     this.auth.user.subscribe(result => {
       if (result) result.updateProfile({ displayName: displayName, photoURL: photoURL })
-        .catch(/* (error) => { console.log("UpdateAuthUserProfile error: " + error) } */);
+        .catch(/* (error) => { console.error("UpdateAuthUserProfile error: " + error) } */); /* Immediately visible results thus no need to display any messages */
     });
   }
 
   updateFirestoreUserData(userId: string, data: any): void {
     this.firestore.firestore.runTransaction(() => {
       return this.firestore.collection("users").doc(userId)
-        .update(data)
+        .update(data) /* Immediately visible results thus no need to display any messages */
         .then(/* result => console.log(result) */)
-        .catch(/* (error) => { console.log(error); } */);
+        .catch(/* (error) => { console.error(error); } */);
     });
   }
   
-  updateFirestoreOrderData(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): void {
-    this.firestore.firestore.runTransaction(() => {
-      return this.firestore.collection("orders").add({
-        "orderedBy": this.loggedInUserId,
-        "items": orderedItems,
-        "shippingMethod": shippingMethod,
-        "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
-        "totalPrice": totalPrice,
-        "status": "Текућа",
-        "comments": []
-      }).then(result => console.log(result))
-        .catch((error) => { console.log(error); });
+  placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): any {
+    return new Promise((resolve, reject) => {
+      return this.getFirestoreData(this.loggedInUserId).subscribe(userData => {
+        return this.firestore.firestore.runTransaction(() => {
+          return this.firestore.collection("orders").add({
+            "orderedBy": this.loggedInUserId,
+            "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity; return map; }, {}),
+            "shippingMethod": shippingMethod,
+            "shippingAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
+            "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
+            "totalPrice": totalPrice,
+            "status": "Текућа"
+          }).then(() => resolve(true)/* result => console.log(result) */)
+            .catch(() => resolve(false)/* (error) => { console.error(error); } */);
+        }).then(() => resolve(true)/* result => console.log(result) */)
+      });
     });
   }
 
@@ -193,9 +198,10 @@ export class FirebaseService {
     var categoryItems: Array<Item> = [];
 
     this.firestore.collection("items").ref
-      .where("categoryName", "==", categoryName).get().then((querySnapshot) => {
-        querySnapshot.forEach((item) => {
+      .where("categoryName", "==", categoryName).get().then(items => {
+        items.forEach(item => {
           categoryItems.push({
+            "id": item.id,
             "title": item.data()["name"],
             "imageUrl": this.retriveImageURL(item.id),
             "description": item.data()["description"],
@@ -209,5 +215,24 @@ export class FirebaseService {
 
   retriveImageURL(imageName: string): Observable<string | null> {
     return this.storage.ref("items/" + imageName + ".png").getDownloadURL();
+  }
+
+  getOrderData(userId: string): Promise<Array<Order>> {
+    var orderData: Array<Order> = [];
+
+    return this.firestore.collection("orders").ref.where("orderedBy", "==", userId).get().then(orders => {
+      orders.docs.forEach(order => {
+        orderData.push({
+          "id": order.id,
+          "placedOn": order.data()["placedOn"].toDate(), //Timestamp to Date
+          "orderedItems": order.data()["items"], //Firestore map to explicit map
+          "shippingAddress": order.data()["shippingAddress"],
+          "shippingMethod": order.data()["shippingMethod"],
+          "status": order.data()["status"],
+          "totalPrice": order.data()["totalPrice"]
+        });
+      });
+    }).then(() => { return Promise.resolve(orderData); });
+  
   }
 }

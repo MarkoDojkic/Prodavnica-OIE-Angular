@@ -1,0 +1,15 @@
+.mat-table {
+    height:100%;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    top: 64.3px;
+}
+
+.expanded-row {
+    min-height: 0px !important; 
+}
+
+.additonalPadding {
+    padding-top: 1% !important;
+}

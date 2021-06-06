@@ -20,7 +20,7 @@ import { NotifierService, NotifierOptions } from 'angular-notifier';
   
 export class ShopComponent implements OnInit {
 
-  numberOfColums: number;
+  numberOfColumns: number;
   rowHeight: string;
   selectedCategory: string;
   items: Array<Item>;
@@ -119,15 +119,15 @@ export class ShopComponent implements OnInit {
 
   onResize(_event: any | null): void {
     if(window.innerWidth > 1920)
-      this.numberOfColums = 5
+      this.numberOfColumns = 5
     else if (window.innerWidth <= 1920 && window.innerWidth > 1300)
-      this.numberOfColums = 4
+      this.numberOfColumns = 4
     else if (window.innerWidth <= 1300 && window.innerWidth > 1000)
-      this.numberOfColums = 3
+      this.numberOfColumns = 3
     else if (window.innerWidth <= 1000 && window.innerWidth > 670)
-      this.numberOfColums = 2
+      this.numberOfColumns = 2
     else if (window.innerWidth <= 670)
-      this.numberOfColums = 1
+      this.numberOfColumns = 1
   }
 
   displayItems(category: string): void {
@@ -138,7 +138,7 @@ export class ShopComponent implements OnInit {
 
       switch (this.selectedCategory) {
         case "Монокристални":
-          this.rowHeight = "1:2.2";
+          this.rowHeight = "1:2.15";
           this.voltages = new Map([["12V", true], ["24V/36V", true], ["48V", true]]);
           break;
         case "Поликристални":
@@ -146,11 +146,11 @@ export class ShopComponent implements OnInit {
           this.voltages = new Map([["12V", true], ["24V", true], ["36V", true]]);
           break;
         case "Аморфни":
-          this.rowHeight = "1:2.2";
+          this.rowHeight = "1:2.22";
           this.voltages = new Map([["12V", true], ["24V", true], ["36V", true], ["48V", true], ["84V", true]]);
           break;
         case "PWM":
-          this.rowHeight = "1:2.6";
+          this.rowHeight = "1:2.58";
           this.voltages = new Map([["12V/24V", true], ["48V", true]]);
           this.amperages = new Map(this.items.map(item => {
             var temp = item.description;
@@ -161,7 +161,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "MPPT":
-          this.rowHeight = "1:2.2";
+          this.rowHeight = "1:2.22";
           this.amperages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Максимална струја пуњења: "),
@@ -171,7 +171,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "OFF-Grid":
-          this.rowHeight = "1:2.1";
+          this.rowHeight = "1:2.02";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Излазна снага: "),
@@ -181,7 +181,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "ON-Grid":
-          this.rowHeight = "1:2.3";
+          this.rowHeight = "1:2.22";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Максимала препоручена снага система:"),
@@ -191,7 +191,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Хибридни":
-          this.rowHeight = "1:2.4";
+          this.rowHeight = "1:2.36";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Снага система: "),
@@ -201,7 +201,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Хоризонтални":
-          this.rowHeight = "1:2.9";
+          this.rowHeight = "1:2.84";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Излазна снага: "),
@@ -211,7 +211,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Вертикални":
-          this.rowHeight = "1:2.9";
+          this.rowHeight = "1:2.75";
           this.wattages = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Излазна снага: "),
@@ -221,7 +221,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Оловни":
-          this.rowHeight = "1:1.9";
+          this.rowHeight = "1:1.85";
           this.amperhours = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Максимални капацитет: "),
@@ -241,7 +241,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Литијумски":
-          this.rowHeight = "1:2";
+          this.rowHeight = "1:1.97";
           this.amperhours = new Map(this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Максимални капацитет: "),
@@ -261,7 +261,7 @@ export class ShopComponent implements OnInit {
           }));
           break;
         case "Електрична возила":
-          this.rowHeight = "1:1.8";
+          this.rowHeight = "1:1.85";
           const minDR = Math.min.apply(Math, this.items.map(item => {
             var temp = item.description;
             temp = temp.slice(temp.lastIndexOf("Домет при пуној батерији: "),
@@ -512,7 +512,6 @@ export class ShopComponent implements OnInit {
   }
 
   buyProduct(product: Item) {
-    
     product.orderedQuantity = product.orderedQuantity === undefined || product.orderedQuantity < 1 ? 1 : product.orderedQuantity;
     product.orderedQuantity = product.orderedQuantity > product.leftInStock ? product.leftInStock : product.orderedQuantity;
     
@@ -533,7 +532,7 @@ export class ShopComponent implements OnInit {
 
     new Observable((observer) => {
       this.idb.getObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-        "orderedProducts", this.fs.loggedInUserId + "_" + product.title)
+        "orderedProducts", this.fs.loggedInUserId + "_" + product.id)
         .then(value => { observer.next(value); })
         .catch(error => { observer.next(error); });
 
@@ -544,19 +543,19 @@ export class ShopComponent implements OnInit {
       }
     }).subscribe(data => {
       
-      var newQuantaty = ((data as Array<Item>).length !== 1) ? 0 : data[0]["orderedQuantity"];
+      var newQuantity = ((data as Array<Item>).length !== 1) ? 0 : data[0]["orderedQuantity"];
       
-      if (newQuantaty === product.leftInStock) this.ns.notify("error", "Није могуће додати производ! Већ се у корпи налази максимална количина!");
+      if (newQuantity === product.leftInStock) this.ns.notify("error", "Није могуће додати производ! Већ се у корпи налази максимална количина!");
       else this.ns.notify("success", "Производ успешно додат у корпу!");
       
-      newQuantaty = newQuantaty + product.orderedQuantity > product.leftInStock ? product.leftInStock : newQuantaty + product.orderedQuantity;
+      newQuantity = newQuantity + product.orderedQuantity > product.leftInStock ? product.leftInStock : newQuantity + product.orderedQuantity;
       this.idb.putObjectStoreItem(this.idb.getIDB(this.localStorageDb),
         "orderedProducts", {
-          id: this.fs.loggedInUserId + "_" + product.title, title: product.title, orderedQuantity: newQuantaty,
+          id: this.fs.loggedInUserId + "_" + product.id, title: product.title, orderedQuantity: newQuantity,
           price: product.price, description: product.description, inStock: product.leftInStock, orderedBy: this.fs.loggedInUserId
       });
       
-      this.ns.notify("info", "Стање у корпи за производ „" + product.title + "“ је: " + newQuantaty + " комад(а)");
+      this.ns.notify("info", "Стање у корпи за производ „" + product.title + "“ је: " + newQuantity + " комад(а)");
     });
   }
 

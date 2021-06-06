@@ -17,8 +17,8 @@ export class CartComponent implements OnInit {
 
   itemsInCart = new MatTableDataSource<Item>();
   displayedColumns: Array<string> = ["title","description","price","orderedQuantity","totalCost","actions"];
-  shippingCost: number = 0;
-  subtotal: number = 0;
+  shippingCost: number = undefined;
+  subtotal: number = undefined;
   shippingVia: string;
   localStorageDb: string = "localStorageDb";
   pageSizeOptionsSet: Set<number> = new Set<number>();
@@ -49,13 +49,15 @@ export class CartComponent implements OnInit {
         this.updateSubtotal();
         
         this.pageSizeOptionsSet.clear();
-        this.pageSizeOptionsSet.add(1);
-        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 2));
-        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 5));
-        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 8));
-        this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 10));
-        this.pageSizeOptionsSet.add(this.itemsInCart.data.length);
-        this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
+        if (this.itemsInCart.data.length !== 0) {
+          this.pageSizeOptionsSet.add(1);
+          this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 2));
+          this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 5));
+          this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 8));
+          this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 10));
+          this.pageSizeOptionsSet.add(this.itemsInCart.data.length);
+          this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
+        }
       });
     }, 2000); /* To give time for database to be opened by app component */
   }
@@ -93,7 +95,7 @@ export class CartComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-          "orderedProducts", this.fs.loggedInUserId + "_" + droppedItem.title);
+          "orderedProducts", this.fs.loggedInUserId + "_" + droppedItem.id);
         this.itemsInCart.data = this.itemsInCart.data.filter(item => item !== droppedItem);
         this.updateSubtotal();
       }
@@ -114,7 +116,7 @@ export class CartComponent implements OnInit {
       if (result.isConfirmed) {
         this.itemsInCart.data.forEach(item => {
           this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-              "orderedProducts", this.fs.loggedInUserId + "_" + item.title);
+              "orderedProducts", this.fs.loggedInUserId + "_" + item.id);
         });
         
         this.itemsInCart.data = [];
@@ -137,25 +139,35 @@ export class CartComponent implements OnInit {
     if (this.shippingVia.length > 0 && this.itemsInCart.data.length > 0
       && this.subtotal > 0 && this.shippingCost > -1) {
       
-      Swal.fire({
-        title: "Успешно послата поруџбина",
-        text: "Сви производи из корпе су успешно поручени. Статус и податке о поруџбини можете пратити на страни Поруџбине. У сваком тренутку можете да откажете поруџбину, докле год она нема статус „Завршена“",
-        icon: "success",
-        showCancelButton: false,
-        confirmButtonText: "У реду",
-        allowOutsideClick: false
-      }).then(() => {
-        this.fs.updateFirestoreOrderData(this.itemsInCart.data, this.shippingVia,
-        this.subtotal + this.subtotal / 5 + this.shippingCost);
-      
-        this.itemsInCart.data.forEach(item => {
-          this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-              "orderedProducts", this.fs.loggedInUserId + "_" + item.title);
+      this.fs.placeOrder(this.itemsInCart.data, this.shippingVia,
+        this.subtotal + this.subtotal / 5 + this.shippingCost).then(() => {
+          Swal.fire({
+            title: "Успешно послата поруџбина",
+            text: "Сви производи из корпе су успешно поручени. Статус и податке о поруџбини можете пратити на страни Поруџбине. У сваком тренутку можете да откажете поруџбину, докле год она нема статус „Завршена“",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonText: "У реду",
+            allowOutsideClick: false
+          }).finally(() => {
+            this.itemsInCart.data.forEach(item => {
+              this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
+                "orderedProducts", item.id);
+            });
+            this.itemsInCart.data = [];
+            this.updateShipping(undefined);
+            this.updateSubtotal();
+          });
+        }).catch(error => {
+          //console.error(error);
+          Swal.fire({
+            title: "Грешка приликом слања поруџбине",
+            text: "Проверите да ли сте повезани на интернет или покушајте поново. Уколико се ова грешка идаље појављује контактирајте администратора",
+            icon: "error",
+            showCancelButton: false,
+            confirmButtonText: "У реду",
+            allowOutsideClick: false
+          });
         });
-        this.itemsInCart.data = [];
-        this.updateShipping(null);
-        this.updateSubtotal();       
-      });
     }
   }
 }

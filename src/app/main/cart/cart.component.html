@@ -1,6 +1,6 @@
 <div class="spaceing">
     <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%" class="mat-card">
-        <mat-table [dataSource]="itemsInCart" matSort class="spaceing-top">
+        <mat-table [dataSource]="itemsInCart" matSort>
             <ng-container matColumnDef="title">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Име производа</mat-header-cell>
                 <mat-cell *matCellDef="let element">{{ element.title }}</mat-cell>
@@ -39,7 +39,7 @@
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="footer">
-                <mat-footer-cell *matFooterCellDef style="margin-left: 25%;">Укупна цена поручених производа је {{ (subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара (са 20% ПДВ)</mat-footer-cell>
+                <mat-footer-cell *matFooterCellDef style="margin-left: 32%;">Укупна цена поручених производа је {{ (subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара (са 20% ПДВ)</mat-footer-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
             <mat-row *matRowDef="let rows; columns: displayedColumns;"></mat-row>
