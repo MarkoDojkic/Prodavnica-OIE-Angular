@@ -86,7 +86,7 @@
         <button type="button" mat-icon-button class="floating" (click)="drawer.toggle()" *ngIf="!drawer.opened">
             <mat-icon>menu</mat-icon>
         </button>
-        <mat-grid-list [cols]="numberOfColums" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
+        <mat-grid-list [cols]="numberOfColumns" (window:resize)="onResize($event)" [rowHeight]="rowHeight" style="min-width: 350px;">
             <mat-grid-tile *ngFor="let item of filteredItems" fxFlex>
               <mat-card fxLayout="column" fxLayoutAlign="center center" fxFlex>
                 <mat-card-header fxLayoutAlign="center center" fxFlex>

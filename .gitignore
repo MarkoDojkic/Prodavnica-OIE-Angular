@@ -44,7 +44,3 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-src/app/fish-demo/fish-demo.component.css
-src/app/fish-demo/fish-demo.component.html
-src/app/fish-demo/fish-demo.component.spec.ts
-src/app/fish-demo/fish-demo.component.ts

@@ -24,7 +24,6 @@ import { OrderComponent } from './main/order/order.component';
 import { NotFoundComponent } from './main/not-found/not-found.component';
 import { FirebaseService } from './services/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
-import { FishDemoComponent } from './fish-demo/fish-demo.component';
 import { getSerbianPaginatorIntl } from './services/MatPaginatorLocalization';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
@@ -37,8 +36,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
     ShopComponent,
     CartComponent,
     OrderComponent,
-    NotFoundComponent,
-    FishDemoComponent
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
