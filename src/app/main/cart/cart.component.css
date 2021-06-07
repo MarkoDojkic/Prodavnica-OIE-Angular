@@ -9,3 +9,15 @@
 mat-table {
     width: 100%;
 }
+
+span, button, mat-cell {
+    font-size: 1.2vw;
+    text-align: center;
+}
+
+@media screen and (max-width: 599px) {
+    span, button, mat-cell {
+        font-size: 2vw;
+        text-align: center;
+    }
+}

@@ -91,7 +91,7 @@ export class ProfilePageComponent implements OnInit {
       this.userSurname = ibData["value"]["displayName"].split(' ')[1];
       this.userEmail = ibData["value"]["email"];
 
-      this.fs.getFirestoreData(this.uid).forEach((data) => { //Assumes valid return from firestore database
+      this.fs.getFirestoreUserData(this.uid).forEach((data) => { //Assumes valid return from firestore database
         this.userPhone = data.get("phone");
         this.userMobilePhone = data.get("mobilePhone");
         this.userDeliveryAddress = data.get("deliveryAddress");

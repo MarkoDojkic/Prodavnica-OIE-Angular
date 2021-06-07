@@ -111,7 +111,7 @@ export class FirebaseService {
   
   placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): any {
     return new Promise((resolve, reject) => {
-      return this.getFirestoreData(this.loggedInUserId).subscribe(userData => {
+      return this.getFirestoreUserData(this.loggedInUserId).subscribe(userData => {
         return this.firestore.firestore.runTransaction(() => {
           return this.firestore.collection("orders").add({
             "orderedBy": this.loggedInUserId,
@@ -122,7 +122,7 @@ export class FirebaseService {
             "totalPrice": totalPrice,
             "status": "Текућа"
           }).then(() => resolve(true)/* result => console.log(result) */)
-            .catch(() => resolve(false)/* (error) => { console.error(error); } */);
+            .catch(() => reject(false)/* (error) => { console.error(error); } */);
         }).then(() => resolve(true)/* result => console.log(result) */)
       });
     });
@@ -154,8 +154,12 @@ export class FirebaseService {
     });
   }
 
-  getFirestoreData(userId: string): Observable<any> {    
+  getFirestoreUserData(userId: string): Observable<any> {    
     return this.firestore.collection("users").doc(userId).get();
+  }
+
+  getFirstoreItemData(itemId: string): Observable<any> {
+    return this.firestore.collection("items").doc(itemId).get();
   }
 
   getIDBData(): Observable<any> {
@@ -225,7 +229,7 @@ export class FirebaseService {
         orderData.push({
           "id": order.id,
           "placedOn": order.data()["placedOn"].toDate(), //Timestamp to Date
-          "orderedItems": order.data()["items"], //Firestore map to explicit map
+          "items": order.data()["items"],
           "shippingAddress": order.data()["shippingAddress"],
           "shippingMethod": order.data()["shippingMethod"],
           "status": order.data()["status"],
@@ -233,6 +237,29 @@ export class FirebaseService {
         });
       });
     }).then(() => { return Promise.resolve(orderData); });
-  
+  }
+
+  updateOrderData(newOrderData: Order): void {
+    this.firestore.firestore.runTransaction(() => {
+      return this.firestore.collection("orders").doc(newOrderData.id).update(newOrderData)
+        .then(() => {
+          Swal.fire({
+            title: "Подаци поруџбине успешно промењени!",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonText: "У реду",
+          });
+        })
+        .catch(error => {
+          /* console.error(error); */
+          Swal.fire({
+            title: "Грешка приликом промене података поруџбине!",
+            text: "Проверите да ли сте повезани на интернет и покушајте поново! Уколико се грешка идаље појављује контактирајте администратора!",
+            icon: "error",
+            showCancelButton: false,
+            confirmButtonText: "У реду",
+          });
+        })
+    });
   }
 }

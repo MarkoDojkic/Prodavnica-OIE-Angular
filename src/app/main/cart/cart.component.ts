@@ -95,7 +95,7 @@ export class CartComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-          "orderedProducts", this.fs.loggedInUserId + "_" + droppedItem.id);
+          "orderedProducts", droppedItem.id);
         this.itemsInCart.data = this.itemsInCart.data.filter(item => item !== droppedItem);
         this.updateSubtotal();
       }
@@ -116,7 +116,7 @@ export class CartComponent implements OnInit {
       if (result.isConfirmed) {
         this.itemsInCart.data.forEach(item => {
           this.idb.removeObjectStoreItem(this.idb.getIDB(this.localStorageDb),
-              "orderedProducts", this.fs.loggedInUserId + "_" + item.id);
+              "orderedProducts", item.id);
         });
         
         this.itemsInCart.data = [];

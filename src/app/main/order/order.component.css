@@ -12,4 +12,17 @@
 
 .additonalPadding {
     padding-top: 1% !important;
+    padding-bottom: 1% !important;
+}
+
+mat-sort-header-content, span, button, mat-cell {
+    font-size: 1vw;
+    text-align: center;
+}
+
+@media screen and (max-width: 599px) {
+    mat-sort-header-content, span, button, mat-cell {
+        font-size: 2vw;
+        text-align: center;
+    }
 }
