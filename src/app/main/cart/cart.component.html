@@ -38,7 +38,7 @@
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
-            <ng-container matColumnDef="footer">
+            <ng-container matColumnDef="footer"><!-- Fix pending -->
                 <mat-footer-cell *matFooterCellDef style="margin-left: 32%;">Укупна цена поручених производа је {{ (subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара (са 20% ПДВ)</mat-footer-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>

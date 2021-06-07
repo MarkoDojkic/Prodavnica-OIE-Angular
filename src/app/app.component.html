@@ -1,6 +1,6 @@
 <div *ngIf="this.fs.loggedInUserId === null">
-    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%" fxLayout.lt-sm="15%">
-        <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+    <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%">
+        <span>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
         
         <div [fxHide.lt-sm]="true" fxFlex="75" fxLayoutGap="2%">
             <button mat-stroked-button routerLink="/shop" fxFlex>
@@ -31,7 +31,7 @@
 </div>
 <div *ngIf="this.fs.loggedInUserId !== null">
     <mat-toolbar fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="2%">
-        <span [fxFlex.gt-sm]="15" [fxFlex.lt-sm]="25">Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
+        <span>Продавница ОИЕ <br> © 2021 Марко Дојкић</span>
         
         <div [fxHide.lt-sm]="true" fxFlex="75" fxLayoutGap="2%">
             <button mat-stroked-button routerLink="/shop" fxFlex>
@@ -55,7 +55,7 @@
             <button mat-icon-button routerLink="/shop" fxFlex>
                 <mat-icon>store</mat-icon>
             </button>
-            <button mat-icon-button routerLink="/orders" fxFlex>
+            <button mat-icon-button routerLink="/order" fxFlex>
                 <mat-icon>receipt</mat-icon>
             </button>
             <button mat-icon-button routerLink="/cart">

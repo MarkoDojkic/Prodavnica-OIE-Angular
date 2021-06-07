@@ -1,7 +1,7 @@
 export interface Order {
   id: string;
   placedOn: Date;
-  orderedItems: Map<string, number>;
+  items: { [key: string]:number };
   shippingAddress: string;
   shippingMethod: "Лично преузимање" | "Курирска служба" | "Пошта";
   status: "Текућа" | "Отказана" | "Завршена";
