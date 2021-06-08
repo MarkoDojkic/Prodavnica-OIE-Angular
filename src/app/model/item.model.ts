@@ -10,14 +10,3 @@ export interface Item {
   orderedQuantity?: number; //Used in indexedDB and expansion panel only
   isEditing?: boolean; //Used in cart component only
 }
-
-export interface CategoryNode {
-  name: string;
-  children?: CategoryNode[];
-}
-
-export interface FlatNode {
-  expandable: boolean;
-  name: string;
-  level: number;
-}

@@ -15,3 +15,14 @@
     <app-root></app-root>
   </body>
 </html>
+<script> /* Script is used for sweetalert review popup star rating */
+  function onHoverRating(selectedRating) {
+      if(selectedRating === null) selectedRating = 0;
+
+      for (let i = 1; i <= 5; i++) {
+          document.querySelector("#sweetAlertRating_rating_" + i).innerHTML = i <= selectedRating ? "star_rate" : "star_outline";
+      }
+      
+      document.querySelector("#sweetAlertRating").innerHTML = selectedRating.toString();
+  }
+</script>

@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { Item } from './main/shop/shop.model';
+import { Item } from './model/item.model';
 
 @Component({
   selector: 'app-root',
