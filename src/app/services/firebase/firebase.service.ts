@@ -1,3 +1,4 @@
+import { Review } from './../../model/review.model';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -10,7 +11,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import Swal from 'sweetalert2';
 import * as firebase from 'firebase';
 import { IndexedDatabaseService } from '../indexed-database/indexed-database.service';
-import { Order } from 'src/app/main/order/order.model';
+import { Order } from 'src/app/model/order.model';
 
 @Injectable({
   providedIn: 'root'
@@ -96,34 +97,43 @@ export class FirebaseService {
   updateAuthUserProfile(displayName: string, photoURL: string): void {
     this.auth.user.subscribe(result => {
       if (result) result.updateProfile({ displayName: displayName, photoURL: photoURL })
-        .catch(/* (error) => { console.error("UpdateAuthUserProfile error: " + error) } */); /* Immediately visible results thus no need to display any messages */
-    });
-  }
-
-  updateFirestoreUserData(userId: string, data: any): void {
-    this.firestore.firestore.runTransaction(() => {
-      return this.firestore.collection("users").doc(userId)
-        .update(data) /* Immediately visible results thus no need to display any messages */
-        .then(/* result => console.log(result) */)
-        .catch(/* (error) => { console.error(error); } */);
+        .catch(/* error => console.error("UpdateAuthUserProfile error: " + error) */); /* Immediately visible results thus no need to display any messages */
     });
   }
   
-  placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): any {
+  updateFirestoreUserData(userId: string, data: any): void {
+    this.firestore.firestore.runTransaction(transaction =>
+      transaction.get(this.firestore.collection("users").doc(userId).ref).then(document => {
+        transaction.update(document.ref, data);
+    }).then( /* result => console.log(result) */)
+      .catch( /* error => console.error(error) */)).then(/* result => console.log(result) */)
+    .catch(/* error => console.error(error) */); /* Immediately visible results thus no need to display any messages */
+  }
+  
+  placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): Promise<any> {
     return new Promise((resolve, reject) => {
-      return this.getFirestoreUserData(this.loggedInUserId).subscribe(userData => {
-        return this.firestore.firestore.runTransaction(() => {
-          return this.firestore.collection("orders").add({
-            "orderedBy": this.loggedInUserId,
-            "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity; return map; }, {}),
-            "shippingMethod": shippingMethod,
-            "shippingAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
-            "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
-            "totalPrice": totalPrice,
-            "status": "Текућа"
-          }).then(() => resolve(true)/* result => console.log(result) */)
-            .catch(() => reject(false)/* (error) => { console.error(error); } */);
-        }).then(() => resolve(true)/* result => console.log(result) */)
+      this.getFirestoreUserData(this.loggedInUserId).subscribe(userData => {
+        this.firestore.collection("orders").add({
+          "orderedBy": this.loggedInUserId,
+          "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity; return map; }, {}),
+          "shippingMethod": shippingMethod,
+          "shippingAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
+          "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
+          "totalPrice": totalPrice,
+          "status": "Текућа"
+        }).then(order => {
+          var newOrderId = order.id;
+          orderedItems.forEach(orderedItem => {
+            this.firestore.collection("reviews").add({
+              "authorId": this.loggedInUserId,
+              "orderId": newOrderId,
+              "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
+              "rating": -1,
+              "review": ""
+            });
+          });
+        }).then(() => resolve("Order placed successfully"))
+          .catch(() => reject("Error occurred when placing order")/* error => reject(Error(error)) */);
       });
     });
   }
@@ -166,8 +176,8 @@ export class FirebaseService {
     const output: Observable<number[]> = new Observable((observer) => {
       this.idb.getObjectStoreItem(this.idb.getIDB(this.firebaseLocalStorageDb),
       "firebaseLocalStorage", IDBKeyRange.lowerBound(0))
-        .then(value => { observer.next(value[0]); })
-        .catch(error => { observer.next(error); });
+        .then(value => observer.next(value[0]))
+        .catch(error => observer.next(error));
 
       return {
         unsubscribe() {
@@ -224,42 +234,83 @@ export class FirebaseService {
   getOrderData(userId: string): Promise<Array<Order>> {
     var orderData: Array<Order> = [];
 
-    return this.firestore.collection("orders").ref.where("orderedBy", "==", userId).get().then(orders => {
-      orders.docs.forEach(order => {
-        orderData.push({
-          "id": order.id,
-          "placedOn": order.data()["placedOn"].toDate(), //Timestamp to Date
-          "items": order.data()["items"],
-          "shippingAddress": order.data()["shippingAddress"],
-          "shippingMethod": order.data()["shippingMethod"],
-          "status": order.data()["status"],
-          "totalPrice": order.data()["totalPrice"]
+    return new Promise((resolve, reject) => {
+      this.firestore.collection("orders").ref.where("orderedBy", "==", userId).get().then(orders => {
+        orders.docs.forEach(order => {
+          orderData.push({
+            "id": order.id,
+            "placedOn": order.data()["placedOn"].toDate(), //Timestamp to Date
+            "items": order.data()["items"],
+            "shippingAddress": order.data()["shippingAddress"],
+            "shippingMethod": order.data()["shippingMethod"],
+            "status": order.data()["status"],
+            "totalPrice": order.data()["totalPrice"]
+          });
         });
-      });
-    }).then(() => { return Promise.resolve(orderData); });
+      }).then(() => resolve(orderData)).catch(/* error => reject(Error(error)) */);
+    });
   }
 
   updateOrderData(newOrderData: Order): void {
-    this.firestore.firestore.runTransaction(() => {
-      return this.firestore.collection("orders").doc(newOrderData.id).update(newOrderData)
-        .then(() => {
-          Swal.fire({
-            title: "Подаци поруџбине успешно промењени!",
-            icon: "success",
-            showCancelButton: false,
-            confirmButtonText: "У реду",
-          });
-        })
-        .catch(error => {
+    this.firestore.firestore.runTransaction(transaction =>
+      transaction.get(this.firestore.collection("orders").doc(newOrderData.id).ref).then(document => {
+        transaction.update(document.ref, newOrderData);
+      }).then( /* result => console.log(result) */ )
+        .catch( /* error => console.error(error) */)
+    ).then(() => {
+        Swal.fire({
+          title: "Подаци поруџбине успешно промењени!",
+          icon: "success",
+          showCancelButton: false,
+          confirmButtonText: "У реду",
+        });
+      })
+      .catch(error => {
+        /* console.error(error); */
+        Swal.fire({
+          title: "Грешка приликом промене података поруџбине!",
+          text: "Проверите да ли сте повезани на интернет и покушајте поново! Уколико се грешка идаље појављује контактирајте администратора!",
+          icon: "error",
+          showCancelButton: false,
+          confirmButtonText: "У реду",
+        });
+      });
+  }
+
+  getReviewData(orderId: string, itemId: string): Promise<Review> {
+    return new Promise((resolve, reject) => {
+      this.firestore.collection("reviews").ref.where("orderId", "==", orderId).where("productId", "==", itemId).onSnapshot(documents => {
+        if (documents.empty)
+          reject(null);
+        else
+          resolve(documents.docs[0].data() as Review);
+      });
+    });
+  }
+
+  getAllReviewsForProduct(itemId: string): Promise<Array<Review>> {
+    return new Promise((resolve, reject) => {
+      this.firestore.collection("reviews").ref.where("productId", "==", itemId).onSnapshot(documents => {
+        if (documents.empty) reject([])
+        else resolve(documents.docs.reduce((output, document) => { output.push(document.data() as Review); return output; }, Array<Review>()))
+      });
+    });
+  }
+
+  updateReview(orderId: string, itemId: string, newReviewData: Review): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      return this.firestore.collection("reviews").ref.where("orderId", "==", orderId).where("productId", "==", itemId).onSnapshot(documents => {
+        return this.firestore.firestore.runTransaction(transaction =>
+          transaction.get(documents.docs[0].ref).then(document => {
+            transaction.update(document.ref, newReviewData);
+          }).then( /* result => console.log(result) */ )
+            .catch( /* error => console.error(error) */)
+        ).then(() => resolve(true))
+         .catch(error => {
           /* console.error(error); */
-          Swal.fire({
-            title: "Грешка приликом промене података поруџбине!",
-            text: "Проверите да ли сте повезани на интернет и покушајте поново! Уколико се грешка идаље појављује контактирајте администратора!",
-            icon: "error",
-            showCancelButton: false,
-            confirmButtonText: "У реду",
-          });
-        })
+          reject(false);
+         });
+      });
     });
   }
 }

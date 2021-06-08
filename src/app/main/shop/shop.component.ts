@@ -3,14 +3,15 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { FirebaseService } from 'src/app/services/firebase/firebase.service';
 import { LabelType, Options } from '@angular-slider/ngx-slider';
-import { Item, CategoryNode, FlatNode } from './shop.model';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { KeyValue } from '@angular/common';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { IndexedDatabaseService } from '../../services/indexed-database/indexed-database.service';
 import { Observable } from 'rxjs';
-import { NotifierService, NotifierOptions } from 'angular-notifier';
+import { NotifierService } from 'angular-notifier';
+import { Item } from 'src/app/model/item.model';
+import { CategoryNode, FlatNode } from 'src/app/model/node.model';
 
 @Component({
   selector: 'app-shop',
