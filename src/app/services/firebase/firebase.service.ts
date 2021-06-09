@@ -123,13 +123,18 @@ export class FirebaseService {
           "status": "Текућа"
         }).then(order => {
           var newOrderId = order.id;
-          orderedItems.forEach(orderedItem => {
-            this.firestore.collection("reviews").add({
-              "authorId": this.loggedInUserId,
-              "orderId": newOrderId,
-              "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
-              "rating": -1,
-              "review": ""
+          this.getIDBData().forEach(ibData => {
+            orderedItems.forEach(orderedItem => {
+              this.firestore.collection("reviews").add({
+                "authorName": ibData["value"]["displayName"].split(' ')[0],
+                "authorSurname": ibData["value"]["displayName"].split(' ')[1],
+                "orderId": newOrderId,
+                "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
+                "rating": 0, /* Default rating */
+                "comment": "",
+                "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
+                "isAnonymous": false
+              });
             });
           });
         }).then(() => resolve("Order placed successfully"))
@@ -300,10 +305,11 @@ export class FirebaseService {
   updateReview(orderId: string, itemId: string, newReviewData: Review): Promise<boolean> {
     return new Promise((resolve, reject) => {
       return this.firestore.collection("reviews").ref.where("orderId", "==", orderId).where("productId", "==", itemId).onSnapshot(documents => {
-        return this.firestore.firestore.runTransaction(transaction =>
+        return this.firestore.firestore.runTransaction(transaction => /* Issue: This transaction keeps looping until page reload -> temporary solution reload page */
           transaction.get(documents.docs[0].ref).then(document => {
+            newReviewData.lastChange = this.firebaseApplication.firestore.FieldValue.serverTimestamp();
             transaction.update(document.ref, newReviewData);
-          }).then( /* result => console.log(result) */ )
+          }).then( /* result => console.log(result) */)
             .catch( /* error => console.error(error) */)
         ).then(() => resolve(true))
          .catch(error => {

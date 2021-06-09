@@ -1,3 +1,4 @@
+import { Review } from './review.model';
 import { Observable } from "rxjs/internal/Observable";
 
 export interface Item {
@@ -9,4 +10,5 @@ export interface Item {
   price: number;
   orderedQuantity?: number; //Used in indexedDB and expansion panel only
   isEditing?: boolean; //Used in cart component only
+  review?: Review;
 }
