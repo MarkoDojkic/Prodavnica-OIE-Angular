@@ -8,7 +8,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import Swal from 'sweetalert2';
-import { NotifierService } from 'angular-notifier';
 
 @Component({
   selector: 'app-order',
@@ -35,7 +34,7 @@ export class OrderComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private fs: FirebaseService, private ns: NotifierService) { }
+  constructor(private fs: FirebaseService) { }
 
   ngOnInit(): void {
     setTimeout(() => {
@@ -47,45 +46,60 @@ export class OrderComponent implements OnInit {
     var i = 0;
 
     this.fs.getOrderData(this.fs.loggedInUserId).then(data => {
-      this.listedOrders.data = data;
-      this.listedOrders.sort = this.sort;
-      this.listedOrders.paginator = this.paginator;
       this.orderDetail = [];
 
-      data.forEach(order => {      
+      data.forEach(order => {
         var orderedItemsData: Array<Item> = [];
+        var sumOfRatings: number = 0;
         var i = 0;
         
         for (let id of Object.keys(order.items)) {
           this.fs.getFirstoreItemData(id).subscribe(item => {
-            orderedItemsData.push({
-              "id": item.id,
-              "leftInStock": null,
-              "title": item.data()["name"],
-              "description": item.data()["description"],
-              "price": item.data()["price"],
-              "imageUrl": null,
-              "orderedQuantity": Object.values(order.items)[i],
-              "isEditing": false
-            });
-            
-            i++;
+            this.fs.getReviewData(order.id, id)
+              .then(response => {
+                orderedItemsData.push({
+                  "id": item.id,
+                  "leftInStock": null,
+                  "title": item.data()["name"],
+                  "description": item.data()["description"],
+                  "price": item.data()["price"],
+                  "imageUrl": null,
+                  "orderedQuantity": Object.values(order.items)[i],
+                  "isEditing": false,
+                  "review": response
+                });
+                sumOfRatings += response.rating;
+                i++;
+              })
+              .catch(error => {
+                /* console.log(error); */
+                return null;
+              });
           });
         }
-
-        this.orderDetail.push(orderedItemsData);
+        
+        setTimeout(() => { /* Waiting for loop to finish processing */
+          order.rating = Math.round(sumOfRatings / orderedItemsData.length);
+          this.orderDetail.push(orderedItemsData);
+        }, 1000);
       });
       
-      this.pageSizeOptionsSet.clear();
-      if (this.listedOrders.data.length !== 0) {
-        this.pageSizeOptionsSet.add(1);
-        this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 2));
-        this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 5));
-        this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 8));
-        this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 10));
-        this.pageSizeOptionsSet.add(this.listedOrders.data.length);
-        this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
-      }
+      setTimeout(() => { /* works without this, but to avoid errors */
+        this.listedOrders.data = data;
+        this.listedOrders.sort = this.sort;
+        this.listedOrders.paginator = this.paginator;
+
+        this.pageSizeOptionsSet.clear();
+        if (this.listedOrders.data.length !== 0) {
+          this.pageSizeOptionsSet.add(1);
+          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 2));
+          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 5));
+          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 8));
+          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 10));
+          this.pageSizeOptionsSet.add(this.listedOrders.data.length);
+          this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
+        }
+      }, 1000);
     });
   }
 
@@ -152,40 +166,12 @@ export class OrderComponent implements OnInit {
       }, 1000);
     }
   }
-
-/*   onHoverRating(elementId: string, selectedRating: number): void { 
-    for (let i = 1; i <= 5; i++) {
-      document.querySelector("#" + elementId + "_rating_" + i).innerHTML = i <= selectedRating ? "star_rate" : "star_outline";
-    }
-    
-    document.querySelector("#sweetAlertRating").innerHTML = selectedRating.toString();
-  } */
-
-  getReviewData(orderId: string, itemId: string): any {
-    this.fs.getReviewData(orderId, itemId)
-      .then(response => { return response; })
-      .catch(error => {
-        /* console.log(error); */
-        return null;
-      });
-  }
-
-  getReviewRating(orderId: string, itemId: string): number {
-    var review = this.getReviewData(orderId, itemId);
-    if (review !== null) return (review as Review).rating;
-    else return -1;
-  }
-
-  getReviewComment(orderId: string, itemId: string): string {
-    var review = this.getReviewData(orderId, itemId);
-    if (review !== null) return (review as Review).review;
-    else return "";
-  }
   
-  updateReview(orderId: string, productId: string): void {
+  updateReview(previousReviewData: Review): void {   
     Swal.fire({
       title: "Приказ и измена рецензије изабраног производа",
       html: `
+      <div class="mat-card">
         <span>Оцена (за негативну оцену пређите мишем лево од прве звездице):</span><br>
         <div fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
           <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(0)" style="color: transparent; width: 0.5px;"></button>
@@ -205,10 +191,12 @@ export class OrderComponent implements OnInit {
               <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_5">star_outline</mat-icon>
           </button>
         </div>
-        <span hidden="true" id="sweetAlertRating"></span>
+        <span hidden="true" id="sweetAlertRating">`+previousReviewData.rating+`</span>
         
         <span>Коментар (максимална дужина 510 карактера):</span><br><br>
-        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none"></textarea>
+        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none; font-size:inherit">`+ previousReviewData.comment +`</textarea><br><br>
+        <span><input type="checkbox" id="sweetAlertIsAnonymous" value="" checked="`+ previousReviewData.isAnonymous +`"> Сакри моје име и презиме</span><br><br>
+      </div>
       `,
       showCancelButton: true,
       confirmButtonText: "Измени рецензију",
@@ -219,14 +207,20 @@ export class OrderComponent implements OnInit {
     }).then(response => {
       if (response.isConfirmed) {
         var newRating: number = parseInt(Swal.getPopup().querySelector("#sweetAlertRating").innerHTML);
-        var newReview: string = (Swal.getPopup().querySelector("#sweetAlertReview") as HTMLTextAreaElement).value;
+        var newComment: string = (Swal.getPopup().querySelector("#sweetAlertReview") as HTMLTextAreaElement).value.trim();
+        var newIsAnonymous: boolean = (Swal.getPopup().querySelector("#sweetAlertIsAnonymous") as HTMLInputElement).checked;
+        
+        if (newRating === previousReviewData.rating && newComment === previousReviewData.comment
+          && newIsAnonymous === previousReviewData.isAnonymous) return; /* No new data */
 
-        this.fs.updateReview(orderId, productId, {
-          "authorId": this.fs.loggedInUserId,
-          "orderId": orderId,
-          "productId": productId,
+        this.fs.updateReview(previousReviewData.orderId, previousReviewData.productId, {
+          "authorName": previousReviewData.authorName,
+          "authorSurname": previousReviewData.authorSurname,
+          "orderId": previousReviewData.orderId,
+          "productId": previousReviewData.productId,
           "rating": newRating,
-          "review": newReview
+          "comment": newComment,
+          "isAnonymous": newIsAnonymous
         }).then(() => {
           Swal.fire({
             title: "Подаци рецензије успешно промењени",
@@ -234,10 +228,10 @@ export class OrderComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: "У реду",
             allowOutsideClick: false
-          });
+          }). then(() => window.location.reload()); /* Temporary fix for issue on firebase.service.ts line 304 */
         }, reject => {
           //console.error(reject);
-          Swal.fire({
+          Swal.fire({/* Fix showing error! */
             title: "Грешка приликом промене података",
             text: "Није могуће променити податке рецензије. Проверите да ли сте повезани на интернет. Уколико се грешка идаље појављује контактирајте администратора.",
             icon: "error",

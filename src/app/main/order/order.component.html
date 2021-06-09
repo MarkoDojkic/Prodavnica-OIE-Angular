@@ -45,7 +45,8 @@
         <mat-header-cell *matHeaderCellDef mat-sort-header>Просечна оцена артикала</mat-header-cell>
         <mat-cell *matCellDef="let element"> <!-- Not done in the most elegant way -->
             <div *ngIf="element.status !== 'Завршена'">Није оцењено</div>
-            <!-- <div *ngIf="element.rating = 1"><mat-icon>star</mat-icon></div> Template for rating should be average of all ordered products individual ratings (0-5 stars)--> 
+            <ng-container *ngFor="let i of [].constructor(element.rating)"><mat-icon>star</mat-icon></ng-container>
+            <ng-container *ngFor="let i of [].constructor(5 - element.rating)"><mat-icon>star_outline</mat-icon></ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
     </ng-container>
@@ -78,18 +79,14 @@
                 </div>
                 <span fxFlex="15" style="padding-top: 0.6%;">{{ (item.price * item.orderedQuantity).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}} динара</span>
                 <div *ngIf="element.status === 'Завршена'" fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
-                    <!-- <button mat-icon-button (mouseenter)="onHoverRating(item.id,1)" (click)="updateRating(element.id,item.id,1)"><mat-icon [id]="item.id + '_rating_1'">star_rate</mat-icon></button>
-                    <button mat-icon-button (mouseenter)="onHoverRating(item.id,2)" (click)="updateRating(element.id,item.id,2)"><mat-icon [id]="item.id + '_rating_2'">star_rate</mat-icon></button>
-                    <button mat-icon-button (mouseenter)="onHoverRating(item.id,3)" (click)="updateRating(element.id,item.id,3)"><mat-icon [id]="item.id + '_rating_3'">star_rate</mat-icon></button>
-                    <button mat-icon-button (mouseenter)="onHoverRating(item.id,4)" (click)="updateRating(element.id,item.id,4)"><mat-icon [id]="item.id + '_rating_4'">star_outline</mat-icon></button>
-                    <button mat-icon-button (mouseenter)="onHoverRating(item.id,5)" (click)="updateRating(element.id,item.id,5)"><mat-icon [id]="item.id + '_rating_5'">star_outline</mat-icon></button> -->
-                    <!-- <div *ngIf="element.rating = 1"><mat-icon>star</mat-icon></div> Template for rating should be average of all ordered products individual ratings (0-5 stars)-->
+                    <ng-container *ngFor="let i of [].constructor(item.review.rating)"><mat-icon>star</mat-icon></ng-container>
+                    <ng-container *ngFor="let i of [].constructor(5 - item.review.rating)"><mat-icon>star_outline</mat-icon></ng-container>
                 </div>
                 <span fxFlex="25">
                     <button mat-icon-button *ngIf="!item.isEditing && element.status === 'Текућа'" (click)="item.isEditing = true"><mat-icon>edit</mat-icon></button>
                     <button mat-icon-button *ngIf="item.isEditing" (click)="item.isEditing = false;" (click)="updateOrderItem(element, i, item.id, false)"><mat-icon>check_circle</mat-icon></button>
                     <button mat-icon-button *ngIf="element.status === 'Текућа' && orderDetail[i].length > 1" (click)="updateOrderItem(element, i, item.id, true)"><mat-icon>delete_forever</mat-icon></button>
-                    <button mat-icon-button *ngIf="element.status === 'Завршена'" (click)="updateReview(element.id, item.id)"><mat-icon>comment</mat-icon></button>
+                    <button mat-icon-button *ngIf="element.status === 'Завршена'" (click)="updateReview(item.review)"><mat-icon>comment</mat-icon></button>
                 </span>
             </div>
         </mat-cell>
@@ -99,4 +96,3 @@
     <mat-row *matRowDef="let rows; columns: displayedColumns;" [matExpansionPanelContent]="expandedElement === element" style="padding-left: 3% !important;"></mat-row>
     <mat-row *matRowDef="let rows; columns: ['orderedItems'];" class="expanded-row"></mat-row>
 </mat-table>
-<notifier-container></notifier-container>

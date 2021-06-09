@@ -99,7 +99,7 @@
                   <span fxFlex="50">Цена по комаду: {{ item.price?.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</span>
                   <span fxFlex="50" *ngIf="item.leftInStock === 0">Нема на стању</span>
                   <button fxFlex="10" type="button" mat-icon-button color="accent" (click)="buyProduct(item)" *ngIf="item.leftInStock > 0"><mat-icon>add_shopping_cart</mat-icon></button>
-                  <button fxFlex="10" type="button" mat-icon-button color="secondary" (click)="showComments(item)"><mat-icon>comment</mat-icon></button>
+                  <button fxFlex="10" type="button" mat-icon-button color="secondary" (click)="showReviews(item.id)"><mat-icon>comment</mat-icon></button>
                 </mat-card-actions>
               </mat-card>
             </mat-grid-tile>

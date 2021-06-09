@@ -7,4 +7,5 @@ export interface Order {
   status: "Текућа" | "Отказана" | "Завршена";
   totalPrice: number;
   isEditing?: boolean; //Used in order component only
+  rating?: number;
 }

@@ -1,7 +1,10 @@
 export interface Review {
-    authorId: string;
+    authorName?: string;
+    authorSurname?: string;
     orderId: string;
     productId: string;
     rating: number;
-    review: string;
+    comment: string;
+    lastChange?: any; /* Timestamp on firebase server, a.k.a FieldValue => to use just convert using .toDate() */
+    isAnonymous?: boolean;
 }
