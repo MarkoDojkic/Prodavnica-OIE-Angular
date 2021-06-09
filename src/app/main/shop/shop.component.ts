@@ -4,7 +4,7 @@ import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree'
 import { FirebaseService } from 'src/app/services/firebase/firebase.service';
 import { LabelType, Options } from '@angular-slider/ngx-slider';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { KeyValue } from '@angular/common';
+import { DatePipe, KeyValue } from '@angular/common';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { IndexedDatabaseService } from '../../services/indexed-database/indexed-database.service';
@@ -66,7 +66,7 @@ export class ShopComponent implements OnInit {
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  constructor(private fs: FirebaseService, private ns: NotifierService,
+  constructor(private fs: FirebaseService, private ns: NotifierService, private datePipe: DatePipe,
     private router: Router, private idb: IndexedDatabaseService) {
     this.categoriesSource.data = [
       {
@@ -560,78 +560,54 @@ export class ShopComponent implements OnInit {
     });
   }
 
-  showReviews(itemId: string) {
-/*  HTML TEMPLATE
-    <div fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="2%">
-          <section fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="1%" *ngFor="let i of [].constructor(10)">
-            <div fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="1%">
-              <span style="padding-top: 3px">Петар Петровић</span> <!-- Padding is for horizontal align with stars -->
-              <ng-container *ngFor="let i of [].constructor(3)"><mat-icon>star</mat-icon></ng-container>
-            <ng-container *ngFor="let i of [].constructor(5 - 3)"><mat-icon>star_outline</mat-icon></ng-container>
-              <span style="padding-top: 3px">09.06.2021. 13:13:13</span> <!-- Padding is for horizontal align with stars -->
-            </div>
-            <textarea readonly>Some random text of comment or something....</textarea>
-          </section>
-        </div>
-
-*/
-    /*  HTML TEMPLATE PARSED
-
-
-      <div _ngcontent-bjf-c268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="2%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="2%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%;">
-    <section _ngcontent-bjf-c268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="1%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="1%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%;">
-       <div _ngcontent-bjf-c268="" fxlayout="row" fxlayoutalign="space-evenly stretch" fxlayoutgap="1%" ng-reflect-fx-layout="row" ng-reflect-fx-layout-align="space-evenly stretch" ng-reflect-fx-layout-gap="1%" style="margin-bottom: 1%; flex-direction: row; box-sizing: border-box; display: flex; place-content: stretch space-evenly; align-items: stretch; max-height: 100%;">
-          <span _ngcontent-bjf-c268="" style="padding-top: 3px; margin-right: 1%;">Петар Петровић</span>
-          <mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="margin-right: 1%;">star</mat-icon>
-          <!--ng-container-->
-          <mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="margin-right: 1%;">star</mat-icon>
-          <!--ng-container-->
-          <mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="margin-right: 1%;">star</mat-icon>
-          <!--ng-container--><!--bindings={
-             "ng-reflect-ng-for-of": ",,"
-             }-->
-          <mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="margin-right: 1%;">star_outline</mat-icon>
-          <!--ng-container-->
-          <mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="margin-right: 1%;">star_outline</mat-icon>
-          <!--ng-container--><!--bindings={
-             "ng-reflect-ng-for-of": ","
-             }--><span _ngcontent-bjf-c268="" style="padding-top: 3px;">09.06.2021. 13:13:13</span>
-       </div>
-       <textarea _ngcontent-bjf-c268="" readonly="">Some random text of comment or something....</textarea>
-    </section>
- </div>
-
-    */
-    
+  showReviews(itemId: string) {    
     this.fs.getAllReviewsForProduct(itemId).then(response => {
       var html:string = `<div _ngcontent-bjf-c268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="2%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="2%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%;" class="mat-card">`;
+      var notReviewedCount: number = 0;
 
       response.forEach(review => {
+        if (review.rating === 0 && review.comment === "") {
+          notReviewedCount++;
+          return;
+        } //Not reviewed yet so skip
+        
         if (review.isAnonymous) {
           review.authorName = "Анонимни";
           review.authorSurname = "корисник";
+        } else {
+          this.fs.getFirestoreUserData(review.reviewedBy).subscribe(data => {
+            review.authorName = data.get("name");
+            review.authorSurname = data.get("surname");
+          });
         }
 
-        html += `<section _ngcontent-bjf-s268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="1%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="1%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%; margin-bottom: 5%;">
+        setTimeout(() => {
+          
+          html += `<section _ngcontent-bjf-s268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="1%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="1%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%; margin-bottom: 5%;">
                     <div _ngcontent-bjf-c268="" fxlayout="row" fxlayoutalign="space-evenly stretch" fxlayoutgap="1%" ng-reflect-fx-layout="row" ng-reflect-fx-layout-align="space-evenly stretch" ng-reflect-fx-layout-gap="1%" style="margin-bottom: 1%; flex-direction: row; box-sizing: border-box; display: flex; place-content: stretch space-evenly; align-items: stretch; max-height: 100%;">
                       <span _ngcontent-bjf-c268="" style="margin-right: 1%; width:45%">`+ review.authorName + " " + review.authorSurname + `</span>`;
         
-        for (let i = 1; i <= 5; i++) {
-          html += `<mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="padding-top: 6px; margin-right: 1%;">`;
-          html += i > review.rating ? "star_outline" : "star";
-          html += `</mat-icon>`;
-        }
+          for (let i = 1; i <= 5; i++) {
+            html += `<mat-icon _ngcontent-bjf-c268="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color ng-star-inserted" aria-hidden="true" data-mat-icon-type="font" style="padding-top: 6px; margin-right: 1%;">`;
+            html += i > review.rating ? "star_outline" : "star";
+            html += `</mat-icon>`;
+          }
 
-        html += `<span _ngcontent-bjf-c268="">`+ "12.12.2012. 14:35:45"/* review.lastChange.toDate() */ + `</span>
-                </div>
-                <p style="margin-top: 3%">`+ review.comment + `</p>
-            </section></div>`
+          html += `<span _ngcontent-bjf-c268="">`+ this.datePipe.transform(review.lastChange.toDate(), "dd.MM.YYYY. H:mm:ss") + `</span>
+                  </div>
+                  <p style="margin-top: 3%">`+ review.comment + `</p>
+              </section></div>`
+        }, 1000);
       });
 
       setTimeout(() => {
+        if (response.length === 0 || response.length === notReviewedCount)
+          html += "<p>Нема доступних рецензија</p>"
+
         html += "</div>" /* Closing div */
+
         Swal.fire({
-          title: "Приказ рецензија за производ са ИД-јем: " + itemId.split("item_")[1],
+          title: "Приказ рецензија за изабрани производ",
           html: html,
           showCancelButton: false,
           confirmButtonText: "У реду",
@@ -639,7 +615,7 @@ export class ShopComponent implements OnInit {
         });
       }, 2000);
     }).catch(reject => {
-      //console.error(reject);
+      /* console.error(reject); */
       Swal.fire({
         title: "Грешка приликом преузимања података",
         text: "Није могуће преузети податке рецензија за производ " + itemId + ". Проверите да ли сте повезани на интернет. Уколико се грешка идаље појављује контактирајте администратора.",
@@ -649,42 +625,6 @@ export class ShopComponent implements OnInit {
         allowOutsideClick: false
       });
     });
-    /* Swal.fire({
-      title: "Приказ рецензија изабраног производа",
-      html: `
-      <div class="mat-card">
-        <span>Оцена (за негативну оцену пређите мишем лево од прве звездице):</span><br>
-        <div fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(0)" style="color: transparent; width: 0.5px;"></button>
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(1)">
-              <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_1">star_outline</mat-icon>
-          </button>
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(2)">
-              <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_2">star_outline</mat-icon>
-          </button>
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(3)">
-              <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_3">star_outline</mat-icon>
-          </button>
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(4)">
-              <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_4">star_outline</mat-icon>
-          </button>
-          <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(5)">
-              <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_5">star_outline</mat-icon>
-          </button>
-        </div>
-        <span hidden="true" id="sweetAlertRating">0</span>
-        
-        <span>Коментар (максимална дужина 510 карактера):</span><br><br>
-        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none">`+ previousReview + `</textarea>
-      </div>  
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Измени рецензију",
-      confirmButtonColor: "green",
-      cancelButtonText: "Одустани",
-      cancelButtonColor: "red",
-      allowOutsideClick: false
-    }); */
   }
 }
 

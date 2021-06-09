@@ -15,7 +15,7 @@
     <app-root></app-root>
   </body>
 </html>
-<script> /* Script is used for sweetalert review popup star rating */
+<script type="text/javascript"> /* Script is used for sweetalert review popup star rating */
   function onHoverRating(selectedRating) {
       if(selectedRating === null) selectedRating = 0;
 
@@ -26,3 +26,8 @@
       document.querySelector("#sweetAlertRating").innerHTML = selectedRating.toString();
   }
 </script>
+<style type="text/css"> /* Style is used for sweetalert review popup star rating */
+  .sweetAlertDisplayFix {
+      display: unset !important;
+  }
+</style>

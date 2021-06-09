@@ -1,5 +1,5 @@
-import { Review } from './../../model/review.model';
-import { FirebaseService } from './../../services/firebase/firebase.service';
+import { Review } from '../../model/review.model';
+import { FirebaseService } from '../../services/firebase/firebase.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Item } from 'src/app/model/item.model';
@@ -72,7 +72,7 @@ export class OrderComponent implements OnInit {
                 i++;
               })
               .catch(error => {
-                /* console.log(error); */
+                /* console.error(error); */
                 return null;
               });
           });
@@ -125,12 +125,16 @@ export class OrderComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         order.status = "Отказана";
+        delete order.id; //Delete unnecessary variable
+        delete order.isEditing; //Delete unnecessary variable
         this.fs.updateOrderData(order);
       }
     });
   }
 
   updateOrder(order: Order): void {
+    delete order.id; //Delete unnecessary variable
+    delete order.isEditing; //Delete unnecessary variable
     this.fs.updateOrderData(order);
   }
   
@@ -148,7 +152,8 @@ export class OrderComponent implements OnInit {
       }).then(result => {
         if (result.isConfirmed) {
           delete order.items[itemId];
-          delete order.isEditing;
+          delete order.id; //Delete unnecessary variable
+          delete order.isEditing; //Delete unnecessary variable
           this.fs.updateOrderData(order);
           setTimeout(() => {
             this.refreshOrders();
@@ -159,7 +164,8 @@ export class OrderComponent implements OnInit {
     }
     else {
       order.items[itemId] = this.orderDetail[index].find(item => item.id === itemId).orderedQuantity;
-      delete order.isEditing;
+      delete order.id; //Delete unnecessary variable
+      delete order.isEditing; //Delete unnecessary variable
       this.fs.updateOrderData(order);
       setTimeout(() => {
         this.refreshOrders();
@@ -167,12 +173,13 @@ export class OrderComponent implements OnInit {
     }
   }
   
-  updateReview(previousReviewData: Review): void {   
+  updateReview(previousReviewData: Review): void {
     Swal.fire({
       title: "Приказ и измена рецензије изабраног производа",
+      customClass: { popup: "sweetAlertDisplayFix" },
       html: `
-      <div class="mat-card">
-        <span>Оцена (за негативну оцену пређите мишем лево од прве звездице):</span><br>
+      <div _ngcontent-bjf-c268="" fxlayout="column" fxlayoutalign="center stretch" fxlayoutgap="2%" ng-reflect-fx-layout="column" ng-reflect-fx-layout-align="center stretch" ng-reflect-fx-layout-gap="2%" style="flex-direction: column; box-sizing: border-box; display: flex; place-content: stretch center; align-items: stretch; max-width: 100%;" class="mat-card">      
+        <span>Оцена (за негативну оцену пређите мишем лево од прве звездице):</span>
         <div fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
           <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(0)" style="color: transparent; width: 0.5px;"></button>
           <button _ngcontent-hdn-c273="" mat-icon-button="" class="mat-focus-indicator ng-tns-c273-0 mat-icon-button mat-button-base" onmouseover="onHoverRating(1)">
@@ -193,9 +200,9 @@ export class OrderComponent implements OnInit {
         </div>
         <span hidden="true" id="sweetAlertRating">`+previousReviewData.rating+`</span>
         
-        <span>Коментар (максимална дужина 510 карактера):</span><br><br>
-        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none; font-size:inherit">`+ previousReviewData.comment +`</textarea><br><br>
-        <span><input type="checkbox" id="sweetAlertIsAnonymous" value="" checked="`+ previousReviewData.isAnonymous +`"> Сакри моје име и презиме</span><br><br>
+        <span>Коментар (максимална дужина 510 карактера):</span><br>
+        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none; font-size:inherit">`+ previousReviewData.comment +`</textarea><br>
+        <span><input type="checkbox" id="sweetAlertIsAnonymous"`+ (previousReviewData.isAnonymous ? "checked" : "") + `> Сакри моје име и презиме</span><br>
       </div>
       `,
       showCancelButton: true,
@@ -214,8 +221,7 @@ export class OrderComponent implements OnInit {
           && newIsAnonymous === previousReviewData.isAnonymous) return; /* No new data */
 
         this.fs.updateReview(previousReviewData.orderId, previousReviewData.productId, {
-          "authorName": previousReviewData.authorName,
-          "authorSurname": previousReviewData.authorSurname,
+          "reviewedBy": previousReviewData.reviewedBy,
           "orderId": previousReviewData.orderId,
           "productId": previousReviewData.productId,
           "rating": newRating,
@@ -228,10 +234,10 @@ export class OrderComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: "У реду",
             allowOutsideClick: false
-          }). then(() => window.location.reload()); /* Temporary fix for issue on firebase.service.ts line 304 */
+          }).then(() => window.location.reload()); /* Temporary fix for issue on firebase.service.ts line 304 */
         }, reject => {
-          //console.error(reject);
-          Swal.fire({/* Fix showing error! */
+          /* console.error(reject); */
+          Swal.fire({
             title: "Грешка приликом промене података",
             text: "Није могуће променити податке рецензије. Проверите да ли сте повезани на интернет. Уколико се грешка идаље појављује контактирајте администратора.",
             icon: "error",

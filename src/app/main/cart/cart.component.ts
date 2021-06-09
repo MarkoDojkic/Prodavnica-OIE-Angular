@@ -157,8 +157,8 @@ export class CartComponent implements OnInit {
             this.updateShipping(undefined);
             this.updateSubtotal();
           });
-        }).catch(error => {
-          //console.error(error);
+        }).catch(reject => {
+          /* console.error(reject); */
           Swal.fire({
             title: "Грешка приликом слања поруџбине",
             text: "Проверите да ли сте повезани на интернет или покушајте поново. Уколико се ова грешка идаље појављује контактирајте администратора",
