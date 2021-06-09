@@ -1,4 +1,5 @@
 export interface Review {
+    reviewedBy: string;
     authorName?: string;
     authorSurname?: string;
     orderId: string;

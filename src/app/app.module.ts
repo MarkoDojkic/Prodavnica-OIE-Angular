@@ -26,6 +26,7 @@ import { FirebaseService } from './services/firebase/firebase.service';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { getSerbianPaginatorIntl } from './services/MatPaginatorLocalization';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -93,7 +94,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
   ],
 
   
-  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard,
+  providers: [Title, CryptoService, FirebaseService, AngularFireAuthGuard, DatePipe,
     IDBDatabase, IDBFactory, { provide: MatPaginatorIntl, useValue: getSerbianPaginatorIntl() }],
   bootstrap: [AppComponent]
 })

@@ -22,6 +22,7 @@ export class ProfilePageComponent implements OnInit {
   paymentPattern: string;
   paymentHint: string;
   paymentErrorMessage: string;
+  favoriteProducts: Array<string> = new Array<string>();
 
   constructor(private fs:FirebaseService) { }
 
@@ -38,12 +39,13 @@ export class ProfilePageComponent implements OnInit {
 
   onUpdate(form: NgForm): void {
 
-    const newName: string = form.controls["name"].value;
-    const newSurname: string = form.controls["surname"].value;
+    const newName: string = form.controls["name"].valid ? form.controls["name"].value : this.userName;
+    const newSurname: string = form.controls["surname"].valid ? form.controls["surname"].value : this.userName;
     const updatedFirestoreData: any = {};
     
-    this.fs.updateAuthUserProfile(((!!newName ? newName : this.userName) + " "
-    + (!!newSurname ? newSurname : this.userSurname)), null);
+    updatedFirestoreData["name"] = newName;
+    updatedFirestoreData["surname"] = newSurname;
+    this.fs.updateAuthUserProfile(newName + " " + newSurname, null);
         
     Object.keys(form.controls).forEach(control => {
       const field: AbstractControl = form.controls[control];
@@ -98,7 +100,8 @@ export class ProfilePageComponent implements OnInit {
         this.userDeliveryAddressPAK = data.get("deliveryAddressPAK");
         this.userPaymentAddress = data.get("paymentAddress");
         this.userPaymentType = data.get("paymentType");
-      });      
+        this.favoriteProducts = data.get("favoriteProducts");
+      });
     });
   }
 

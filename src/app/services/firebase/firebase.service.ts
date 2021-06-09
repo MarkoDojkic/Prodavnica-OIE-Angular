@@ -1,4 +1,4 @@
-import { Review } from './../../model/review.model';
+import { Review } from '../../model/review.model';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -37,7 +37,7 @@ export class FirebaseService {
 
   signInViaEmail(email: string, password: string): void {
     this.auth.signInWithEmailAndPassword(email, this.cs.encrypt(this.key, password))
-      .then(/* result => { console.log(result); } */).then(() => {
+      .then(/* resolve => { console.log(resolve); } */).then(() => {
       Swal.fire({
         title: "Логовање успешно!",
         text: "Успешно сте се улоговали!",
@@ -48,8 +48,8 @@ export class FirebaseService {
         this.ngZone.run(() => { this.router.navigate(["/profile"]); });
         this.updateLoggedInUserId();
       });
-    }).catch((error) => {
-      /* console.error(error); */
+    }).catch((reject) => {
+      /* console.error(reject); */
       Swal.fire({
         title: "Логовање неуспешно!",
         text: "Проверите поново да ли сте исправно унели\nВашу адресу електронске поште и лозинку!",
@@ -65,12 +65,15 @@ export class FirebaseService {
       /* result.user.sendEmailVerification(); */
       this.updateAuthUserProfile((form.controls["name"].value + " " + form.controls["surname"].value), null);
       this.updateFirestoreUserData(result.user.uid, {
+        "name": form.controls["name"].value, /* For showing in reviews */
+        "surname": form.controls["surname"].value, /* For showing in reviews */
         "phone": form.controls["phone"].hasError('required') ? '' : form.controls["phone"].value,
         "mobilePhone": form.controls["mobilePhone"].hasError('required') ? '' : form.controls["mobilePhone"].value,
         "deliveryAddress": form.controls["deliveryAddress"].hasError('required') ? '' : form.controls["deliveryAddress"].value,
         "deliveryAddressPAK": form.controls["deliveryAddressPAK"].hasError('required') ? '' : form.controls["deliveryAddressPAK"].value,
         "paymentType": form.controls["paymentType"].value,
-        "paymentAddress": form.controls["paymentAddress"].value
+        "paymentAddress": form.controls["paymentAddress"].value,
+        "favoriteProducts": []
       });
     }).then(() => {
       Swal.fire({
@@ -82,8 +85,8 @@ export class FirebaseService {
       }).then(() => {
         this.ngZone.run(() => { this.signOut(); });
       });
-    }).catch((error) => {
-      /* console.error(error); */
+    }).catch((reject) => {
+      /* console.error(reject); */
       Swal.fire({
         title: "Регистрација неуспешна!",
         text: "Највероватније већ постоји корисник са наведеном адресом електронске поште.\nУколико сте заборавили лознику затражите промену лозинке!",
@@ -97,7 +100,7 @@ export class FirebaseService {
   updateAuthUserProfile(displayName: string, photoURL: string): void {
     this.auth.user.subscribe(result => {
       if (result) result.updateProfile({ displayName: displayName, photoURL: photoURL })
-        .catch(/* error => console.error("UpdateAuthUserProfile error: " + error) */); /* Immediately visible results thus no need to display any messages */
+        .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
     });
   }
   
@@ -105,9 +108,9 @@ export class FirebaseService {
     this.firestore.firestore.runTransaction(transaction =>
       transaction.get(this.firestore.collection("users").doc(userId).ref).then(document => {
         transaction.update(document.ref, data);
-    }).then( /* result => console.log(result) */)
-      .catch( /* error => console.error(error) */)).then(/* result => console.log(result) */)
-    .catch(/* error => console.error(error) */); /* Immediately visible results thus no need to display any messages */
+    }).then( /* resolve => console.log(resolve) */)
+      .catch( /* error => console.reject(reject) */)).then(/* result => console.log(result) */)
+    .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
   }
   
   placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): Promise<any> {
@@ -126,8 +129,7 @@ export class FirebaseService {
           this.getIDBData().forEach(ibData => {
             orderedItems.forEach(orderedItem => {
               this.firestore.collection("reviews").add({
-                "authorName": ibData["value"]["displayName"].split(' ')[0],
-                "authorSurname": ibData["value"]["displayName"].split(' ')[1],
+                "reviewedBy": this.loggedInUserId,
                 "orderId": newOrderId,
                 "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
                 "rating": 0, /* Default rating */
@@ -260,8 +262,8 @@ export class FirebaseService {
     this.firestore.firestore.runTransaction(transaction =>
       transaction.get(this.firestore.collection("orders").doc(newOrderData.id).ref).then(document => {
         transaction.update(document.ref, newOrderData);
-      }).then( /* result => console.log(result) */ )
-        .catch( /* error => console.error(error) */)
+      }).then( /* resolve => console.log(resolve) */ )
+        .catch( /* reject => console.error(reject) */)
     ).then(() => {
         Swal.fire({
           title: "Подаци поруџбине успешно промењени!",
@@ -296,9 +298,9 @@ export class FirebaseService {
   getAllReviewsForProduct(itemId: string): Promise<Array<Review>> {
     return new Promise((resolve, reject) => {
       this.firestore.collection("reviews").ref.where("productId", "==", itemId).onSnapshot(documents => {
-        if (documents.empty) reject([])
+        if (documents.empty) resolve([])
         else resolve(documents.docs.reduce((output, document) => { output.push(document.data() as Review); return output; }, Array<Review>()))
-      });
+      }, error => reject(error));
     });
   }
 
@@ -309,11 +311,11 @@ export class FirebaseService {
           transaction.get(documents.docs[0].ref).then(document => {
             newReviewData.lastChange = this.firebaseApplication.firestore.FieldValue.serverTimestamp();
             transaction.update(document.ref, newReviewData);
-          }).then( /* result => console.log(result) */)
-            .catch( /* error => console.error(error) */)
+          }).then( /* resolve => console.log(resolve) */)
+            .catch( /* reject => console.error(error) */)
         ).then(() => resolve(true))
-         .catch(error => {
-          /* console.error(error); */
+         .catch(reject => {
+          /* reject(reject); */
           reject(false);
          });
       });

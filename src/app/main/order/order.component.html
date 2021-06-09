@@ -2,7 +2,7 @@
     <ng-container matColumnDef="orderTime">
         <mat-header-cell *matHeaderCellDef style="margin-left: -1% !important">Време и датум поруџбине</mat-header-cell>
         <mat-cell *matCellDef="let element">
-            <span>{{ element.placedOn | date: "dd.MM.YYYY. hh:mm:ss" }}</span>
+            <span>{{ element.placedOn | date: "dd.MM.YYYY. H:mm:ss" }}</span>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
     </ng-container>
@@ -14,7 +14,7 @@
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
     </ng-container>
     <ng-container matColumnDef="shippingMethod">
-        <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -3% !important">Начин доставе</mat-header-cell>
+        <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -2% !important">Начин доставе</mat-header-cell>
         <mat-cell *matCellDef="let element">
             <span *ngIf="!element.isEditing">{{ element.shippingMethod }}</span>
             <span *ngIf="element.isEditing">
@@ -28,7 +28,7 @@
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
     </ng-container>
     <ng-container matColumnDef="status">
-        <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -5% !important">Статус поруџбине</mat-header-cell>
+        <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -3% !important">Статус поруџбине</mat-header-cell>
         <mat-cell *matCellDef="let element">
             <span>{{ element.status }}</span>
         </mat-cell>
@@ -44,9 +44,9 @@
     <ng-container matColumnDef="rating">
         <mat-header-cell *matHeaderCellDef mat-sort-header>Просечна оцена артикала</mat-header-cell>
         <mat-cell *matCellDef="let element"> <!-- Not done in the most elegant way -->
-            <div *ngIf="element.status !== 'Завршена'">Није оцењено</div>
-            <ng-container *ngFor="let i of [].constructor(element.rating)"><mat-icon>star</mat-icon></ng-container>
-            <ng-container *ngFor="let i of [].constructor(5 - element.rating)"><mat-icon>star_outline</mat-icon></ng-container>
+            <div *ngIf="element.status !== 'Завршена'">Није доступно</div>
+            <ng-container *ngIf="element.status === 'Завршена'"><mat-icon *ngFor="let i of [].constructor(element.rating)">star</mat-icon></ng-container>
+            <ng-container *ngIf="element.status === 'Завршена'"><mat-icon *ngFor="let i of [].constructor(5 - element.rating)">star_outline</mat-icon></ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
     </ng-container>

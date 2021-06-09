@@ -13,7 +13,7 @@ export class IndexedDatabaseService {
   openIDB(databaseName: string, databaseVersion: number): void {
     const openIDB = window.indexedDB.open(databaseName, databaseVersion);
     openIDB.onsuccess = () => { this.openedIDBDatabases.push(openIDB.result); }
-    openIDB.onerror = error => { console.error("Error while opening database: " + JSON.stringify(error))}
+    openIDB.onerror = error => { console.error("Error while opening database: " /* + JSON.stringify(error) */)}
   }
 
   getIDB(dbName: string): IDBDatabase {
@@ -40,7 +40,7 @@ export class IndexedDatabaseService {
       }
     }
     createIDB.onsuccess = () => this.openedIDBDatabases.push(createIDB.result);
-    createIDB.onerror = error => console.error(error);
+    /* createIDB.onerror = error => console.error(error); */
   }
 
   getObjectStoreItem(database: IDBDatabase, objectStoreName: string, objectStoreKey: IDBValidKey | IDBKeyRange): Promise<any> {
