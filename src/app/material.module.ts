@@ -1,3 +1,5 @@
+import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -43,7 +45,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatTableModule,
         MatSortModule,
         MatSnackBarModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatChipsModule,
+        MatAutocompleteModule        
     ],
     exports: [
         MatButtonModule,
@@ -66,7 +70,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatTableModule,
         MatSortModule,
         MatSnackBarModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatChipsModule,
+        MatAutocompleteModule
     ]
 })
 
