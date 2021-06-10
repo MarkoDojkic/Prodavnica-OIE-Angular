@@ -328,12 +328,12 @@ export class ShopComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredItems = this.items.filter(item => {
+    this.filteredItems = this.items.filter(item => { /* First filter -> use all items array */
       return item.price >= this.minPrice && item.price <= this.maxPrice;
     })
       
     if (this.minInStock != null || this.minInStock != undefined)
-      this.filteredItems = this.filteredItems.filter(item => item.leftInStock >= this.minInStock);
+      this.filteredItems = this.filteredItems.filter(item => item.leftInStock >= this.minInStock); /* Every other filter -> use filtered items array */
     
     if (this.selectedCategory === "Монокристални" || this.selectedCategory === "Поликристални" || this.selectedCategory === "Аморфни") {
       for (const key of Array.from(this.voltages.keys())) {
@@ -471,7 +471,7 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.selectedCategory === "Електрична возила") {
-      this.filteredItems = this.items.filter(item => {
+      this.filteredItems = this.filteredItems.filter(item => {
         var temp = item.description;
         temp = temp.slice(temp.lastIndexOf("Домет при пуној батерији: "),
                             temp.lastIndexOf(" km Број путника:"))

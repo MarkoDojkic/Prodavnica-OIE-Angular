@@ -1,6 +1,9 @@
 import { FirebaseService } from '../../services/firebase/firebase.service';
-import { AbstractControl, NgForm, NgModel } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { AbstractControl, NgForm, NgModel, FormControl } from '@angular/forms';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { map, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-profile-page',
@@ -21,8 +24,17 @@ export class ProfilePageComponent implements OnInit {
   userPaymentType: number;
   paymentPattern: string;
   paymentHint: string;
-  paymentErrorMessage: string;
+  paymentErrorMessage: string; fac
   favoriteProducts: Array<string> = new Array<string>();
+  avaiableFavoriteProducts: Array<string> = ['Монокристални соларни панели', 'Поликристални соларни панели',
+    'Аморфни соларни панели', 'Електрична возила', 'PWM контролери пуњења акумулатора',
+    'MPPT контролери пуњења акумулатора', 'OFF-Grid инвертори', 'ON-Grid инвертори', 'Хибридни инвертори',
+    'Хоризонтални ветрогенератори', 'Вертикални ветрогенератори', 'Оловни акумулатори',
+    'Никл базирани акумулатори', 'Литијумски акумулатори', 'Специјални акумулатори'];
+  filteredFavoriteProducts: Observable<Array<string>> = new Observable<Array<string>>();
+  favoriteProductsInputControl: FormControl = new FormControl();
+
+  @ViewChild("favoriteProductInput") favoriteProductInput: ElementRef<HTMLInputElement>;
 
   constructor(private fs:FirebaseService) { }
 
@@ -30,6 +42,11 @@ export class ProfilePageComponent implements OnInit {
     setTimeout(() => {
       this.updateFieldData();
     }, 1000); /* To give time for firebaseLocalStorageDb to be opened by service */
+
+    this.filteredFavoriteProducts = this.favoriteProductsInputControl.valueChanges.pipe(startWith(null),
+      map((favoriteProduct: string | null) => favoriteProduct ? this.avaiableFavoriteProducts.filter(avaiableFavoriteProduct =>
+        avaiableFavoriteProduct.toLowerCase().indexOf(favoriteProduct.toLowerCase()) === 0) : this.avaiableFavoriteProducts.slice())
+    );
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
@@ -69,6 +86,8 @@ export class ProfilePageComponent implements OnInit {
       form.controls["passwordRepeat"].reset();
       return;
     }
+
+    updatedFirestoreData["favoriteProducts"] = this.favoriteProducts;
 
     this.fs.updateFirestoreUserData(this.uid, updatedFirestoreData);
     
@@ -142,5 +161,16 @@ export class ProfilePageComponent implements OnInit {
         this.paymentHint = null;
         this.paymentErrorMessage = null;
     }
+  }
+
+  addSelectedFavoriteProduct(event: MatAutocompleteSelectedEvent): void {
+    var selectedFavoriteProduct: string = this.avaiableFavoriteProducts.find(favoriteProduct => event.option.viewValue.startsWith(favoriteProduct, 0));
+    if(!this.favoriteProducts.includes(selectedFavoriteProduct, 0))
+      this.favoriteProducts.push(selectedFavoriteProduct);
+  }
+
+  removeSelectedFavoriteProduct(selectedFavoriteProduct: string): void {
+    const index = this.favoriteProducts.indexOf(selectedFavoriteProduct);
+    this.favoriteProducts.splice(index, 1);
   }
 }
