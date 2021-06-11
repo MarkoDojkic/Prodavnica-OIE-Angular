@@ -62,7 +62,7 @@ export class FirebaseService {
 
   signUpViaEmail(email: string, password: string, form: NgForm): void {
     this.auth.createUserWithEmailAndPassword(email, this.cs.encrypt(this.key, password)).then((result) => {
-      /* result.user.sendEmailVerification(); */
+      /* result.user.sendEmailVerification(); */ /* Commented for testing purposes, i.e. creation of dummy accounts */
       this.updateAuthUserProfile((form.controls["name"].value + " " + form.controls["surname"].value), null);
       this.updateFirestoreUserData(result.user.uid, {
         "name": form.controls["name"].value, /* For showing in reviews */
@@ -107,7 +107,10 @@ export class FirebaseService {
   updateFirestoreUserData(userId: string, data: any): void {
     this.firestore.firestore.runTransaction(transaction =>
       transaction.get(this.firestore.collection("users").doc(userId).ref).then(document => {
-        transaction.update(document.ref, data);
+        if (document.exists)
+          transaction.update(document.ref, data);
+        else
+          transaction.set(document.ref, data);
     }).then( /* resolve => console.log(resolve) */)
       .catch( /* error => console.reject(reject) */)).then(/* result => console.log(result) */)
     .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
@@ -147,7 +150,7 @@ export class FirebaseService {
 
   updateUserEmail(newEmail: string) {
     this.auth.user.subscribe(result => {
-      /* if (result) result.updateEmail(newEmail); */
+      /* if (result) result.updateEmail(newEmail); */ /* Commented for testing purposes, i.e. creation of dummy accounts */
       Swal.fire({
         title: "Промена адресе електронске поште!",
         text: "Захтев за промену адресе електронске поште је послат на Вашу стару адресу!",
@@ -209,9 +212,7 @@ export class FirebaseService {
 
   updateLoggedInUserId(): void {
     setTimeout(() => { /* Timeout to wait for database to be opened */
-        const observable = this.getIDBData();
-        if (observable === null) this.userId = null;
-        else observable.subscribe(result => this.userId = result["value"]["uid"]);
+      this.getIDBData().subscribe(result => this.userId = result !== undefined ? result["value"]["uid"] : null);
     }, 2000);
   }
 

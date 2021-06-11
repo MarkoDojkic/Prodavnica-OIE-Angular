@@ -1,5 +1,5 @@
 <form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="3%"
-#form="ngForm" (ngSubmit)="fs.signInViaEmail(emailInput.value, passwordInput.value)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
+#form="ngForm" (ngSubmit)="fs.signInViaEmail(emailInput.value, passwordInput.value)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <mat-form-field appearance="outline">
         <mat-label>Адреса електронске поште</mat-label>
         <input type="email" ngModel matInput autocomplete="prodavnica-oie-email" pattern="^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$" name="email" #emailInput="ngModel" required/>
