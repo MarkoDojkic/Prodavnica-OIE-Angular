@@ -59,7 +59,8 @@ export class ProfilePageComponent implements OnInit {
     const newSurname: string = (form.controls["surname"].valid && form.controls["surname"].dirty) ? form.controls["surname"].value : this.userSurname;
     const updatedFirestoreData: any = {};
     
-    this.fs.updateAuthUserProfile(newName + " " + newSurname, null);
+    if (!newName.includes(this.userName) || !newSurname.includes(this.userSurname))
+      this.fs.updateAuthUserProfile(newName + " " + newSurname, null);
         
     Object.keys(form.controls).forEach(control => {
       const field: AbstractControl = form.controls[control];
@@ -86,15 +87,14 @@ export class ProfilePageComponent implements OnInit {
     updatedFirestoreData["favoriteProducts"] = this.favoriteProducts;
 
     this.fs.updateFirestoreUserData(this.uid, updatedFirestoreData);
-    
-    setTimeout(() => {
-      form.controls["name"].reset();
-      form.controls["surname"].reset();
-      form.controls["email"].reset();
-      form.controls["password"].reset();
-      form.controls["passwordRepeat"].reset();
-      this.updateFieldData();
-    }, 1000); /* To give time to retrive updated data */
+
+    form.controls["name"].reset();
+    form.controls["surname"].reset();
+    form.controls["email"].reset();
+    form.controls["password"].reset();
+    form.controls["passwordRepeat"].reset();
+
+    this.updateFieldData();
   }
 
   updateFieldData() {

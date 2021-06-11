@@ -1,9 +1,13 @@
-.mat-table {
+.spaceing {
     height:100%;
     width: 100%;
     position: absolute;
     text-align: center;
     top: 64.3px;
+}
+
+mat-table {
+    width: 100%;
 }
 
 .expanded-row {

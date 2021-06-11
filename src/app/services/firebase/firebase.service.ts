@@ -163,14 +163,15 @@ export class FirebaseService {
 
   updateUserPassword(newPassword: string) {
     this.auth.user.subscribe(result => {
-      result.updatePassword(this.cs.encrypt(this.key, newPassword));
-      Swal.fire({
-        title: "Лозинка успешно промењена!",
-        text: "Успешно сте променили лозинку! Ради сигурности сада ћете бити излоговани.",
-        icon: "success",
-        showCancelButton: false,
-        confirmButtonText: "У реду",
-      }).then(() => this.signOut());
+      result.updatePassword(this.cs.encrypt(this.key, newPassword)).then(() => {
+        Swal.fire({
+          title: "Лозинка успешно промењена!",
+          text: "Успешно сте променили лозинку! Ради сигурности сада ћете бити излоговани.",
+          icon: "success",
+          showCancelButton: false,
+          confirmButtonText: "У реду",
+        }).then(() => this.signOut());
+      }).catch(/* reject => console.error(reject) */);
     });
   }
 
