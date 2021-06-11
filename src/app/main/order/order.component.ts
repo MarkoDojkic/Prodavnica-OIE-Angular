@@ -42,6 +42,10 @@ export class OrderComponent implements OnInit {
     }, 2000);
   }
 
+  filterOrders(filterValue: string): void {
+    this.listedOrders.data = this.listedOrders.data.filter(order => JSON.stringify(order).includes(filterValue));
+  }
+
   refreshOrders(): void {
     var i = 0;
 
