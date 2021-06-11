@@ -26,11 +26,11 @@ export class ProfilePageComponent implements OnInit {
   paymentHint: string;
   paymentErrorMessage: string; fac
   favoriteProducts: Array<string> = new Array<string>();
-  avaiableFavoriteProducts: Array<string> = ['Монокристални соларни панели', 'Поликристални соларни панели',
-    'Аморфни соларни панели', 'Електрична возила', 'PWM контролери пуњења акумулатора',
-    'MPPT контролери пуњења акумулатора', 'OFF-Grid инвертори', 'ON-Grid инвертори', 'Хибридни инвертори',
-    'Хоризонтални ветрогенератори', 'Вертикални ветрогенератори', 'Оловни акумулатори',
-    'Никл базирани акумулатори', 'Литијумски акумулатори', 'Специјални акумулатори'];
+  avaiableFavoriteProducts: Array<string> = ["Монокристални соларни панели", "Поликристални соларни панели",
+    "Аморфни соларни панели", "Електрична возила", "PWM контролери пуњења акумулатора",
+    "MPPT контролери пуњења акумулатора", "OFF-Grid инвертори", "ON-Grid инвертори", "Хибридни инвертори",
+    "Хоризонтални ветрогенератори", "Вертикални ветрогенератори", "Оловни акумулатори",
+    "Никл базирани акумулатори", "Литијумски акумулатори", "Специјални акумулатори"];
   filteredFavoriteProducts: Observable<Array<string>> = new Observable<Array<string>>();
   favoriteProductsInputControl: FormControl = new FormControl();
 
@@ -43,8 +43,8 @@ export class ProfilePageComponent implements OnInit {
       this.updateFieldData();
     }, 1000); /* To give time for firebaseLocalStorageDb to be opened by service */
 
-    this.filteredFavoriteProducts = this.favoriteProductsInputControl.valueChanges.pipe(startWith(null),
-      map((favoriteProduct: string | null) => favoriteProduct ? this.avaiableFavoriteProducts.filter(avaiableFavoriteProduct =>
+    this.filteredFavoriteProducts = this.favoriteProductsInputControl.valueChanges
+      .pipe(map((favoriteProduct: string | null) => favoriteProduct ? this.avaiableFavoriteProducts.filter(avaiableFavoriteProduct =>
         avaiableFavoriteProduct.toLowerCase().indexOf(favoriteProduct.toLowerCase()) === 0) : this.avaiableFavoriteProducts.slice())
     );
   }
@@ -55,19 +55,15 @@ export class ProfilePageComponent implements OnInit {
   }
 
   onUpdate(form: NgForm): void {
-
-    const newName: string = form.controls["name"].valid ? form.controls["name"].value : this.userName;
-    const newSurname: string = form.controls["surname"].valid ? form.controls["surname"].value : this.userName;
+    const newName: string = (form.controls["name"].valid && form.controls["name"].dirty) ? form.controls["name"].value : this.userName;
+    const newSurname: string = (form.controls["surname"].valid && form.controls["surname"].dirty) ? form.controls["surname"].value : this.userSurname;
     const updatedFirestoreData: any = {};
     
-    updatedFirestoreData["name"] = newName;
-    updatedFirestoreData["surname"] = newSurname;
     this.fs.updateAuthUserProfile(newName + " " + newSurname, null);
         
     Object.keys(form.controls).forEach(control => {
       const field: AbstractControl = form.controls[control];
-      if (field.dirty && field.valid && control !== "name" && control !== "surname"
-        && control !== "email" && control !== "password" && control != "passwordRepeat") {
+      if (field.dirty && field.valid && control !== "email" && control !== "password" && control != "passwordRepeat") {
         updatedFirestoreData[control] = field.value;
         setTimeout(() => { field.reset(); }, 1500); /* To give time to firestore to update */
       }
@@ -99,10 +95,6 @@ export class ProfilePageComponent implements OnInit {
       form.controls["passwordRepeat"].reset();
       this.updateFieldData();
     }, 1000); /* To give time to retrive updated data */
-  }
-  
-  onFormReset(form: NgForm): void {
-    form.reset();
   }
 
   updateFieldData() {
@@ -167,6 +159,8 @@ export class ProfilePageComponent implements OnInit {
     var selectedFavoriteProduct: string = this.avaiableFavoriteProducts.find(favoriteProduct => event.option.viewValue.startsWith(favoriteProduct, 0));
     if(!this.favoriteProducts.includes(selectedFavoriteProduct, 0))
       this.favoriteProducts.push(selectedFavoriteProduct);
+    this.favoriteProductsInputControl.setValue("", { emitEvent: true }); //emitEvent: true will fire valueChanges
+    this.favoriteProductInput.nativeElement.value = "";
   }
 
   removeSelectedFavoriteProduct(selectedFavoriteProduct: string): void {

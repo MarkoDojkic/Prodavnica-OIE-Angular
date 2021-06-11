@@ -1,6 +1,6 @@
 import { FirebaseService } from '../../services/firebase/firebase.service';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, NgForm, NgModel } from '@angular/forms';
+import { FormGroup, NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-registration',
@@ -20,16 +20,12 @@ export class RegistrationComponent implements OnInit {
     this.paymentPattern = this.paymentHint = this.paymentErrorMessage = null;
   }
 
-  onFormReset(form: NgForm): void {
-    form.reset();
-  }
-
   checkRequiredFields(form: FormGroup): boolean {
     var isAllValid: boolean = true;
     Object.keys(form.controls).forEach(id => {
       if(form.controls[id].hasError('required')) isAllValid = false;
     });
-    return isAllValid && !form.controls["passwordRepeat"].hasError("matched");
+    return isAllValid && !form.controls["passwordRepeat"]?.hasError("matched");
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {

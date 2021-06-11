@@ -1,5 +1,5 @@
 <form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.2%" fxLayoutGap.lt-md="2.2%"
-#form="ngForm" (ngSubmit)="fs.signUpViaEmail(emailInput,passwordInput, form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
+#form="ngForm" (ngSubmit)="fs.signUpViaEmail(emailInput.value,passwordInput.value, form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label for="name">Име</mat-label>
@@ -70,16 +70,16 @@
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" fxFlex>
             <mat-label for="deliveryAddress">Адреса за доставу</mat-label>
-            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?))$" 
-                    ngModel matInput name="deliveryAddress" #deliveryAddressAddress="ngModel" [required]="deliveryAddressPak.invalid || deliveryAddressPak.pristine">
+            <input type="text" pattern="^([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s)+((BB)|(ББ)|([0-9]+[a-z]?)),\s([\u0410-\u0418\u0402\u0408\u041A-\u041F\u0409\u040A\u0420-\u0428\u040B\u040FA-Z\u0110\u017D\u0106\u010C\u0160]{1}[\u0430-\u0438\u0452\u043A-\u043F\u045A\u0459\u0440-\u0448\u0458\u045B\u045Fa-z\u0111\u017E\u0107\u010D\u0161]+\s?)+$" 
+                    ngModel matInput name="deliveryAddress" #deliveryAddress="ngModel" [required]="deliveryAddressPak.invalid || deliveryAddressPak.pristine">
             <mat-icon matSuffix>location_on</mat-icon>
-            <mat-hint>пр. Данијелова 32 или Цара Душана 75d или Вудроа Вилсона ББ</mat-hint>
-            <mat-error *ngIf="deliveryAddressAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
+            <mat-hint>пр. Николе Пашића 93, Ниш или Цара Душана 75d, Земун или Новосадска ББ, Стара Пазова</mat-hint>
+            <mat-error *ngIf="deliveryAddress.hasError('required')">Поље адресе за доставу не сме бити празно уколико ПАК није наведен</mat-error>
         </mat-form-field>
         <!-- Checking this group of fields has bugs in some edge cases -->
         <mat-form-field appearance="outline" fxFlex>
             <mat-label for="deliveryAddressPAK">Поштански адресни код</mat-label>
-            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="deliveryAddressPAK" #deliveryAddressPak="ngModel" [required]="deliveryAddressAddress.invalid || deliveryAddressAddress.pristine"/>
+            <input type="number" pattern="^[0-9]{6}$" ngModel matInput name="deliveryAddressPAK" #deliveryAddressPak="ngModel" [required]="deliveryAddress.invalid || deliveryAddress.pristine"/>
             <mat-icon matSuffix>local_post_office</mat-icon>
             <mat-hint>пр. 456789</mat-hint>
             <mat-error *ngIf="deliveryAddressPak.hasError('required')">Поље ПАК броја не сме бити празно уколико адреса за доставу није наведена</mat-error>
@@ -89,7 +89,7 @@
     <div>
         <mat-form-field appearance="outline" fxFlexFill>
             <mat-label for="paymentAddress">Број кредитне картице/адреса новчаника крипто валуте</mat-label>
-            <input type="text" pattern="{{ paymentPattern }}" ngModel matInput name="paymentAddress" [disabled]="paymentPattern == null" required/>
+            <input type="text" pattern="{{ paymentPattern }}" ngModel matInput name="paymentAddress" #paymentAddress="ngModel" [disabled]="paymentPattern == null" required/>
             <mat-icon matSuffix>payment</mat-icon>
             <mat-hint>{{ paymentHint }}</mat-hint>
             <mat-error>{{ paymentErrorMessage }}</mat-error>
@@ -97,8 +97,8 @@
     </div>
 
     <section fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="center start" fxLayoutGap="3%" fxLayoutGap.lt-md="1.5%">
-        <mat-radio-group ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId" required>
-            <mat-radio-button ngModel value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)">
+        <mat-radio-group ngModel name="paymentType" #paymentType="ngModel" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId" required>
+            <mat-radio-button value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)">
                 {{ paymentType }}
             </mat-radio-button>
         </mat-radio-group>

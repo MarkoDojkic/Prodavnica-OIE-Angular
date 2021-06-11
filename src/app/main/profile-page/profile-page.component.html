@@ -1,5 +1,5 @@
 <form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1.2%" fxLayoutGap.lt-md="2.2%"
-#form="ngForm" (ngSubmit)="onUpdate(form)" (ngReset)="onFormReset(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
+#form="ngForm" (ngSubmit)="onUpdate(form)" class="mat-card"> <!-- Class mat-card is used to apply dark mode background and coloring -->
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5%">
         <mat-form-field appearance="outline" floatLabel="always" floatLabel="always" fxFlex>
             <mat-label for="name">Име</mat-label>
@@ -86,7 +86,7 @@
 
     <section fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="center start" fxLayoutGap="3%" fxLayoutGap.lt-md="1.5%">
         <mat-radio-group ngModel name="paymentType" *ngFor="let paymentType of ['MasterCard', 'Visa', 'American Express', 'Bitcoin', 'Ethereum', 'Monero']; let paymentId = index" [attr.data-index]="paymentId">
-            <mat-radio-button ngModel value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)" [checked]="paymentId == userPaymentType">
+            <mat-radio-button value="{{ paymentId }}" (click)="updatePaymentAddressInput(paymentId)" [checked]="paymentId == userPaymentType">
                 {{ paymentType }}
             </mat-radio-button>
         </mat-radio-group>
