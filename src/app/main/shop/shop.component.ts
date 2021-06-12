@@ -41,6 +41,7 @@ export class ShopComponent implements OnInit {
   maxDrivingRange: number;
   priceSliderOptions: Options;
   priceSliderOptionsDrivingRange: Options;
+  minRating: number = 0;
 
   //To order when using keyvalue pipe in amperages * otherwise it'll sort like strings *
   orderByNumber = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
@@ -335,6 +336,21 @@ export class ShopComponent implements OnInit {
     if (this.minInStock != null || this.minInStock != undefined)
       this.filteredItems = this.filteredItems.filter(item => item.leftInStock >= this.minInStock); /* Every other filter -> use filtered items array */
     
+    this.filteredItems.forEach(item => {
+      var sumOfRatings: number = 0;
+      var totalReviews: number = 0;
+
+      this.fs.getAllReviewsForProduct(item.id).then(reviews => {
+        reviews.forEach(review => {
+          sumOfRatings += review.rating
+          totalReviews++;
+        });
+      }).then(() => {
+        if (totalReviews !== 0 && Math.round(sumOfRatings / totalReviews) < this.minRating)
+          this.filteredItems.splice(this.filteredItems.findIndex(currentItem => currentItem.id === item.id), 1)
+      });
+    });
+    
     if (this.selectedCategory === "Монокристални" || this.selectedCategory === "Поликристални" || this.selectedCategory === "Аморфни") {
       for (const key of Array.from(this.voltages.keys())) {
         if (key === "12V" && !this.voltages.get(key)) this.filterOutVoltage(12, 24);
@@ -501,6 +517,13 @@ export class ShopComponent implements OnInit {
     this.applyFilters();
   }
 
+  updateRating(minRating: number): void {
+    this.minRating = minRating;
+    for (let i = 1; i <= 5; i++) {
+      document.querySelector("#shopRating_" + i).innerHTML = i <= minRating ? "star" : "star_outline"; 
+    }
+  }
+
   filterOutVoltage(voltageMin: number, voltageMax: number): void {
     this.filteredItems = this.filteredItems.filter(item => {
       var temp = item.description;
@@ -509,7 +532,7 @@ export class ShopComponent implements OnInit {
       temp = temp.slice(24, temp.length);
       
       return parseInt(temp) < voltageMin || parseInt(temp) > voltageMax;
-    })
+    });
   }
 
   buyProduct(product: Item) {

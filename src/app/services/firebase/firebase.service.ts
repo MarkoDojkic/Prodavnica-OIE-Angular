@@ -123,7 +123,7 @@ export class FirebaseService {
           "orderedBy": this.loggedInUserId,
           "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity; return map; }, {}),
           "shippingMethod": shippingMethod,
-          "shippingAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
+          "deliveryAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
           "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
           "totalPrice": totalPrice,
           "status": "Текућа"
@@ -135,7 +135,6 @@ export class FirebaseService {
                 "reviewedBy": this.loggedInUserId,
                 "orderId": newOrderId,
                 "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
-                "rating": 0, /* Default rating */
                 "comment": "",
                 "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
                 "isAnonymous": false
@@ -250,7 +249,7 @@ export class FirebaseService {
             "id": order.id,
             "placedOn": order.data()["placedOn"].toDate(), //Timestamp to Date
             "items": order.data()["items"],
-            "shippingAddress": order.data()["shippingAddress"],
+            "deliveryAddress": order.data()["deliveryAddress"],
             "shippingMethod": order.data()["shippingMethod"],
             "status": order.data()["status"],
             "totalPrice": order.data()["totalPrice"]

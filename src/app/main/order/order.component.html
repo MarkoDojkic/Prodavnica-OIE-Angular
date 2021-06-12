@@ -1,9 +1,9 @@
 
 <div class="spaceing">
     <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="2%" class="mat-card">
-        <input type="text" matInput placeholder="Унесите термин за претрагу" (change)="filterOrders($event.target.value)" fxFill/> <!-- Testing and UI fix pending -->
+        <input type="text" matInput placeholder="Унесите термин за претрагу поруџбина" (keyup)="filterOrders($event.target.value)" fxFill/> <!-- Testing and UI fix pending -->
 
-        <mat-table [dataSource]="listedOrders" matSort multiTemplateDataRows>
+        <mat-table [dataSource]="orders" matSort multiTemplateDataRows>
             <ng-container matColumnDef="orderTime">
                 <mat-header-cell *matHeaderCellDef style="margin-left: -1% !important">Време и датум поруџбине</mat-header-cell>
                 <mat-cell *matCellDef="let element">
@@ -11,10 +11,10 @@
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
-            <ng-container matColumnDef="shippingAddress">
+            <ng-container matColumnDef="deliveryAddress">
                 <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: 4% !important">Место доставе</mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    <span>{{ element.shippingAddress }}</span>
+                    <span>{{ element.deliveryAddress }}</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -102,6 +102,7 @@
             <mat-row *matRowDef="let rows; columns: ['orderedItems'];" class="expanded-row"></mat-row>
         </mat-table>
 
-        <mat-paginator [pageSize]="1" [pageSizeOptions]="pageSizeOptions" fxFill></mat-paginator> <!-- UI fix pending -->
+        <mat-paginator [pageSize]="1" [pageSizeOptions]="pageSizeOptions" fxFlex></mat-paginator>
+        <section></section> <!-- Blank space -->
      </div>
 </div>

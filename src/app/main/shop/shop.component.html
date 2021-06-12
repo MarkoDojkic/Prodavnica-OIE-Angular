@@ -62,7 +62,16 @@
             </mat-expansion-panel-header>
             <ngx-slider [(value)]="minDrivingRange" [(highValue)]="maxDrivingRange" [(options)]="priceSliderOptionsDrivingRange" (userChangeEnd)="applyFilters()"></ngx-slider>
           </mat-expansion-panel>
-          
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-description>Филтрирај по оцени</mat-panel-description>
+            </mat-expansion-panel-header>
+            <div fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
+              <button mat-icon-button (mouseover)="updateRating(0)" (click)="applyFilters()" id="shopRating_0"><mat-icon>not_interested</mat-icon></button>
+              <button mat-icon-button *ngFor="let dummy of [].constructor(5); let i = index" (mouseover)="updateRating(i + 1)" (click)="applyFilters()"><mat-icon id="{{'shopRating_' + (i + 1)}}">star_outline</mat-icon></button>
+            </div>
+          </mat-expansion-panel>
         </mat-accordion>
         <mat-divider></mat-divider>
 
