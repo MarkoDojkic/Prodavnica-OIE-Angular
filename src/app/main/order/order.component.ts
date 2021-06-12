@@ -26,7 +26,7 @@ export class OrderComponent implements OnInit {
 
   orders = new MatTableDataSource<Order>();
   listedOrders: Array<Order>;
-  displayedColumns: Array<string> = ["orderTime", "deliveryAddress", "shippingMethod", "status", "totalPrice", "rating", "actions"];
+  displayedColumns: Array<string> = ["orderTime", "deliveryAddress", "shippingMethod", "status", "subtotal", "rating", "actions"];
   pageSizeOptionsSet: Set<number> = new Set<number>();
   pageSizeOptions: Array<number>;
   orderDetail: Array<Array<Item>>;
@@ -60,6 +60,7 @@ export class OrderComponent implements OnInit {
       data.forEach(order => {
         var orderedItemsData: Array<Item> = [];
         var sumOfRatings: number = 0;
+        var subtotal: number = 0;
         var i = 0;
         
         for (let id of Object.keys(order.items)) {
@@ -71,13 +72,14 @@ export class OrderComponent implements OnInit {
                   "leftInStock": null,
                   "title": item.data()["name"],
                   "description": item.data()["description"],
-                  "price": item.data()["price"],
+                  "price": parseInt(Object.values(order.items)[i].split('$')[1]), /* Price at the time of initial purchase  */
                   "imageUrl": null,
-                  "orderedQuantity": Object.values(order.items)[i],
+                  "orderedQuantity": parseInt(Object.values(order.items)[i].split('$')[0]),
                   "isEditing": false,
                   "review": response
                 });
                 sumOfRatings += response.rating;
+                subtotal += parseInt(Object.values(order.items)[i].split('$')[0]) * parseInt(Object.values(order.items)[i].split('$')[1])
                 i++;
               })
               .catch(error => {
@@ -88,9 +90,26 @@ export class OrderComponent implements OnInit {
         }
         
         setTimeout(() => { /* Waiting for loop to finish processing */
-          order.rating = Math.round(sumOfRatings / orderedItemsData.length);
-          this.orderDetail.push(orderedItemsData);
-        }, 1000);
+          subtotal += subtotal / 5;
+          switch (order.shippingMethod) {
+            case "Лично преузимање": subtotal += 0; break;
+            case "Курирска служба": subtotal += orderedItemsData.length * 1500; break;
+            case "Пошта": subtotal = orderedItemsData.length * 2000; break;
+            default: subtotal += 0;
+          }
+          order.subtotal = subtotal;
+          if (order.status === "Завршена") {
+            order.rating = Math.round(sumOfRatings / orderedItemsData.length);
+            this.orderDetail.push(orderedItemsData);
+          } else {
+            delete order.rating;
+            orderedItemsData.forEach(oId => delete oId.review);
+            setTimeout(() => {
+              this.orderDetail.push(orderedItemsData);
+            }, 2000);
+          }
+          
+        }, 5000);
       });
       
       setTimeout(() => { /* works without this, but to avoid errors */
@@ -108,7 +127,7 @@ export class OrderComponent implements OnInit {
           this.pageSizeOptionsSet.add(this.orders.data.length);
           this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
         }
-      }, 1000);
+      }, 8000);
     });
   }
 
@@ -134,18 +153,18 @@ export class OrderComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         order.status = "Отказана";
-        delete order.id; //Delete unnecessary variable
         delete order.isEditing; //Delete unnecessary variable
         delete order.rating; //Delete unnecessary variable
+        delete order.subtotal; //Delete unnecessary variable
         this.fs.updateOrderData(order);
       }
     });
   }
 
   updateOrder(order: Order): void {
-    delete order.id; //Delete unnecessary variable
     delete order.isEditing; //Delete unnecessary variable
     delete order.rating; //Delete unnecessary variable
+    delete order.subtotal; //Delete unnecessary variable
     this.fs.updateOrderData(order);
   }
   
@@ -163,9 +182,9 @@ export class OrderComponent implements OnInit {
       }).then(result => {
         if (result.isConfirmed) {
           delete order.items[itemId];
-          delete order.id; //Delete unnecessary variable
           delete order.isEditing; //Delete unnecessary variable
           delete order.rating; //Delete unnecessary variable
+          delete order.subtotal; //Delete unnecessary variable
           this.fs.updateOrderData(order);
           setTimeout(() => {
             this.refreshOrders();
@@ -175,10 +194,10 @@ export class OrderComponent implements OnInit {
       
     }
     else {
-      order.items[itemId] = this.orderDetail[index].find(item => item.id === itemId).orderedQuantity;
-      delete order.id; //Delete unnecessary variable
+      order.items[itemId] = this.orderDetail[index].find(item => item.id === itemId).orderedQuantity + "$" + order.items[itemId].split('$')[1];
       delete order.isEditing; //Delete unnecessary variable
       delete order.rating; //Delete unnecessary variable
+      delete order.subtotal; //Delete unnecessary variable
       this.fs.updateOrderData(order);
       setTimeout(() => {
         this.refreshOrders();

@@ -619,7 +619,7 @@ export class ShopComponent implements OnInit {
           html += `<span _ngcontent-bjf-c268="">`+ this.datePipe.transform(review.lastChange.toDate(), "dd.MM.YYYY. H:mm:ss") + `</span>
                   </div>
                   <p style="margin-top: 3%">`+ review.comment + `</p>
-              </section></div>`
+              </section>`
         }, 1000);
       });
 

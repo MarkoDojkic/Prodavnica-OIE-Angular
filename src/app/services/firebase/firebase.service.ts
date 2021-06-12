@@ -116,16 +116,15 @@ export class FirebaseService {
     .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
   }
   
-  placeOrder(orderedItems: Array<Item>, shippingMethod: string, totalPrice: number): Promise<any> {
+  placeOrder(orderedItems: Array<Item>, shippingMethod: string, subtotal: number): Promise<any> {
     return new Promise((resolve, reject) => {
       this.getFirestoreUserData(this.loggedInUserId).subscribe(userData => {
         this.firestore.collection("orders").add({
           "orderedBy": this.loggedInUserId,
-          "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity; return map; }, {}),
+          "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity + "$" + item.price; return map; }, {}),
           "shippingMethod": shippingMethod,
           "deliveryAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
           "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
-          "totalPrice": totalPrice,
           "status": "Текућа"
         }).then(order => {
           var newOrderId = order.id;
@@ -251,8 +250,7 @@ export class FirebaseService {
             "items": order.data()["items"],
             "deliveryAddress": order.data()["deliveryAddress"],
             "shippingMethod": order.data()["shippingMethod"],
-            "status": order.data()["status"],
-            "totalPrice": order.data()["totalPrice"]
+            "status": order.data()["status"]
           });
         });
       }).then(() => resolve(orderData)).catch(/* error => reject(Error(error)) */);

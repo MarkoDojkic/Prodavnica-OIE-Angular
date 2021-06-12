@@ -39,10 +39,10 @@
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
-            <ng-container matColumnDef="totalPrice">
+            <ng-container matColumnDef="subtotal">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Укупан износ за плаћање</mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    <span>{{ element.totalPrice.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</span>
+                    <span>{{ element.subtotal.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
