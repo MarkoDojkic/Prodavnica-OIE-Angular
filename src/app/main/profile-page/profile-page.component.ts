@@ -24,7 +24,7 @@ export class ProfilePageComponent implements OnInit {
   userPaymentType: number;
   paymentPattern: string;
   paymentHint: string;
-  paymentErrorMessage: string; fac
+  paymentErrorMessage: string;
   favoriteProducts: Array<string> = new Array<string>();
   avaiableFavoriteProducts: Array<string> = ["Монокристални соларни панели", "Поликристални соларни панели",
     "Аморфни соларни панели", "Електрична возила", "PWM контролери пуњења акумулатора",

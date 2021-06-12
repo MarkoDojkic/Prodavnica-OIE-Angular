@@ -24,8 +24,9 @@ import Swal from 'sweetalert2';
   
 export class OrderComponent implements OnInit {
 
-  listedOrders = new MatTableDataSource<Order>();
-  displayedColumns: Array<string> = ["orderTime", "shippingAddress", "shippingMethod", "status", "totalPrice", "rating", "actions"];
+  orders = new MatTableDataSource<Order>();
+  listedOrders: Array<Order>;
+  displayedColumns: Array<string> = ["orderTime", "deliveryAddress", "shippingMethod", "status", "totalPrice", "rating", "actions"];
   pageSizeOptionsSet: Set<number> = new Set<number>();
   pageSizeOptions: Array<number>;
   orderDetail: Array<Array<Item>>;
@@ -43,7 +44,11 @@ export class OrderComponent implements OnInit {
   }
 
   filterOrders(filterValue: string): void {
-    this.listedOrders.data = this.listedOrders.data.filter(order => JSON.stringify(order).includes(filterValue));
+    if (filterValue === undefined || filterValue.length === 0)
+      this.orders.data = this.listedOrders;
+    else
+      this.orders.data = this.listedOrders.filter(order => JSON.stringify(Object.values(order)).includes(filterValue, 0));
+    //Example of search string: ["d2sgFAJ6JdW0ya6dHbGn","2021-06-09T14:44:34.578Z",{"item_39":1,"item_44":3,"item_88":1,"item_125":24,"item_2":5,"item_73":1},"Булевар Милутина Миланковића 25","Курирска служба","Завршена",8438004,4]
   }
 
   refreshOrders(): void {
@@ -89,18 +94,18 @@ export class OrderComponent implements OnInit {
       });
       
       setTimeout(() => { /* works without this, but to avoid errors */
-        this.listedOrders.data = data;
-        this.listedOrders.sort = this.sort;
-        this.listedOrders.paginator = this.paginator;
+        this.orders.data = this.listedOrders = data;
+        this.orders.sort = this.sort;
+        this.orders.paginator = this.paginator;
 
         this.pageSizeOptionsSet.clear();
-        if (this.listedOrders.data.length !== 0) {
+        if (this.orders.data.length !== 0) {
           this.pageSizeOptionsSet.add(1);
-          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 2));
-          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 5));
-          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 8));
-          this.pageSizeOptionsSet.add(Math.floor(this.listedOrders.data.length / 10));
-          this.pageSizeOptionsSet.add(this.listedOrders.data.length);
+          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 2));
+          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 5));
+          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 8));
+          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 10));
+          this.pageSizeOptionsSet.add(this.orders.data.length);
           this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
         }
       }, 1000);
@@ -131,6 +136,7 @@ export class OrderComponent implements OnInit {
         order.status = "Отказана";
         delete order.id; //Delete unnecessary variable
         delete order.isEditing; //Delete unnecessary variable
+        delete order.rating; //Delete unnecessary variable
         this.fs.updateOrderData(order);
       }
     });
@@ -139,6 +145,7 @@ export class OrderComponent implements OnInit {
   updateOrder(order: Order): void {
     delete order.id; //Delete unnecessary variable
     delete order.isEditing; //Delete unnecessary variable
+    delete order.rating; //Delete unnecessary variable
     this.fs.updateOrderData(order);
   }
   
@@ -158,6 +165,7 @@ export class OrderComponent implements OnInit {
           delete order.items[itemId];
           delete order.id; //Delete unnecessary variable
           delete order.isEditing; //Delete unnecessary variable
+          delete order.rating; //Delete unnecessary variable
           this.fs.updateOrderData(order);
           setTimeout(() => {
             this.refreshOrders();
@@ -170,6 +178,7 @@ export class OrderComponent implements OnInit {
       order.items[itemId] = this.orderDetail[index].find(item => item.id === itemId).orderedQuantity;
       delete order.id; //Delete unnecessary variable
       delete order.isEditing; //Delete unnecessary variable
+      delete order.rating; //Delete unnecessary variable
       this.fs.updateOrderData(order);
       setTimeout(() => {
         this.refreshOrders();

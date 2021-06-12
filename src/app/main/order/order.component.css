@@ -6,6 +6,10 @@
     top: 64.3px;
 }
 
+.mat-card {
+    padding-top: 2%;
+}
+
 mat-table {
     width: 100%;
 }
