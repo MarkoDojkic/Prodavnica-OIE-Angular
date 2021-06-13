@@ -286,7 +286,6 @@ export class OrderComponent implements OnInit {
               "comment": newComment,
               "isAnonymous": newIsAnonymous
             };
-            window.location.reload(); /* Temporary fix for issue on firebase.service.ts line 314 */
           });
         }, reject => {
           /* console.error(reject); */

@@ -2,7 +2,7 @@ import { Review } from '../../model/review.model';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { Injectable, NgZone } from '@angular/core';
 import { CryptoService } from '../crypto/crypto.service';
 import { Observable } from 'rxjs';
@@ -112,7 +112,8 @@ export class FirebaseService {
         else
           transaction.set(document.ref, data);
     }).then( /* resolve => console.log(resolve) */)
-      .catch( /* error => console.reject(reject) */)).then(/* result => console.log(result) */)
+        .catch( /* error => console.reject(reject) */)
+    ).then(/* result => console.log(result) */)
     .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
   }
   
@@ -308,28 +309,19 @@ export class FirebaseService {
     });
   }
 
-  updateReview(orderId: string, itemId: string, newReviewData: Review): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      return this.firestore.collection("reviews").ref.where("orderId", "==", orderId).where("productId", "==", itemId).onSnapshot(documents => {
-        return this.firestore.firestore.runTransaction(transaction => /* Issue: This transaction keeps looping until page reload -> temporary solution reload page */
-          transaction.get(documents.docs[0].ref).then(document => {
-            transaction.update(document.ref, {
-              "reviewedBy": newReviewData.reviewedBy,
-              "orderId": newReviewData.orderId,
-              "productId": newReviewData.productId,
-              "rating": newReviewData.rating,
-              "comment": newReviewData.comment,
-              "isAnonymous": newReviewData.isAnonymous,
-              "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp()
-            });
-          }).then( /* resolve => console.log(resolve) */)
-            .catch( /* reject => console.error(error) */)
-        ).then(() => resolve(true))
-         .catch(reject => {
-          /* reject(reject); */
-          reject(false);
-         });
+  updateReview(orderId: string, itemId: string, newReviewData: Review): Promise<boolean> | any {
+    return this.firestore.firestore.runTransaction(async transaction => {
+      const document = await this.firestore.firestore.collection("reviews").where("orderId", "==", orderId).where("productId", "==", itemId).limit(1).get();
+      return transaction.update(document.docs[0].ref, {
+        "reviewedBy": newReviewData.reviewedBy,
+        "orderId": newReviewData.orderId,
+        "productId": newReviewData.productId,
+        "rating": newReviewData.rating,
+        "comment": newReviewData.comment,
+        "isAnonymous": newReviewData.isAnonymous,
+        "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp()
       });
-    });
+    }).then(() => { return Promise.resolve(true) })
+      .catch(reject => { return Promise.reject(false); /* console.error(reject) */});
   }
 }
