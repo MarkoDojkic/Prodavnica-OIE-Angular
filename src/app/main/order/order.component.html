@@ -6,26 +6,26 @@
         <mat-table [dataSource]="orders" matSort multiTemplateDataRows>
             <ng-container matColumnDef="orderTime">
                 <mat-header-cell *matHeaderCellDef style="margin-left: -1% !important">Време и датум поруџбине</mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <span>{{ element.placedOn | date: "dd.MM.YYYY. H:mm:ss" }}</span>
+                <mat-cell *matCellDef="let order">
+                    <span>{{ order.placedOn | date: "dd.MM.YYYY. H:mm:ss" }}</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="deliveryAddress">
                 <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: 4% !important">Место доставе</mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <span>{{ element.deliveryAddress }}</span>
+                <mat-cell *matCellDef="let order">
+                    <span>{{ order.deliveryAddress }}</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="shippingMethod">
                 <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -2% !important">Начин доставе</mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <span *ngIf="!element.isEditing">{{ element.shippingMethod }}</span>
-                    <span *ngIf="element.isEditing">
-                        <select (change)="element.shippingMethod = $event.target.value">    
+                <mat-cell *matCellDef="let order">
+                    <span *ngIf="!order.isEditing">{{ order.shippingMethod }}</span>
+                    <span *ngIf="order.isEditing">
+                        <select (change)="order.shippingMethod = $event.target.value">    
                             <option *ngFor="let shippingMethod of ['Лично преузимање', 'Курирска служба', 'Пошта']"
-                                [value]="shippingMethod" [selected]="element.shippingMethod === shippingMethod"> {{ shippingMethod }}
+                                [value]="shippingMethod" [selected]="order.shippingMethod === shippingMethod"> {{ shippingMethod }}
                             </option>
                         </select>
                     </span>
@@ -34,24 +34,24 @@
             </ng-container>
             <ng-container matColumnDef="status">
                 <mat-header-cell *matHeaderCellDef mat-sort-header style="margin-left: -3% !important">Статус поруџбине</mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <span>{{ element.status }}</span>
+                <mat-cell *matCellDef="let order">
+                    <span>{{ order.status }}</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="subtotal">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Укупан износ за плаћање</mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <span>{{ element.subtotal.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</span>
+                <mat-cell *matCellDef="let order">
+                    <span>{{ order.subtotal.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
             <ng-container matColumnDef="rating">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>Просечна оцена артикала</mat-header-cell>
-                <mat-cell *matCellDef="let element"> <!-- Not done in the most elegant way -->
-                    <div *ngIf="element.status !== 'Завршена'">Није доступно</div>
-                    <ng-container *ngIf="element.status === 'Завршена'"><mat-icon *ngFor="let i of [].constructor(element.rating)">star</mat-icon></ng-container>
-                    <ng-container *ngIf="element.status === 'Завршена'"><mat-icon *ngFor="let i of [].constructor(5 - element.rating)">star_outline</mat-icon></ng-container>
+                <mat-cell *matCellDef="let order">
+                    <div *ngIf="order.status !== 'Завршена'">Није доступно</div>
+                    <ng-container *ngIf="order.status === 'Завршена'"><mat-icon *ngFor="let dummy of [].constructor(order.rating === null ? 0 : order.rating)">star</mat-icon></ng-container>
+                    <ng-container *ngIf="order.status === 'Завршена'"><mat-icon *ngFor="let dummy of [].constructor(5 - (order.rating === null ? 5 : order.rating))">star_outline</mat-icon></ng-container>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -60,45 +60,45 @@
                     <span [fxHide.lt-sm]="true"><button mat-stroked-button (click)="refreshOrders()">Учитај са сервера</button></span>
                     <span [fxHide.gt-xs]="true"><button mat-icon-button><mat-icon>refresh</mat-icon></button></span>
                 </mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <button mat-icon-button *ngIf="!element.isEditing && element.status === 'Текућа'" (click)="element.isEditing = true"><mat-icon>edit</mat-icon></button>
-                    <button mat-icon-button *ngIf="element.isEditing" (click)="element.isEditing = false; updateOrder(element);"><mat-icon>check_circle</mat-icon></button>
-                    <button mat-icon-button *ngIf="element.status === 'Текућа'" (click)="cancelOrder(element)"><mat-icon>delete_forever</mat-icon></button>
-                    <button mat-icon-button (click)="expandedElement = expandedElement === element ? null : element"><mat-icon>shopping_basket</mat-icon></button>
+                <mat-cell *matCellDef="let order">
+                    <button mat-icon-button *ngIf="!order.isEditing && order.status === 'Текућа'" (click)="order.isEditing = true"><mat-icon>edit</mat-icon></button>
+                    <button mat-icon-button *ngIf="order.isEditing" (click)="order.isEditing = false; updateOrder(order);"><mat-icon>check_circle</mat-icon></button>
+                    <button mat-icon-button *ngIf="order.status === 'Текућа'" (click)="cancelOrder(order)"><mat-icon>delete_forever</mat-icon></button>
+                    <button mat-icon-button (click)="expandedOrder = order == expandedOrder ? null : order"><mat-icon>shopping_basket</mat-icon></button>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
 
             <ng-container matColumnDef="orderedItems">
-                <mat-cell *matCellDef="let element; let i = dataIndex" [colspan]="6" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'" [ngClass]="element == expandedElement ? 'additonalPadding' : null"
+                <mat-cell *matCellDef="let order;" [colspan]="6" [@detailExpand]="order == expandedOrder ? 'expanded' : 'collapsed'" [ngClass]="order == expandedOrder ? 'additonalPadding' : null"
                 fxLayout="column" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
-                    <div *ngFor="let item of orderDetail[i]" fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
+                    <div *ngFor="let item of orderDetail[findIndex(order)]" fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
                         <span fxFlex="25" style="padding-top: 0.6%;">{{ item.title }}</span>
                         <span fxFlex="25">
                             <button mat-stroked-button [fxHide.lt-sm]="true" (click)="showItemDescription(item.title, item.description)">Прикажи опис</button>
                             <button mat-icon-button [fxHide.gt-xs]="true" (click)="showItemDescription(item.title, item.description)"><mat-icon>search</mat-icon></button>
                         </span>
                         <div fxFlex="10" style="padding-top: 0.6%;">
-                            <input type="number" min="1" max="999" matInput [(ngModel)]="item.orderedQuantity" *ngIf="item.isEditing"/>
+                            <input type="number" min="1" max="{{item.leftInStock}}" matInput [(ngModel)]="item.orderedQuantity" *ngIf="item.isEditing"/>
                             <span *ngIf="!item.isEditing">{{ item.orderedQuantity }}</span> комад(а)
                         </div>
                         <span fxFlex="15" style="padding-top: 0.6%;">{{ (item.price * item.orderedQuantity).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}} динара</span>
-                        <div *ngIf="element.status === 'Завршена'" fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
-                            <ng-container *ngFor="let i of [].constructor(item.review.rating)"><mat-icon>star</mat-icon></ng-container>
-                            <ng-container *ngFor="let i of [].constructor(5 - item.review.rating)"><mat-icon>star_outline</mat-icon></ng-container>
+                        <div *ngIf="order.status === 'Завршена'" fxLayout="row" fxLayoutAlign="space-evenly stretch" fxLayoutGap="2%">
+                            <ng-container *ngFor="let dummy of [].constructor(item.review === undefined ? 0 : item.review?.rating)"><mat-icon>star</mat-icon></ng-container>
+                            <ng-container *ngFor="let dummy of [].constructor(5 - (item.review === undefined ? 5 : item.review?.rating))"><mat-icon>star_outline</mat-icon></ng-container>
                         </div>
                         <span fxFlex="25">
-                            <button mat-icon-button *ngIf="!item.isEditing && element.status === 'Текућа'" (click)="item.isEditing = true"><mat-icon>edit</mat-icon></button>
-                            <button mat-icon-button *ngIf="item.isEditing" (click)="item.isEditing = false;" (click)="updateOrderItem(element, i, item.id, false)"><mat-icon>check_circle</mat-icon></button>
-                            <button mat-icon-button *ngIf="element.status === 'Текућа' && orderDetail[i].length > 1" (click)="updateOrderItem(element, i, item.id, true)"><mat-icon>delete_forever</mat-icon></button>
-                            <button mat-icon-button *ngIf="element.status === 'Завршена'" (click)="updateReview(item.review)"><mat-icon>comment</mat-icon></button>
+                            <button mat-icon-button *ngIf="!item.isEditing && order.status === 'Текућа'" (click)="item.isEditing = true"><mat-icon>edit</mat-icon></button>
+                            <button mat-icon-button *ngIf="item.isEditing" (click)="item.isEditing = false;" (click)="updateOrderItem(order, findIndex(order), item.id, false)"><mat-icon>check_circle</mat-icon></button>
+                            <button mat-icon-button *ngIf="order.status === 'Текућа' && orderDetail[findIndex(order)].length > 1" (click)="updateOrderItem(order, findIndex(order), item.id, true)"><mat-icon>delete_forever</mat-icon></button>
+                            <button mat-icon-button *ngIf="order.status === 'Завршена'" (click)="updateReview(item, order)"><mat-icon>comment</mat-icon></button>
                         </span>
                     </div>
                 </mat-cell>
             </ng-container>
 
             <mat-header-row *matHeaderRowDef="displayedColumns" style="padding-left: 3% !important;"></mat-header-row>
-            <mat-row *matRowDef="let rows; columns: displayedColumns;" [matExpansionPanelContent]="expandedElement === element" style="padding-left: 3% !important;"></mat-row>
+            <mat-row *matRowDef="let rows; columns: displayedColumns; " [matExpansionPanelContent]="order == expandedOrder" style="padding-left: 3% !important;"></mat-row>
             <mat-row *matRowDef="let rows; columns: ['orderedItems'];" class="expanded-row"></mat-row>
         </mat-table>
 

@@ -116,28 +116,27 @@ export class FirebaseService {
     .catch(/* reject => console.error(reject) */); /* Immediately visible results thus no need to display any messages */
   }
   
-  placeOrder(orderedItems: Array<Item>, shippingMethod: string, subtotal: number): Promise<any> {
+  placeOrder(orderedItems: Array<Item>, shippingMethod: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.getFirestoreUserData(this.loggedInUserId).subscribe(userData => {
         this.firestore.collection("orders").add({
           "orderedBy": this.loggedInUserId,
           "items": orderedItems.reduce((map, item) => { map[item.id.split(this.loggedInUserId + "_")[1]] = item.orderedQuantity + "$" + item.price; return map; }, {}),
           "shippingMethod": shippingMethod,
-          "deliveryAddress": userData.get("deliveryAddress") === null ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress") + (userData.get("deliveryAddressPAK") !== null ? " (" + userData.get("deliveryAddressPAK") + ")" : ""),
+          "deliveryAddress": userData.get("deliveryAddress").length === 0 ? "ПАК: " + userData.get("deliveryAddressPAK") : userData.get("deliveryAddress"),
           "placedOn": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
           "status": "Текућа"
         }).then(order => {
           var newOrderId = order.id;
-          this.getIDBData().forEach(ibData => {
-            orderedItems.forEach(orderedItem => {
-              this.firestore.collection("reviews").add({
-                "reviewedBy": this.loggedInUserId,
-                "orderId": newOrderId,
-                "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
-                "comment": "",
-                "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
-                "isAnonymous": false
-              });
+          orderedItems.forEach(orderedItem => {
+            this.firestore.collection("reviews").add({
+              "reviewedBy": this.loggedInUserId,
+              "orderId": newOrderId,
+              "productId": orderedItem.id.split(this.loggedInUserId + "_")[1],
+              "comment": "",
+              "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp(),
+              "isAnonymous": false,
+              "rating": 0
             });
           });
         }).then(() => resolve("Order placed successfully"))
@@ -260,7 +259,13 @@ export class FirebaseService {
   updateOrderData(newOrderData: Order): void {
     this.firestore.firestore.runTransaction(transaction =>
       transaction.get(this.firestore.collection("orders").doc(newOrderData.id).ref).then(document => {
-        transaction.update(document.ref, newOrderData);
+        transaction.update(document.ref, {
+          "placedOn": newOrderData.placedOn,
+          "items": newOrderData.items,
+          "deliveryAddress": newOrderData.deliveryAddress,
+          "shippingMethod": newOrderData.shippingMethod,
+          "status": newOrderData.status
+        });
       }).then( /* resolve => console.log(resolve) */ )
         .catch( /* reject => console.error(reject) */)
     ).then(() => {
@@ -308,8 +313,15 @@ export class FirebaseService {
       return this.firestore.collection("reviews").ref.where("orderId", "==", orderId).where("productId", "==", itemId).onSnapshot(documents => {
         return this.firestore.firestore.runTransaction(transaction => /* Issue: This transaction keeps looping until page reload -> temporary solution reload page */
           transaction.get(documents.docs[0].ref).then(document => {
-            newReviewData.lastChange = this.firebaseApplication.firestore.FieldValue.serverTimestamp();
-            transaction.update(document.ref, newReviewData);
+            transaction.update(document.ref, {
+              "reviewedBy": newReviewData.reviewedBy,
+              "orderId": newReviewData.orderId,
+              "productId": newReviewData.productId,
+              "rating": newReviewData.rating,
+              "comment": newReviewData.comment,
+              "isAnonymous": newReviewData.isAnonymous,
+              "lastChange": this.firebaseApplication.firestore.FieldValue.serverTimestamp()
+            });
           }).then( /* resolve => console.log(resolve) */)
             .catch( /* reject => console.error(error) */)
         ).then(() => resolve(true))

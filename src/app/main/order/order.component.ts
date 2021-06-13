@@ -40,7 +40,7 @@ export class OrderComponent implements OnInit {
   ngOnInit(): void {
     setTimeout(() => {
       this.refreshOrders();
-    }, 2000);
+    }, 2000); /* Time needed to load firebase credentials */
   }
 
   filterOrders(filterValue: string): void {
@@ -48,86 +48,111 @@ export class OrderComponent implements OnInit {
       this.orders.data = this.listedOrders;
     else
       this.orders.data = this.listedOrders.filter(order => JSON.stringify(Object.values(order)).includes(filterValue, 0));
-    //Example of search string: ["d2sgFAJ6JdW0ya6dHbGn","2021-06-09T14:44:34.578Z",{"item_39":1,"item_44":3,"item_88":1,"item_125":24,"item_2":5,"item_73":1},"Булевар Милутина Миланковића 25","Курирска служба","Завршена",8438004,4]
+    this.updatePageSizeOptions();
+    //Example of search string: ["TE561FLEyixbxHtTjvmi","2020-11-04T03:06:35.000Z",{"item_117":"5$237500","item_52":"4$16700","item_35":"5$19200","item_21":"13$19200","item_36":"13$22300","item_71":"15$21000"},"Булевар Милутина Миланковића 25, Нови Београд","Пошта","Текућа",2657760]
+  }
+
+  findIndex(order: Order): number {
+    return this.listedOrders.findIndex(o => o.id === order.id);
+  }
+
+  calculateSubtotal(order: Order): number {
+    var output: number = 0;
+
+    Object.values(order.items).forEach(item => {
+      output += parseInt(item.split('$')[0]) * parseInt(item.split('$')[1]);
+    })
+
+    output += output / 5;
+
+    switch (order.shippingMethod) {
+      case "Лично преузимање": output += 0; break;
+      case "Курирска служба": output += Object.keys(order.items).length * 1500; break;
+      case "Пошта": output += Object.keys(order.items).length * 2000; break;
+      default: output += 0;
+    }
+
+    return output;
+  }
+
+  updatePageSizeOptions(): void {
+    this.pageSizeOptionsSet.clear();
+    if (this.orders.data.length !== 0) {
+      this.pageSizeOptionsSet.add(1);
+      this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 2));
+      this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 5));
+      this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 8));
+      this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 10));
+      this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
+    }
   }
 
   refreshOrders(): void {
-    var i = 0;
-
     this.fs.getOrderData(this.fs.loggedInUserId).then(data => {
       this.orderDetail = [];
 
       data.forEach(order => {
         var orderedItemsData: Array<Item> = [];
         var sumOfRatings: number = 0;
-        var subtotal: number = 0;
-        var i = 0;
+        var itemIndex: number = 0;
         
         for (let id of Object.keys(order.items)) {
           this.fs.getFirstoreItemData(id).subscribe(item => {
-            this.fs.getReviewData(order.id, id)
-              .then(response => {
+            if (order.status === "Завршена") {
+              this.fs.getReviewData(order.id, id).then(response => {
                 orderedItemsData.push({
                   "id": item.id,
                   "leftInStock": null,
                   "title": item.data()["name"],
                   "description": item.data()["description"],
-                  "price": parseInt(Object.values(order.items)[i].split('$')[1]), /* Price at the time of initial purchase  */
+                  "price": parseInt(Object.values(order.items)[itemIndex].split('$')[1]), /* Price at the time of initial purchase  */
                   "imageUrl": null,
-                  "orderedQuantity": parseInt(Object.values(order.items)[i].split('$')[0]),
+                  "orderedQuantity": parseInt(Object.values(order.items)[itemIndex].split('$')[0]),
                   "isEditing": false,
                   "review": response
                 });
                 sumOfRatings += response.rating;
-                subtotal += parseInt(Object.values(order.items)[i].split('$')[0]) * parseInt(Object.values(order.items)[i].split('$')[1])
-                i++;
+                itemIndex++;
               })
-              .catch(error => {
-                /* console.error(error); */
-                return null;
+                .catch(error => {
+                  console.error(error);
+                  return null;
+                });
+            }
+            else {
+              orderedItemsData.push({
+                "id": item.id,
+                "leftInStock": item.data()["leftInStock"],
+                "title": item.data()["name"],
+                "description": item.data()["description"],
+                "price": parseInt(Object.values(order.items)[itemIndex].split('$')[1]), /* Price at the time of initial purchase  */
+                "imageUrl": null,
+                "orderedQuantity": parseInt(Object.values(order.items)[itemIndex].split('$')[0]),
+                "isEditing": false
               });
+              itemIndex++;
+            }
           });
         }
         
         setTimeout(() => { /* Waiting for loop to finish processing */
-          subtotal += subtotal / 5;
-          switch (order.shippingMethod) {
-            case "Лично преузимање": subtotal += 0; break;
-            case "Курирска служба": subtotal += orderedItemsData.length * 1500; break;
-            case "Пошта": subtotal = orderedItemsData.length * 2000; break;
-            default: subtotal += 0;
-          }
-          order.subtotal = subtotal;
-          if (order.status === "Завршена") {
+          order.subtotal = this.calculateSubtotal(order);
+          if (order.status === "Завршена"){
             order.rating = Math.round(sumOfRatings / orderedItemsData.length);
-            this.orderDetail.push(orderedItemsData);
-          } else {
-            delete order.rating;
-            orderedItemsData.forEach(oId => delete oId.review);
-            setTimeout(() => {
-              this.orderDetail.push(orderedItemsData);
-            }, 2000);
           }
-          
-        }, 5000);
-      });
+
+          this.orderDetail.push(orderedItemsData);  
+        }, 2000);
+      }, this);
       
       setTimeout(() => { /* works without this, but to avoid errors */
-        this.orders.data = this.listedOrders = data;
+        this.orders.data = data;
+        this.listedOrders = data;
         this.orders.sort = this.sort;
         this.orders.paginator = this.paginator;
 
-        this.pageSizeOptionsSet.clear();
-        if (this.orders.data.length !== 0) {
-          this.pageSizeOptionsSet.add(1);
-          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 2));
-          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 5));
-          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 8));
-          this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 10));
-          this.pageSizeOptionsSet.add(this.orders.data.length);
-          this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
-        }
-      }, 8000);
+        this.updatePageSizeOptions();
+      }, 2001);
     });
   }
 
@@ -153,18 +178,12 @@ export class OrderComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         order.status = "Отказана";
-        delete order.isEditing; //Delete unnecessary variable
-        delete order.rating; //Delete unnecessary variable
-        delete order.subtotal; //Delete unnecessary variable
         this.fs.updateOrderData(order);
       }
     });
   }
 
   updateOrder(order: Order): void {
-    delete order.isEditing; //Delete unnecessary variable
-    delete order.rating; //Delete unnecessary variable
-    delete order.subtotal; //Delete unnecessary variable
     this.fs.updateOrderData(order);
   }
   
@@ -182,30 +201,21 @@ export class OrderComponent implements OnInit {
       }).then(result => {
         if (result.isConfirmed) {
           delete order.items[itemId];
-          delete order.isEditing; //Delete unnecessary variable
-          delete order.rating; //Delete unnecessary variable
-          delete order.subtotal; //Delete unnecessary variable
+          this.orderDetail[index] = this.orderDetail[index].filter(item => item.id !== itemId);
+          order.subtotal = this.calculateSubtotal(order);
           this.fs.updateOrderData(order);
-          setTimeout(() => {
-            this.refreshOrders();
-          }, 1000);
         }
       })
       
     }
     else {
       order.items[itemId] = this.orderDetail[index].find(item => item.id === itemId).orderedQuantity + "$" + order.items[itemId].split('$')[1];
-      delete order.isEditing; //Delete unnecessary variable
-      delete order.rating; //Delete unnecessary variable
-      delete order.subtotal; //Delete unnecessary variable
+      order.subtotal = this.calculateSubtotal(order);
       this.fs.updateOrderData(order);
-      setTimeout(() => {
-        this.refreshOrders();
-      }, 1000);
     }
   }
   
-  updateReview(previousReviewData: Review): void {
+  updateReview(item: Item, order: Order): void {
     Swal.fire({
       title: "Приказ и измена рецензије изабраног производа",
       customClass: { popup: "sweetAlertDisplayFix" },
@@ -230,11 +240,11 @@ export class OrderComponent implements OnInit {
               <mat-icon _ngcontent-ynd-c273="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" id="sweetAlertRating_rating_5">star_outline</mat-icon>
           </button>
         </div>
-        <span hidden="true" id="sweetAlertRating">`+previousReviewData.rating+`</span>
+        <span hidden="true" id="sweetAlertRating">`+item.review.rating+`</span>
         
         <span>Коментар (максимална дужина 510 карактера):</span><br>
-        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none; font-size:inherit">`+ previousReviewData.comment +`</textarea><br>
-        <span><input type="checkbox" id="sweetAlertIsAnonymous"`+ (previousReviewData.isAnonymous ? "checked" : "") + `> Сакри моје име и презиме</span><br>
+        <textarea maxlength="510" id="sweetAlertReview" rows="10" cols="50" style="resize:none; font-size:inherit">`+ item.review.comment +`</textarea><br>
+        <span><input type="checkbox" id="sweetAlertIsAnonymous"`+ (item.review.isAnonymous ? "checked" : "") + `> Сакри моје име и презиме</span><br>
       </div>
       `,
       showCancelButton: true,
@@ -249,13 +259,13 @@ export class OrderComponent implements OnInit {
         var newComment: string = (Swal.getPopup().querySelector("#sweetAlertReview") as HTMLTextAreaElement).value.trim();
         var newIsAnonymous: boolean = (Swal.getPopup().querySelector("#sweetAlertIsAnonymous") as HTMLInputElement).checked;
         
-        if (newRating === previousReviewData.rating && newComment === previousReviewData.comment
-          && newIsAnonymous === previousReviewData.isAnonymous) return; /* No new data */
-
-        this.fs.updateReview(previousReviewData.orderId, previousReviewData.productId, {
-          "reviewedBy": previousReviewData.reviewedBy,
-          "orderId": previousReviewData.orderId,
-          "productId": previousReviewData.productId,
+        if (newRating === item.review.rating && newComment === item.review.comment
+          && newIsAnonymous === item.review.isAnonymous) return; /* No new data */
+                
+        this.fs.updateReview(item.review.orderId, item.review.productId, {
+          "reviewedBy": item.review.reviewedBy,
+          "orderId": item.review.orderId,
+          "productId": item.review.productId,
           "rating": newRating,
           "comment": newComment,
           "isAnonymous": newIsAnonymous
@@ -266,7 +276,18 @@ export class OrderComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: "У реду",
             allowOutsideClick: false
-          }).then(() => window.location.reload()); /* Temporary fix for issue on firebase.service.ts line 304 */
+          }).finally(() => {
+            order.rating = Math.round((Object.keys(order.items).length * order.rating - item.review.rating + newRating) / Object.keys(order.items).length);
+            item.review = {
+              "reviewedBy": item.review.reviewedBy,
+              "orderId": item.review.orderId,
+              "productId": item.review.productId,
+              "rating": newRating,
+              "comment": newComment,
+              "isAnonymous": newIsAnonymous
+            };
+            window.location.reload(); /* Temporary fix for issue on firebase.service.ts line 314 */
+          });
         }, reject => {
           /* console.error(reject); */
           Swal.fire({
@@ -282,3 +303,4 @@ export class OrderComponent implements OnInit {
     });
   }
 }
+

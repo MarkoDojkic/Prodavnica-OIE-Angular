@@ -139,8 +139,7 @@ export class CartComponent implements OnInit {
     if (this.shippingVia.length > 0 && this.itemsInCart.data.length > 0
       && this.subtotal > 0 && this.shippingCost > -1) {
       
-      this.fs.placeOrder(this.itemsInCart.data, this.shippingVia,
-        this.subtotal + this.subtotal / 5 + this.shippingCost).then(() => {
+      this.fs.placeOrder(this.itemsInCart.data, this.shippingVia).then(() => {
           Swal.fire({
             title: "Успешно послата поруџбина",
             text: "Сви производи из корпе су успешно поручени. Статус и податке о поруџбини можете пратити на страни Поруџбине. У сваком тренутку можете да откажете поруџбину, докле год она нема статус „Завршена“",
