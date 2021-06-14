@@ -83,6 +83,7 @@ export class OrderComponent implements OnInit {
       this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 5));
       this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 8));
       this.pageSizeOptionsSet.add(Math.floor(this.orders.data.length / 10));
+      this.pageSizeOptionsSet.delete(0);
       this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
     }
   }

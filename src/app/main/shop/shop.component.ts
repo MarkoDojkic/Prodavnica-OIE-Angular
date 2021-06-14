@@ -616,7 +616,7 @@ export class ShopComponent implements OnInit {
             html += `</mat-icon>`;
           }
 
-          html += `<span _ngcontent-bjf-c268="">`+ this.datePipe.transform(review.lastChange.toDate(), "dd.MM.YYYY. H:mm:ss") + `</span>
+          html += `<span _ngcontent-bjf-c268="">`+ this.datePipe.transform(review.lastChange.toDate(), "dd.MM.YYYY. HH:mm:ss") + `</span>
                   </div>
                   <p style="margin-top: 3%">`+ review.comment + `</p>
               </section>`

@@ -60,8 +60,8 @@
                 <span>
                     Адреса за доставу: <i>Подешена на профилу</i> <br><br>
                     Начин плаћања: <i>Подешена на профилу</i> <br><br>
-                    Цена доставе: {{ shippingCost?.toLocaleString("sr-RS", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }} динара <br><br>
-                    Укупно за плаћање: {{ (shippingCost + subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара
+                    Цена доставе: {{ shippingCost?.toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара <br><br>
+                    Укупно за плаћање: {{ (shippingCost === undefined ? 0 : shippingCost + subtotal + subtotal/5).toLocaleString("sr-RS", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} динара
                 </span>
             </section>
             <section fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">

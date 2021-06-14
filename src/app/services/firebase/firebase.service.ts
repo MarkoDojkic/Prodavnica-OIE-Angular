@@ -2,8 +2,8 @@ import { Review } from '../../model/review.model';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
-import { Injectable, NgZone } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Injectable } from '@angular/core';
 import { CryptoService } from '../crypto/crypto.service';
 import { Observable } from 'rxjs';
 import { Item } from 'src/app/main/shop/shop.component';
@@ -27,7 +27,7 @@ export class FirebaseService {
   
 
   constructor(private firestore: AngularFirestore, private auth: AngularFireAuth,
-    private ngZone: NgZone, private router: Router, private storage: AngularFireStorage,
+    private router: Router, private storage: AngularFireStorage,
     private idb: IndexedDatabaseService, private cs: CryptoService) {
       setTimeout(() => {
         this.idb.openIDB(this.firebaseLocalStorageDb, 1);
@@ -45,7 +45,7 @@ export class FirebaseService {
         showCancelButton: false,
         confirmButtonText: "У реду",
       }).then(() => {
-        this.ngZone.run(() => { this.router.navigate(["/profile"]); });
+        this.router.navigate(["/profile"]);
         this.updateLoggedInUserId();
       });
     }).catch((reject) => {
@@ -83,7 +83,7 @@ export class FirebaseService {
         showCancelButton: false,
         confirmButtonText: "У реду",
       }).then(() => {
-        this.ngZone.run(() => { this.signOut(); });
+        this.signOut();
       });
     }).catch((reject) => {
       /* console.error(reject); */

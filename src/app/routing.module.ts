@@ -13,7 +13,7 @@ const redirectLoggedInToProfile = () => redirectLoggedInTo(["profile"]); //To re
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(["login"]);
 
 const routes: Routes = [
-    { path: '', redirectTo: "/shop", pathMatch: 'full'}, //Note: ...canActivate shortcut not working
+    { path: '', redirectTo: "/shop", pathMatch: 'full'},
     { path: 'login', component: LoginComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Логовање', authGuardPipe: redirectLoggedInToProfile } },
     { path: 'registration', component: RegistrationComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Регистрација', authGuardPipe: redirectLoggedInToProfile } },
     { path: 'profile', component: ProfilePageComponent, canActivate: [AngularFireAuthGuard], data: { title: 'Профил', authGuardPipe: redirectUnauthorizedToLogin } },

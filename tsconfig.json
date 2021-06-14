@@ -10,7 +10,6 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "resolveJsonModule": true, /* To load json files */
     "target": "es2015",
     "module": "es2020",
     "lib": [

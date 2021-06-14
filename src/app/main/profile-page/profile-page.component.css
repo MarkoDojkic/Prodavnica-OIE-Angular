@@ -1,7 +1,7 @@
 form {
     height: 100%;
     overflow-y: scroll;
-    padding-top: 300px;
+    padding-top: 22%;
 }
 
 form > div {
@@ -12,6 +12,6 @@ form > div {
     form {
         height: 100%;
         overflow-y: scroll;
-        padding-top: 720px;
+        padding-top: 160%;
     }
 }
