@@ -7,7 +7,7 @@
             <ng-container matColumnDef="orderTime">
                 <mat-header-cell *matHeaderCellDef style="margin-left: -1% !important">Време и датум поруџбине</mat-header-cell>
                 <mat-cell *matCellDef="let order">
-                    <span>{{ order.placedOn | date: "dd.MM.YYYY. H:mm:ss" }}</span>
+                    <span>{{ order.placedOn | date: "dd.MM.YYYY. HH:mm:ss" }}</span>
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>

@@ -6,7 +6,7 @@
         <mat-icon matSuffix>alternate_email</mat-icon>
         <mat-hint>пр. marko.dojkic.18@singimail.rs</mat-hint>
         <mat-error *ngIf="emailInput.hasError('required')">Поље адресе електронске поште не сме бити празно</mat-error>
-        <mat-error *ngIf="emailInput.hasError('email')">Није исправан формат адресе електронске поште</mat-error>
+        <mat-error *ngIf="emailInput.hasError('pattern')">Није исправан формат адресе електронске поште</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -15,7 +15,7 @@
         <mat-icon matSuffix>lock</mat-icon>
         <mat-hint>пр. secretPassword123</mat-hint>
         <mat-error *ngIf="passwordInput.hasError('required')">Поље лозинке не сме бити празно</mat-error>
-        <mat-error *ngIf="passwordInput.value?.length > 0 && passwordInput.value?.length < 8">Лозинка мора садржати минимум 8 карактера</mat-error>
+        <mat-error *ngIf="passwordInput.hasError('minlength')">Лозинка мора садржати минимум 8 карактера</mat-error>
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="10px">

@@ -9,7 +9,6 @@ import { RoutingModule } from './routing.module';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
-import { HttpClientModule } from '@angular/common/http';
 import { NotifierModule } from 'angular-notifier';
 
 import { AppComponent } from './app.component';
@@ -48,7 +47,6 @@ import { DatePipe } from '@angular/common';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
     NgxSliderModule,
-    HttpClientModule,
     ReactiveFormsModule,
     NotifierModule.withConfig({
       position: {
@@ -68,7 +66,7 @@ import { DatePipe } from '@angular/common';
         onClick: 'hide',
         onMouseover: 'pauseAutoHide',
         showDismissButton: true,
-        stacking: 4
+        stacking: 8
       },
       animations: {
         enabled: true,

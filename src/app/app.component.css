@@ -10,7 +10,7 @@ span, button, mat-slide-toggle {
 
 @media screen and (max-width: 599px) {
     span, button, mat-slide-toggle {
-        font-size: 2vw;
+        font-size: 2.4vw;
         text-align: center;
     }
 }

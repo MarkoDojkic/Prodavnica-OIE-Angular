@@ -56,6 +56,7 @@ export class CartComponent implements OnInit {
           this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 8));
           this.pageSizeOptionsSet.add(Math.floor(this.itemsInCart.data.length / 10));
           this.pageSizeOptionsSet.add(this.itemsInCart.data.length);
+          this.pageSizeOptionsSet.delete(0);
           this.pageSizeOptions = Array.from(this.pageSizeOptionsSet);
         }
       });

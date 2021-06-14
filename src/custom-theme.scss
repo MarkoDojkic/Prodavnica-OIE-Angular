@@ -420,3 +420,7 @@ form { height: 95%; background-color: darkslategray; }
 .mat-button-wrapper {
   white-space: pre-wrap;
 }
+
+.mat-toolbar-row, .mat-toolbar-single-row {
+  height: 64px !important; /* Fix default 56px on screens < 599px */
+}

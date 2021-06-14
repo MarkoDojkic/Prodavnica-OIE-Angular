@@ -66,7 +66,7 @@ export class ProfilePageComponent implements OnInit {
       const field: AbstractControl = form.controls[control];
       if (field.dirty && field.valid && control !== "email" && control !== "password" && control != "passwordRepeat") {
         updatedFirestoreData[control] = field.value;
-        setTimeout(() => { field.reset(); }, 1500); /* To give time to firestore to update */
+        setTimeout(() => { field.reset(); }, 1500); /* To give firestore time to update */
       }
     });
 
