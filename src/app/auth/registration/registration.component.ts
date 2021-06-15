@@ -23,9 +23,9 @@ export class RegistrationComponent implements OnInit {
   checkRequiredFields(form: FormGroup): boolean {
     var isAllValid: boolean = true;
     Object.keys(form.controls).forEach(id => {
-      if(form.controls[id].hasError('required')) isAllValid = false;
+      if(form.controls[id].hasError('required') || form.controls[id].hasError('pattern')) isAllValid = false;
     });
-    return isAllValid && !form.controls["passwordRepeat"]?.hasError("matched");
+    return isAllValid && !form.controls["password"]?.hasError("minlength") && !form.controls["passwordRepeat"]?.hasError("matched");
   }
 
   checkPasswordRepeat(pass: NgModel, repeatPass: NgModel): void {
